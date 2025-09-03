@@ -39,8 +39,6 @@ define( 'WCST_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WCST_PLUGIN_VERSION', '1.0.0' );
 define( 'WCST_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-spl_autoload_register( 'wcst_autoloader' );
-
 /**
  * Check plugin dependencies.
  *
@@ -133,6 +131,9 @@ if ( ! empty( wcst_check_dependencies() ) ) {
 	return;
 }
 
+// Register autoloader.
+spl_autoload_register( 'wcst_autoloader' );
+
 /**
  * Plugin autoloader.
  *
@@ -171,6 +172,9 @@ function wcst_autoloader( $class_name ) {
 		require_once $file_path;
 	}
 }
+
+// Register autoloader after function is defined.
+spl_autoload_register( 'wcst_autoloader' );
 
 /**
  * Initialize the plugin.

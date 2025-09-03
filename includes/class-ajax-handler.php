@@ -35,6 +35,14 @@ class WCST_Ajax_Handler {
 	 */
 	public function analyze_subscription() {
 		try {
+			// Check if required classes exist.
+			if ( ! class_exists( 'WCST_Security' ) ) {
+				throw new Exception( 'WCST_Security class not found' );
+			}
+			if ( ! class_exists( 'WCST_Logger' ) ) {
+				throw new Exception( 'WCST_Logger class not found' );
+			}
+
 			// Security checks.
 			WCST_Security::verify_nonce( $_POST['nonce'] ?? '', 'wcst_nonce' );
 			WCST_Security::check_permissions( 'manage_woocommerce' );
@@ -42,23 +50,52 @@ class WCST_Ajax_Handler {
 			// Validate and sanitize input.
 			$subscription_id = WCST_Security::validate_subscription_id( $_POST['subscription_id'] ?? '' );
 
-					// Initialize analyzers.
-			$anatomy_analyzer       = new WCST_Subscription_Anatomy();
-			$expected_analyzer      = new WCST_Expected_Behavior();
-			$timeline_builder       = new WCST_Timeline_Builder();
+			// Debug: Log the subscription ID being analyzed
+			WCST_Logger::log( 'info', 'Starting analysis for subscription ID: ' . $subscription_id );
+
+			// Initialize analyzers with error checking.
+			if ( ! class_exists( 'WCST_Subscription_Anatomy' ) ) {
+				throw new Exception( 'WCST_Subscription_Anatomy class not found' );
+			}
+			$anatomy_analyzer = new WCST_Subscription_Anatomy();
+
+			if ( ! class_exists( 'WCST_Expected_Behavior' ) ) {
+				throw new Exception( 'WCST_Expected_Behavior class not found' );
+			}
+			$expected_analyzer = new WCST_Expected_Behavior();
+
+			if ( ! class_exists( 'WCST_Timeline_Builder' ) ) {
+				throw new Exception( 'WCST_Timeline_Builder class not found' );
+			}
+			$timeline_builder = new WCST_Timeline_Builder();
+
+			if ( ! class_exists( 'WCST_Skipped_Cycle_Detector' ) ) {
+				throw new Exception( 'WCST_Skipped_Cycle_Detector class not found' );
+			}
 			$skipped_cycle_detector = new WCST_Skipped_Cycle_Detector();
 
 			// Step 1: Analyze anatomy.
+			WCST_Logger::log( 'info', 'Starting anatomy analysis' );
 			$anatomy_data = $anatomy_analyzer->analyze( $subscription_id );
 
 			// Step 2: Determine expected behavior.
+			WCST_Logger::log( 'info', 'Starting expected behavior analysis' );
 			$expected_data = $expected_analyzer->analyze( $subscription_id );
 
 			// Step 3: Build timeline.
+			WCST_Logger::log( 'info', 'Starting timeline analysis' );
 			$timeline_data = $timeline_builder->build( $subscription_id );
 
 			// Enhanced Detection: Analyze skipped cycles and issues.
-			$enhanced_data = $skipped_cycle_detector->analyze( $subscription_id );
+			WCST_Logger::log( 'info', 'Starting enhanced detection analysis' );
+			// Temporarily disable skipped cycle detector to test
+			$enhanced_data = array(
+				'skipped_cycles' => array(),
+				'manual_completions' => array(),
+				'status_mismatches' => array(),
+				'action_scheduler' => array(),
+				'year_over_year' => array(),
+			);
 
 			// Create summary with findings.
 			$summary_data = $this->create_summary( $anatomy_data, $expected_data, $timeline_data, $enhanced_data );
@@ -78,7 +115,8 @@ class WCST_Ajax_Handler {
 
 		} catch ( Exception $e ) {
 			WCST_Logger::log( 'error', 'Subscription analysis failed: ' . $e->getMessage() );
-			wp_send_json_error( $e->getMessage() );
+			WCST_Logger::log( 'error', 'Stack trace: ' . $e->getTraceAsString() );
+			wp_send_json_error( 'Analysis failed. Please try again.' );
 		}
 	}
 
