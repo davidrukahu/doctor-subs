@@ -14,9 +14,23 @@ Doctor Subs analyzes WooCommerce subscriptions to identify common problems:
 
 ## Installation
 
-1. Upload the plugin files to `/wp-content/plugins/doctor-subs/`
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Access via **WooCommerce > Doctor Subs**
+### Download from GitHub Releases
+
+1. **Visit the GitHub Releases page**: [Doctor Subs v1.0.0](https://github.com/davidrukahu/doctor-subs/releases/tag/v1.0.0)
+2. **Download the plugin**: Click on `doctor-subs.zip` in the Assets section
+3. **Upload to WordPress**: 
+   - Go to **Plugins > Add New > Upload Plugin**
+   - Choose the downloaded `doctor-subs.zip` file
+   - Click **Install Now**
+4. **Activate the plugin**: Click **Activate Plugin**
+5. **Access the tool**: Navigate to **WooCommerce > Doctor Subs**
+
+### Manual Installation (Alternative)
+
+1. Download and extract the plugin files
+2. Upload the `doctor-subs` folder to `/wp-content/plugins/`
+3. Activate the plugin through the 'Plugins' menu in WordPress
+4. Access via **WooCommerce > Doctor Subs**
 
 ## Requirements
 
