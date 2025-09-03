@@ -9,7 +9,7 @@
 **License:** GPLv2 or later  
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html  
 
-A WordPress plugin that helps diagnose and troubleshoot WooCommerce subscription issues using a systematic approach.
+A WordPress plugin that helps diagnose and troubleshoot WooCommerce subscription issues.
 
 ## What It Does
 
@@ -23,23 +23,11 @@ Doctor Subs analyzes WooCommerce subscriptions to identify common problems:
 
 ## Installation
 
-### Download from GitHub Releases
-
-1. **Visit the GitHub Releases page**: [Doctor Subs v1.0.0](https://github.com/davidrukahu/doctor-subs/releases/tag/v1.0.0)
-2. **Download the plugin**: Click on `doctor-subs.zip` in the Assets section
-3. **Upload to WordPress**: 
-   - Go to **Plugins > Add New > Upload Plugin**
-   - Choose the downloaded `doctor-subs.zip` file
-   - Click **Install Now**
-4. **Activate the plugin**: Click **Activate Plugin**
-5. **Access the tool**: Navigate to **WooCommerce > Doctor Subs**
-
-### Manual Installation (Alternative)
-
-1. Download and extract the plugin files
-2. Upload the `doctor-subs` folder to `/wp-content/plugins/`
-3. Activate the plugin through the 'Plugins' menu in WordPress
-4. Access via **WooCommerce > Doctor Subs**
+1. **Download**: Visit [GitHub Releases](https://github.com/davidrukahu/doctor-subs/releases) and download "Source code (zip)"
+2. **Upload**: Go to **Plugins > Add New > Upload Plugin** in WordPress
+3. **Install**: Choose the downloaded zip file and click **Install Now**
+4. **Activate**: Click **Activate Plugin**
+5. **Access**: Navigate to **WooCommerce > Doctor Subs**
 
 ## Requirements
 
