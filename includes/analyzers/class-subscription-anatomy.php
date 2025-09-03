@@ -50,13 +50,13 @@ class WCST_Subscription_Anatomy {
 	public function analyze( $subscription_id ) {
 		// Validate subscription exists and is accessible.
 		if ( ! function_exists( 'wcs_get_subscription' ) ) {
-			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'dr-subs' ) );
+			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
 		}
 
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'dr-subs' ) );
+			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		return array(
@@ -229,7 +229,7 @@ class WCST_Subscription_Anatomy {
 
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $actions_table ) ) !== $actions_table ) {
 			return array(
-				'error' => __( 'Action Scheduler tables not found.', 'dr-subs' ),
+				'error' => __( 'Action Scheduler tables not found.', 'doctor-subs' ),
 			);
 		}
 
@@ -367,22 +367,22 @@ class WCST_Subscription_Anatomy {
 
 		// Check if gateway exists and is enabled.
 		if ( ! $gateway ) {
-			$warnings[] = __( 'Payment gateway not found or not available.', 'dr-subs' );
+			$warnings[] = __( 'Payment gateway not found or not available.', 'doctor-subs' );
 			$is_valid   = false;
 		} elseif ( ! $gateway->is_available() ) {
-			$warnings[] = __( 'Payment gateway is disabled or not available.', 'dr-subs' );
+			$warnings[] = __( 'Payment gateway is disabled or not available.', 'doctor-subs' );
 			$is_valid   = false;
 		}
 
 		// Check if subscription requires manual renewal when it shouldn't.
 		if ( $subscription->is_manual() && $gateway && $this->gateway_supports_subscriptions( $gateway ) ) {
-			$warnings[] = __( 'Subscription is set to manual renewal but payment gateway supports automatic renewals.', 'dr-subs' );
+			$warnings[] = __( 'Subscription is set to manual renewal but payment gateway supports automatic renewals.', 'doctor-subs' );
 		}
 
 		// Check payment token if applicable.
 		$token_info = $this->get_payment_token_info( $subscription );
 		if ( $token_info && ! $token_info['is_valid'] ) {
-			$warnings[] = __( 'Payment token appears to be invalid or expired.', 'dr-subs' );
+			$warnings[] = __( 'Payment token appears to be invalid or expired.', 'doctor-subs' );
 			$is_valid   = false;
 		}
 
@@ -423,7 +423,7 @@ class WCST_Subscription_Anatomy {
 		return array(
 			'id'       => $token_id,
 			'is_valid' => false,
-			'error'    => __( 'Token not found or invalid.', 'dr-subs' ),
+			'error'    => __( 'Token not found or invalid.', 'doctor-subs' ),
 		);
 	}
 

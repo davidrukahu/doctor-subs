@@ -52,13 +52,13 @@ class WCST_Skipped_Cycle_Detector {
 	 */
 	public function analyze( $subscription_id ) {
 		if ( ! function_exists( 'wcs_get_subscription' ) ) {
-			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'dr-subs' ) );
+			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
 		}
 
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'dr-subs' ) );
+			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		return array(
@@ -82,8 +82,8 @@ class WCST_Skipped_Cycle_Detector {
 
 		$billing_period   = $subscription->get_billing_period();
 		$billing_interval = $subscription->get_billing_interval();
-		$start_date       = $subscription->get_date( 'start' );
-		$next_payment     = $subscription->get_date( 'next_payment' );
+		$start_date       = $subscription->get_gmdate( 'start' );
+		$next_payment     = $subscription->get_gmdate( 'next_payment' );
 
 		if ( ! $start_date ) {
 			return $skipped_cycles;
@@ -121,16 +121,16 @@ class WCST_Skipped_Cycle_Detector {
 					'type'           => 'no_payments',
 					'severity'       => 'warning',
 					'description'    => sprintf(
-						__( 'No payments received since start date %s', 'dr-subs' ),
-						date( 'Y-m-d', $start_timestamp )
+						__( 'No payments received since start date %s', 'doctor-subs' ),
+						gmdate( 'Y-m-d', $start_timestamp )
 					),
 					'details'        => array(
-						'start_date'             => date( 'Y-m-d', $start_timestamp ),
+						'start_date'             => gmdate( 'Y-m-d', $start_timestamp ),
 						'expected_first_payment' => $expected_first_payment,
 						'billing_period'         => $billing_period,
 						'billing_interval'       => $billing_interval,
 					),
-					'recommendation' => __( 'Check if payments are being processed correctly.', 'dr-subs' ),
+					'recommendation' => __( 'Check if payments are being processed correctly.', 'doctor-subs' ),
 					'correctable'    => false,
 				);
 			}
@@ -156,21 +156,21 @@ class WCST_Skipped_Cycle_Detector {
 						'type'                => 'skipped_cycle',
 						'severity'            => 'warning',
 						'description'         => sprintf(
-							__( 'Payment cycle skipped — expected payment around %1$s, next payment was %2$s', 'dr-subs' ),
-							date( 'Y-m-d', $expected_timestamp ),
-							date( 'Y-m-d', $next_payment )
+							__( 'Payment cycle skipped — expected payment around %1$s, next payment was %2$s', 'doctor-subs' ),
+							gmdate( 'Y-m-d', $expected_timestamp ),
+							gmdate( 'Y-m-d', $next_payment )
 						),
 						'details'             => array(
-							'last_payment_date'  => date( 'Y-m-d', $current_payment ),
-							'expected_next_date' => date( 'Y-m-d', $expected_timestamp ),
-							'actual_next_date'   => date( 'Y-m-d', $next_payment ),
+							'last_payment_date'  => gmdate( 'Y-m-d', $current_payment ),
+							'expected_next_date' => gmdate( 'Y-m-d', $expected_timestamp ),
+							'actual_next_date'   => gmdate( 'Y-m-d', $next_payment ),
 							'days_skipped'       => $days_difference,
 							'billing_period'     => $billing_period,
 							'billing_interval'   => $billing_interval,
 						),
-						'recommendation'      => __( 'Review what happened during this period and consider if payment should be collected.', 'dr-subs' ),
+						'recommendation'      => __( 'Review what happened during this period and consider if payment should be collected.', 'doctor-subs' ),
 						'correctable'         => true,
-						'suggested_next_date' => date( 'Y-m-d', $expected_timestamp ),
+						'suggested_next_date' => gmdate( 'Y-m-d', $expected_timestamp ),
 					);
 				}
 			}
@@ -191,20 +191,20 @@ class WCST_Skipped_Cycle_Detector {
 						'type'                => 'overdue_payment',
 						'severity'            => 'warning',
 						'description'         => sprintf(
-							__( 'Payment overdue — expected payment around %1$s, now %2$s', 'dr-subs' ),
-							date( 'Y-m-d', $expected_timestamp ),
-							date( 'Y-m-d', $current_time )
+							__( 'Payment overdue — expected payment around %1$s, now %2$s', 'doctor-subs' ),
+							gmdate( 'Y-m-d', $expected_timestamp ),
+							gmdate( 'Y-m-d', $current_time )
 						),
 						'details'             => array(
-							'last_payment_date'  => date( 'Y-m-d', $last_payment_timestamp ),
-							'expected_next_date' => date( 'Y-m-d', $expected_timestamp ),
+							'last_payment_date'  => gmdate( 'Y-m-d', $last_payment_timestamp ),
+							'expected_next_date' => gmdate( 'Y-m-d', $expected_timestamp ),
 							'days_overdue'       => $days_since_expected,
 							'billing_period'     => $billing_period,
 							'billing_interval'   => $billing_interval,
 						),
-						'recommendation'      => __( 'Check payment processing and customer status.', 'dr-subs' ),
+						'recommendation'      => __( 'Check payment processing and customer status.', 'doctor-subs' ),
 						'correctable'         => true,
-						'suggested_next_date' => date( 'Y-m-d', $expected_timestamp ),
+						'suggested_next_date' => gmdate( 'Y-m-d', $expected_timestamp ),
 					);
 				}
 			}
@@ -243,7 +243,7 @@ class WCST_Skipped_Cycle_Detector {
 					'type'           => 'manual_payment',
 					'severity'       => 'info',
 					'description'    => sprintf(
-						__( 'Manual payment completion detected for order #%d', 'dr-subs' ),
+						__( 'Manual payment completion detected for order #%d', 'doctor-subs' ),
 						$order_id
 					),
 					'details'        => array(
@@ -253,7 +253,7 @@ class WCST_Skipped_Cycle_Detector {
 						'order_status'   => $order->get_status(),
 						'transaction_id' => $transaction_id,
 					),
-					'recommendation' => __( 'Verify manual payment was properly recorded.', 'dr-subs' ),
+					'recommendation' => __( 'Verify manual payment was properly recorded.', 'doctor-subs' ),
 				);
 			}
 
@@ -263,7 +263,7 @@ class WCST_Skipped_Cycle_Detector {
 					'type'           => 'manual_completion',
 					'severity'       => 'warning',
 					'description'    => sprintf(
-						__( 'Order #%d marked complete without transaction ID', 'dr-subs' ),
+						__( 'Order #%d marked complete without transaction ID', 'doctor-subs' ),
 						$order_id
 					),
 					'details'        => array(
@@ -272,7 +272,7 @@ class WCST_Skipped_Cycle_Detector {
 						'order_date'     => $order->get_date_created()->format( 'Y-m-d H:i:s' ),
 						'transaction_id' => $transaction_id,
 					),
-					'recommendation' => __( 'Verify payment was actually received and properly recorded.', 'dr-subs' ),
+					'recommendation' => __( 'Verify payment was actually received and properly recorded.', 'doctor-subs' ),
 				);
 			}
 		}
@@ -291,8 +291,8 @@ class WCST_Skipped_Cycle_Detector {
 		$status_mismatches = array();
 
 		$status       = $subscription->get_status();
-		$next_payment = $subscription->get_date( 'next_payment' );
-		$end_date     = $subscription->get_date( 'end' );
+		$next_payment = $subscription->get_gmdate( 'next_payment' );
+		$end_date     = $subscription->get_gmdate( 'end' );
 
 		// Check for expired status with future next payment
 		if ( 'expired' === $status && $next_payment ) {
@@ -303,13 +303,13 @@ class WCST_Skipped_Cycle_Detector {
 				$status_mismatches[] = array(
 					'type'           => 'status_mismatch',
 					'severity'       => 'error',
-					'description'    => __( 'Subscription shows Expired but has a valid future next payment date', 'dr-subs' ),
+					'description'    => __( 'Subscription shows Expired but has a valid future next payment date', 'doctor-subs' ),
 					'details'        => array(
 						'current_status'    => $status,
 						'next_payment_date' => $next_payment,
 						'days_until_next'   => ceil( ( $next_timestamp - $now ) / DAY_IN_SECONDS ),
 					),
-					'recommendation' => __( 'Review subscription status and payment schedule for consistency.', 'dr-subs' ),
+					'recommendation' => __( 'Review subscription status and payment schedule for consistency.', 'doctor-subs' ),
 				);
 			}
 		}
@@ -323,13 +323,13 @@ class WCST_Skipped_Cycle_Detector {
 				$status_mismatches[] = array(
 					'type'           => 'status_mismatch',
 					'severity'       => 'error',
-					'description'    => __( 'Subscription shows Active but has passed its end date', 'dr-subs' ),
+					'description'    => __( 'Subscription shows Active but has passed its end date', 'doctor-subs' ),
 					'details'        => array(
 						'current_status' => $status,
 						'end_date'       => $end_date,
 						'days_past_end'  => ceil( ( $now - $end_timestamp ) / DAY_IN_SECONDS ),
 					),
-					'recommendation' => __( 'Consider updating subscription status to reflect actual state.', 'dr-subs' ),
+					'recommendation' => __( 'Consider updating subscription status to reflect actual state.', 'doctor-subs' ),
 				);
 			}
 		}
@@ -368,12 +368,12 @@ class WCST_Skipped_Cycle_Detector {
 			$audit_results[] = array(
 				'type'           => 'missing_action',
 				'severity'       => 'warning',
-				'description'    => __( 'No scheduled subscription payment actions found', 'dr-subs' ),
+				'description'    => __( 'No scheduled subscription payment actions found', 'doctor-subs' ),
 				'details'        => array(
 					'action_type'     => 'woocommerce_scheduled_subscription_payment',
 					'subscription_id' => $subscription_id,
 				),
-				'recommendation' => __( 'Check if subscription payments are properly scheduled.', 'dr-subs' ),
+				'recommendation' => __( 'Check if subscription payments are properly scheduled.', 'doctor-subs' ),
 			);
 		}
 
@@ -393,17 +393,17 @@ class WCST_Skipped_Cycle_Detector {
 				'type'           => 'failed_action',
 				'severity'       => 'error',
 				'description'    => sprintf(
-					__( 'Failed Action Scheduler event: %s', 'dr-subs' ),
+					__( 'Failed Action Scheduler event: %s', 'doctor-subs' ),
 					$action->get_hook()
 				),
 				'details'        => array(
 					'action_id'      => $action_id,
 					'action_hook'    => $action->get_hook(),
-					'scheduled_date' => $action->get_schedule()->get_date()->format( 'Y-m-d H:i:s' ),
-					'last_attempt'   => $action->get_last_attempt_date() ? $action->get_last_attempt_date()->format( 'Y-m-d H:i:s' ) : 'Never',
+					'scheduled_date' => $action->get_schedule()->get_gmdate()->format( 'Y-m-d H:i:s' ),
+					'last_attempt'   => $action->get_last_attempt_gmdate() ? $action->get_last_attempt_gmdate()->format( 'Y-m-d H:i:s' ) : 'Never',
 					'retry_count'    => $action->get_retry_count(),
 				),
-				'recommendation' => __( 'Review failed action and consider manual intervention.', 'dr-subs' ),
+				'recommendation' => __( 'Review failed action and consider manual intervention.', 'doctor-subs' ),
 			);
 		}
 
@@ -454,12 +454,12 @@ class WCST_Skipped_Cycle_Detector {
 					$analysis[] = array(
 						'type'           => 'missing_year',
 						'severity'       => 'warning',
-						'description'    => sprintf( __( 'No renewals found for year %d', 'dr-subs' ), $year ),
+						'description'    => sprintf( __( 'No renewals found for year %d', 'doctor-subs' ), $year ),
 						'details'        => array(
 							'year'            => $year,
 							'analysis_period' => $min_year . ' - ' . $max_year,
 						),
-						'recommendation' => __( 'Investigate why no renewals occurred during this period.', 'dr-subs' ),
+						'recommendation' => __( 'Investigate why no renewals occurred during this period.', 'doctor-subs' ),
 					);
 				}
 			}
@@ -487,7 +487,7 @@ class WCST_Skipped_Cycle_Detector {
 		}
 
 		$expected_timestamp = $last_timestamp + ( $period_days * DAY_IN_SECONDS );
-		return date( 'Y-m-d H:i:s', $expected_timestamp );
+		return gmdate( 'Y-m-d H:i:s', $expected_timestamp );
 	}
 
 	/**

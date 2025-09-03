@@ -9,12 +9,12 @@ declare( strict_types=1 );
 
 /**
  * Plugin Name: Doctor Subs
- * Plugin URI: https://github.com/davidrukahu/dr-subs
+ * Plugin URI: https://github.com/davidrukahu/doctor-subs
  * Description: An intuitive WooCommerce Subscriptions troubleshooting tool that implements a simple 3-step diagnostic process.
  * Version: 1.0.0
  * Author: DavidR
- * Author URI: https://github.com/davidrukahu/dr-subs
- * Text Domain: dr-subs
+ * Author URI: https://github.com/davidrukahu/doctor-subs
+ * Text Domain: doctor-subs
  * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.4
@@ -72,7 +72,7 @@ function wcst_check_dependencies() {
 	}
 
 	if ( ! $woocommerce_active ) {
-		$errors[] = __( 'Doctor Subs requires WooCommerce to be installed and activated.', 'dr-subs' );
+		$errors[] = __( 'Doctor Subs requires WooCommerce to be installed and activated.', 'doctor-subs' );
 	}
 
 	// Check if WooCommerce Subscriptions is active using multiple methods.
@@ -107,7 +107,7 @@ function wcst_check_dependencies() {
 	}
 
 	if ( ! $subscriptions_active ) {
-		$errors[] = __( 'Doctor Subs requires WooCommerce Subscriptions to be installed and activated.', 'dr-subs' );
+		$errors[] = __( 'Doctor Subs requires WooCommerce Subscriptions to be installed and activated.', 'doctor-subs' );
 	}
 
 	return $errors;

@@ -62,7 +62,7 @@ class WCST_Subscription_Data {
 					'id'           => $subscription->get_id(),
 					'title'        => sprintf(
 						/* translators: %d: subscription ID */
-						__( 'Subscription #%d', 'dr-subs' ),
+						__( 'Subscription #%d', 'doctor-subs' ),
 						$subscription->get_id()
 					),
 					'status'       => $subscription->get_status(),
@@ -130,7 +130,7 @@ class WCST_Subscription_Data {
 					'id'           => $subscription->get_id(),
 					'title'        => sprintf(
 						/* translators: %d: subscription ID */
-						__( 'Subscription #%d', 'dr-subs' ),
+						__( 'Subscription #%d', 'doctor-subs' ),
 						$subscription->get_id()
 					),
 					'status'       => $subscription->get_status(),

@@ -64,13 +64,13 @@ class WCST_Timeline_Builder {
 	 */
 	public function build( $subscription_id ) {
 		if ( ! function_exists( 'wcs_get_subscription' ) ) {
-			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'dr-subs' ) );
+			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
 		}
 
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'dr-subs' ) );
+			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		// Collect events from all sources.
@@ -105,12 +105,6 @@ class WCST_Timeline_Builder {
 
 				// Final safety check - ensure both are strings
 				if ( ! is_string( $timestamp_a ) || ! is_string( $timestamp_b ) ) {
-					error_log( 'WCST Timeline Debug - Non-string timestamp detected:' );
-					error_log( 'Raw A: ' . print_r( $raw_a, true ) );
-					error_log( 'Raw B: ' . print_r( $raw_b, true ) );
-					error_log( 'Formatted A: ' . print_r( $timestamp_a, true ) );
-					error_log( 'Formatted B: ' . print_r( $timestamp_b, true ) );
-
 					// Force string conversion
 					$timestamp_a = (string) $timestamp_a;
 					$timestamp_b = (string) $timestamp_b;
@@ -145,13 +139,13 @@ class WCST_Timeline_Builder {
 
 		// Add key subscription dates as events.
 		$key_dates = array(
-			'date_created' => __( 'Subscription created', 'dr-subs' ),
-			'start'        => __( 'Subscription started', 'dr-subs' ),
-			'trial_end'    => __( 'Trial period ended', 'dr-subs' ),
-			'last_payment' => __( 'Last payment processed', 'dr-subs' ),
-			'next_payment' => __( 'Next payment scheduled', 'dr-subs' ),
-			'cancelled'    => __( 'Subscription cancelled', 'dr-subs' ),
-			'end'          => __( 'Subscription ended', 'dr-subs' ),
+			'date_created' => __( 'Subscription created', 'doctor-subs' ),
+			'start'        => __( 'Subscription started', 'doctor-subs' ),
+			'trial_end'    => __( 'Trial period ended', 'doctor-subs' ),
+			'last_payment' => __( 'Last payment processed', 'doctor-subs' ),
+			'next_payment' => __( 'Next payment scheduled', 'doctor-subs' ),
+			'cancelled'    => __( 'Subscription cancelled', 'doctor-subs' ),
+			'end'          => __( 'Subscription ended', 'doctor-subs' ),
 		);
 
 		foreach ( $key_dates as $date_type => $description ) {
@@ -267,13 +261,13 @@ class WCST_Timeline_Builder {
 			'category'    => 'order',
 			'title'       => sprintf(
 				/* translators: 1: order type, 2: order ID */
-				__( '%1$s order #%2$d created', 'dr-subs' ),
+				__( '%1$s order #%2$d created', 'doctor-subs' ),
 				ucfirst( $order_type ),
 				$order->get_id()
 			),
 			'description' => sprintf(
 				/* translators: 1: order type, 2: order ID, 3: order total */
-				__( '%1$s order #%2$d created with total %3$s', 'dr-subs' ),
+				__( '%1$s order #%2$d created with total %3$s', 'doctor-subs' ),
 				ucfirst( $order_type ),
 				$order->get_id(),
 				$order->get_formatted_order_total()
@@ -297,12 +291,12 @@ class WCST_Timeline_Builder {
 				'category'    => 'payment',
 				'title'       => sprintf(
 					/* translators: %d: order ID */
-					__( 'Payment completed for order #%d', 'dr-subs' ),
+					__( 'Payment completed for order #%d', 'doctor-subs' ),
 					$order->get_id()
 				),
 				'description' => sprintf(
 					/* translators: 1: order ID, 2: payment amount */
-					__( 'Payment of %2$s completed for order #%1$d', 'dr-subs' ),
+					__( 'Payment of %2$s completed for order #%1$d', 'doctor-subs' ),
 					$order->get_id(),
 					$order->get_formatted_order_total()
 				),
@@ -333,7 +327,7 @@ class WCST_Timeline_Builder {
 				'category'    => 'order',
 				'title'       => sprintf(
 					/* translators: %d: order ID */
-					__( 'Order #%d note', 'dr-subs' ),
+					__( 'Order #%d note', 'doctor-subs' ),
 					$order->get_id()
 				),
 				'description' => $note->content,
@@ -610,10 +604,10 @@ class WCST_Timeline_Builder {
 	 */
 	private function format_action_title( $hook, $status ) {
 		$hook_titles = array(
-			'woocommerce_scheduled_subscription_payment'   => __( 'Scheduled subscription payment', 'dr-subs' ),
-			'woocommerce_scheduled_subscription_expiration' => __( 'Scheduled subscription expiration', 'dr-subs' ),
-			'woocommerce_scheduled_subscription_trial_end' => __( 'Scheduled trial end', 'dr-subs' ),
-			'woocommerce_scheduled_subscription_end_of_prepaid_term' => __( 'End of prepaid term', 'dr-subs' ),
+			'woocommerce_scheduled_subscription_payment'   => __( 'Scheduled subscription payment', 'doctor-subs' ),
+			'woocommerce_scheduled_subscription_expiration' => __( 'Scheduled subscription expiration', 'doctor-subs' ),
+			'woocommerce_scheduled_subscription_trial_end' => __( 'Scheduled trial end', 'doctor-subs' ),
+			'woocommerce_scheduled_subscription_end_of_prepaid_term' => __( 'End of prepaid term', 'doctor-subs' ),
 		);
 
 		$title = isset( $hook_titles[ $hook ] ) ? $hook_titles[ $hook ] : $hook;
@@ -633,7 +627,7 @@ class WCST_Timeline_Builder {
 
 		return sprintf(
 			/* translators: 1: hook name, 2: action status, 3: action arguments */
-			__( 'Action: %1$s | Status: %2$s | Args: %3$s', 'dr-subs' ),
+			__( 'Action: %1$s | Status: %2$s | Args: %3$s', 'doctor-subs' ),
 			$action->hook,
 			$action->status,
 			wp_json_encode( $args )
@@ -693,10 +687,10 @@ class WCST_Timeline_Builder {
 				$discrepancies[] = array(
 					'severity'    => 'critical',
 					'type'        => 'failed_action',
-					'title'       => __( 'Failed Scheduled Action', 'dr-subs' ),
+					'title'       => __( 'Failed Scheduled Action', 'doctor-subs' ),
 					'description' => sprintf(
 						/* translators: 1: action hook, 2: timestamp */
-						__( 'Scheduled action "%1$s" failed at %2$s', 'dr-subs' ),
+						__( 'Scheduled action "%1$s" failed at %2$s', 'doctor-subs' ),
 						$event['metadata']['hook'],
 						$event['timestamp']
 					),

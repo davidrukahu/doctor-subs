@@ -138,8 +138,8 @@ class WCST_Ajax_Handler {
 			$issues[] = array(
 				'severity'    => 'critical',
 				'type'        => 'payment_method',
-				'title'       => __( 'Payment Method Issue', 'dr-subs' ),
-				'description' => __( 'The payment method appears to have issues that may affect renewals.', 'dr-subs' ),
+				'title'       => __( 'Payment Method Issue', 'doctor-subs' ),
+				'description' => __( 'The payment method appears to have issues that may affect renewals.', 'doctor-subs' ),
 			);
 			$status   = 'issues_found';
 		}
@@ -149,10 +149,10 @@ class WCST_Ajax_Handler {
 			$issues[] = array(
 				'severity'    => 'warning',
 				'type'        => 'scheduled_actions',
-				'title'       => __( 'Failed Scheduled Actions', 'dr-subs' ),
+				'title'       => __( 'Failed Scheduled Actions', 'doctor-subs' ),
 				'description' => sprintf(
 					/* translators: %d: number of failed actions */
-					__( '%d scheduled actions have failed. This may affect automatic renewals.', 'dr-subs' ),
+					__( '%d scheduled actions have failed. This may affect automatic renewals.', 'doctor-subs' ),
 					count( $anatomy_data['scheduled_actions']['failed'] )
 				),
 			);
@@ -167,7 +167,7 @@ class WCST_Ajax_Handler {
 				$issues[] = array(
 					'severity'    => $discrepancy['severity'] ?? 'warning',
 					'type'        => 'timeline_discrepancy',
-					'title'       => $discrepancy['title'] ?? __( 'Timeline Discrepancy', 'dr-subs' ),
+					'title'       => $discrepancy['title'] ?? __( 'Timeline Discrepancy', 'doctor-subs' ),
 					'description' => $discrepancy['description'] ?? '',
 				);
 			}
@@ -182,8 +182,8 @@ class WCST_Ajax_Handler {
 					$issues[] = array(
 						'severity'    => 'warning',
 						'type'        => 'skipped_cycle',
-						'title'       => __( 'Skipped Payment Cycle', 'dr-subs' ),
-						'description' => $cycle['description'] ?? __( 'A payment cycle was skipped.', 'dr-subs' ),
+						'title'       => __( 'Skipped Payment Cycle', 'doctor-subs' ),
+						'description' => $cycle['description'] ?? __( 'A payment cycle was skipped.', 'doctor-subs' ),
 					);
 				}
 				$status = 'issues_found';
@@ -195,8 +195,8 @@ class WCST_Ajax_Handler {
 					$issues[] = array(
 						'severity'    => 'info',
 						'type'        => 'manual_completion',
-						'title'       => __( 'Manual Completion Detected', 'dr-subs' ),
-						'description' => $completion['description'] ?? __( 'Payment was completed manually.', 'dr-subs' ),
+						'title'       => __( 'Manual Completion Detected', 'doctor-subs' ),
+						'description' => $completion['description'] ?? __( 'Payment was completed manually.', 'doctor-subs' ),
 					);
 				}
 			}
@@ -207,8 +207,8 @@ class WCST_Ajax_Handler {
 					$issues[] = array(
 						'severity'    => 'warning',
 						'type'        => 'status_mismatch',
-						'title'       => __( 'Status Mismatch', 'dr-subs' ),
-						'description' => $mismatch['description'] ?? __( 'Subscription status appears inconsistent.', 'dr-subs' ),
+						'title'       => __( 'Status Mismatch', 'doctor-subs' ),
+						'description' => $mismatch['description'] ?? __( 'Subscription status appears inconsistent.', 'doctor-subs' ),
 					);
 				}
 				$status = 'issues_found';
@@ -217,10 +217,10 @@ class WCST_Ajax_Handler {
 
 		// Generate next steps based on findings.
 		if ( empty( $issues ) ) {
-			$next_steps[] = __( 'No issues detected. The subscription appears to be functioning normally.', 'dr-subs' );
+			$next_steps[] = __( 'No issues detected. The subscription appears to be functioning normally.', 'doctor-subs' );
 		} else {
-			$next_steps[] = __( 'Review the identified issues above and take appropriate action.', 'dr-subs' );
-			$next_steps[] = __( 'Consider contacting WooCommerce support if issues persist.', 'dr-subs' );
+			$next_steps[] = __( 'Review the identified issues above and take appropriate action.', 'doctor-subs' );
+			$next_steps[] = __( 'Consider contacting WooCommerce support if issues persist.', 'doctor-subs' );
 		}
 
 		return array(

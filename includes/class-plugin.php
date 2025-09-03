@@ -109,9 +109,6 @@ class WCST_Plugin {
 	 * @since 1.0.0
 	 */
 	public function init() {
-		// Load text domain for translations.
-		load_plugin_textdomain( 'dr-subs', false, dirname( WCST_PLUGIN_BASENAME ) . '/languages' );
-
 		// Fire action for extensions.
 		do_action( 'wcst_init' );
 	}
@@ -134,8 +131,8 @@ class WCST_Plugin {
 	 * @return array Modified plugin action links.
 	 */
 	public function add_settings_link( $links ) {
-		$settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=dr-subs' ) ) . '">' .
-						esc_html__( 'Troubleshoot', 'dr-subs' ) . '</a>';
+		$settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=doctor-subs' ) ) . '">' .
+						esc_html__( 'Troubleshoot', 'doctor-subs' ) . '</a>';
 		array_unshift( $links, $settings_link );
 		return $links;
 	}

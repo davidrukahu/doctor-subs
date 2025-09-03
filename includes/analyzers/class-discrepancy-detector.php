@@ -41,7 +41,7 @@ class WCST_Discrepancy_Detector {
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'dr-subs' ) );
+			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		$discrepancies = array();
@@ -90,13 +90,13 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'payment_overdue',
 					'category'       => 'payment_timing',
 					'severity'       => 'critical',
-					'description'    => sprintf( __( 'Payment is %d days overdue', 'dr-subs' ), abs( $days_until_next ) ),
+					'description'    => sprintf( __( 'Payment is %d days overdue', 'doctor-subs' ), abs( $days_until_next ) ),
 					'details'        => array(
 						'expected_date'       => $next_payment,
 						'days_overdue'        => abs( $days_until_next ),
 						'subscription_status' => $subscription->get_status(),
 					),
-					'recommendation' => __( 'Check payment method and retry payment or contact customer.', 'dr-subs' ),
+					'recommendation' => __( 'Check payment method and retry payment or contact customer.', 'doctor-subs' ),
 				);
 			}
 
@@ -106,12 +106,12 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'payment_due_soon',
 					'category'       => 'payment_timing',
 					'severity'       => 'warning',
-					'description'    => sprintf( __( 'Payment due in %d days', 'dr-subs' ), $days_until_next ),
+					'description'    => sprintf( __( 'Payment due in %d days', 'doctor-subs' ), $days_until_next ),
 					'details'        => array(
 						'due_date'       => $next_payment,
 						'days_until_due' => $days_until_next,
 					),
-					'recommendation' => __( 'Monitor payment processing and ensure payment method is valid.', 'dr-subs' ),
+					'recommendation' => __( 'Monitor payment processing and ensure payment method is valid.', 'doctor-subs' ),
 				);
 			}
 		}
@@ -127,13 +127,13 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'irregular_payment_interval',
 					'category'       => 'payment_timing',
 					'severity'       => 'medium',
-					'description'    => __( 'Payment interval differs from expected schedule', 'dr-subs' ),
+					'description'    => __( 'Payment interval differs from expected schedule', 'doctor-subs' ),
 					'details'        => array(
 						'expected_interval' => $expected_interval,
 						'actual_interval'   => $actual_interval,
 						'difference_days'   => round( $interval_difference / DAY_IN_SECONDS ),
 					),
-					'recommendation' => __( 'Review subscription schedule and payment processing.', 'dr-subs' ),
+					'recommendation' => __( 'Review subscription schedule and payment processing.', 'doctor-subs' ),
 				);
 			}
 		}
@@ -174,12 +174,12 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'missing_renewal_action',
 					'category'       => 'scheduler_issue',
 					'severity'       => 'critical',
-					'description'    => __( 'No renewal action scheduled for next payment', 'dr-subs' ),
+					'description'    => __( 'No renewal action scheduled for next payment', 'doctor-subs' ),
 					'details'        => array(
 						'expected_renewal_date' => $expected_renewal_date,
 						'subscription_id'       => $subscription_id,
 					),
-					'recommendation' => __( 'Manually schedule renewal action or check Action Scheduler configuration.', 'dr-subs' ),
+					'recommendation' => __( 'Manually schedule renewal action or check Action Scheduler configuration.', 'doctor-subs' ),
 				);
 			}
 		}
@@ -201,12 +201,12 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'failed_actions',
 				'category'       => 'scheduler_issue',
 				'severity'       => 'high',
-				'description'    => sprintf( __( '%d failed actions detected', 'dr-subs' ), $failed_actions ),
+				'description'    => sprintf( __( '%d failed actions detected', 'doctor-subs' ), $failed_actions ),
 				'details'        => array(
 					'failed_count'    => $failed_actions,
 					'subscription_id' => $subscription_id,
 				),
-				'recommendation' => __( 'Review failed actions in Action Scheduler and resolve underlying issues.', 'dr-subs' ),
+				'recommendation' => __( 'Review failed actions in Action Scheduler and resolve underlying issues.', 'doctor-subs' ),
 			);
 		}
 
@@ -227,12 +227,12 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'unexpected_status',
 				'category'       => 'status_issue',
 				'severity'       => $current_status === 'on-hold' ? 'high' : 'medium',
-				'description'    => sprintf( __( 'Subscription in unexpected status: %s', 'dr-subs' ), $current_status ),
+				'description'    => sprintf( __( 'Subscription in unexpected status: %s', 'doctor-subs' ), $current_status ),
 				'details'        => array(
 					'current_status'  => $current_status,
 					'subscription_id' => $subscription->get_id(),
 				),
-				'recommendation' => __( 'Review subscription status and take appropriate action.', 'dr-subs' ),
+				'recommendation' => __( 'Review subscription status and take appropriate action.', 'doctor-subs' ),
 			);
 		}
 
@@ -246,13 +246,13 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'stuck_status',
 					'category'       => 'status_issue',
 					'severity'       => 'high',
-					'description'    => sprintf( __( 'Subscription stuck in %1$s status for %2$d days', 'dr-subs' ), $current_status, round( $days_since_modification ) ),
+					'description'    => sprintf( __( 'Subscription stuck in %1$s status for %2$d days', 'doctor-subs' ), $current_status, round( $days_since_modification ) ),
 					'details'        => array(
 						'status'        => $current_status,
 						'days_stuck'    => round( $days_since_modification ),
 						'last_modified' => $last_modified,
 					),
-					'recommendation' => __( 'Investigate why subscription is stuck and take corrective action.', 'dr-subs' ),
+					'recommendation' => __( 'Investigate why subscription is stuck and take corrective action.', 'doctor-subs' ),
 				);
 			}
 		}
@@ -274,12 +274,12 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'missing_payment_token',
 				'category'       => 'gateway_communication',
 				'severity'       => 'critical',
-				'description'    => __( 'No payment token found for subscription', 'dr-subs' ),
+				'description'    => __( 'No payment token found for subscription', 'doctor-subs' ),
 				'details'        => array(
 					'payment_method'  => $payment_method,
 					'subscription_id' => $subscription->get_id(),
 				),
-				'recommendation' => __( 'Check payment method configuration and ensure tokenization is working.', 'dr-subs' ),
+				'recommendation' => __( 'Check payment method configuration and ensure tokenization is working.', 'doctor-subs' ),
 			);
 		}
 
@@ -294,24 +294,24 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'expired_payment_method',
 					'category'       => 'gateway_communication',
 					'severity'       => 'critical',
-					'description'    => __( 'Payment method has expired', 'dr-subs' ),
+					'description'    => __( 'Payment method has expired', 'doctor-subs' ),
 					'details'        => array(
 						'expiry_date'  => $expiry_date,
 						'days_expired' => abs( $days_until_expiry ),
 					),
-					'recommendation' => __( 'Contact customer to update payment method.', 'dr-subs' ),
+					'recommendation' => __( 'Contact customer to update payment method.', 'doctor-subs' ),
 				);
 			} elseif ( $days_until_expiry <= 30 ) {
 				$discrepancies[] = array(
 					'type'           => 'expiring_payment_method',
 					'category'       => 'gateway_communication',
 					'severity'       => 'warning',
-					'description'    => sprintf( __( 'Payment method expires in %d days', 'dr-subs' ), $days_until_expiry ),
+					'description'    => sprintf( __( 'Payment method expires in %d days', 'doctor-subs' ), $days_until_expiry ),
 					'details'        => array(
 						'expiry_date'       => $expiry_date,
 						'days_until_expiry' => $days_until_expiry,
 					),
-					'recommendation' => __( 'Notify customer to update payment method before expiry.', 'dr-subs' ),
+					'recommendation' => __( 'Notify customer to update payment method before expiry.', 'doctor-subs' ),
 				);
 			}
 		}
@@ -345,11 +345,11 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'missing_renewal_reminders',
 				'category'       => 'notification_gap',
 				'severity'       => 'medium',
-				'description'    => __( 'Renewal reminder emails are disabled', 'dr-subs' ),
+				'description'    => __( 'Renewal reminder emails are disabled', 'doctor-subs' ),
 				'details'        => array(
 					'setting' => 'woocommerce_subscription_renewal_reminder_enabled',
 				),
-				'recommendation' => __( 'Enable renewal reminder emails to improve customer experience.', 'dr-subs' ),
+				'recommendation' => __( 'Enable renewal reminder emails to improve customer experience.', 'doctor-subs' ),
 			);
 		}
 
@@ -360,11 +360,11 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'missing_payment_failed_emails',
 				'category'       => 'notification_gap',
 				'severity'       => 'high',
-				'description'    => __( 'Payment failed emails are disabled', 'dr-subs' ),
+				'description'    => __( 'Payment failed emails are disabled', 'doctor-subs' ),
 				'details'        => array(
 					'setting' => 'woocommerce_subscription_payment_failed_enabled',
 				),
-				'recommendation' => __( 'Enable payment failed emails to notify customers of payment issues.', 'dr-subs' ),
+				'recommendation' => __( 'Enable payment failed emails to notify customers of payment issues.', 'doctor-subs' ),
 			);
 		}
 
@@ -384,11 +384,11 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'manual_renewal_required',
 				'category'       => 'payment_method',
 				'severity'       => 'info',
-				'description'    => __( 'Subscription requires manual renewal', 'dr-subs' ),
+				'description'    => __( 'Subscription requires manual renewal', 'doctor-subs' ),
 				'details'        => array(
 					'payment_method' => $payment_method,
 				),
-				'recommendation' => __( 'Monitor subscription and process payments manually.', 'dr-subs' ),
+				'recommendation' => __( 'Monitor subscription and process payments manually.', 'doctor-subs' ),
 			);
 		}
 
@@ -399,11 +399,11 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'high_payment_retry_count',
 				'category'       => 'payment_method',
 				'severity'       => 'high',
-				'description'    => sprintf( __( 'High payment retry count: %d attempts', 'dr-subs' ), $retry_count ),
+				'description'    => sprintf( __( 'High payment retry count: %d attempts', 'doctor-subs' ), $retry_count ),
 				'details'        => array(
 					'retry_count' => $retry_count,
 				),
-				'recommendation' => __( 'Contact customer to resolve payment method issues.', 'dr-subs' ),
+				'recommendation' => __( 'Contact customer to resolve payment method issues.', 'doctor-subs' ),
 			);
 		}
 
@@ -425,12 +425,12 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'non_subscription_product',
 					'category'       => 'configuration',
 					'severity'       => 'critical',
-					'description'    => __( 'Subscription contains non-subscription product', 'dr-subs' ),
+					'description'    => __( 'Subscription contains non-subscription product', 'doctor-subs' ),
 					'details'        => array(
 						'product_id'   => $product->get_id(),
 						'product_type' => $product->get_type(),
 					),
-					'recommendation' => __( 'Review subscription products and ensure all are subscription products.', 'dr-subs' ),
+					'recommendation' => __( 'Review subscription products and ensure all are subscription products.', 'doctor-subs' ),
 				);
 			}
 		}
@@ -451,11 +451,11 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'missing_stripe_customer',
 				'category'       => 'gateway_communication',
 				'severity'       => 'high',
-				'description'    => __( 'No Stripe customer ID found', 'dr-subs' ),
+				'description'    => __( 'No Stripe customer ID found', 'doctor-subs' ),
 				'details'        => array(
 					'gateway' => 'stripe',
 				),
-				'recommendation' => __( 'Check Stripe integration and customer creation process.', 'dr-subs' ),
+				'recommendation' => __( 'Check Stripe integration and customer creation process.', 'doctor-subs' ),
 			);
 		}
 
@@ -475,11 +475,11 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'missing_paypal_subscription',
 				'category'       => 'gateway_communication',
 				'severity'       => 'high',
-				'description'    => __( 'No PayPal subscription ID found', 'dr-subs' ),
+				'description'    => __( 'No PayPal subscription ID found', 'doctor-subs' ),
 				'details'        => array(
 					'gateway' => 'paypal',
 				),
-				'recommendation' => __( 'Check PayPal integration and subscription creation process.', 'dr-subs' ),
+				'recommendation' => __( 'Check PayPal integration and subscription creation process.', 'doctor-subs' ),
 			);
 		}
 

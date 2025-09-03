@@ -31,7 +31,7 @@ class WCST_Logger {
 	 * @since 1.0.0
 	 * @var string
 	 */
-	private static $source = 'dr-subs';
+	private static $source = 'doctor-subs';
 
 	/**
 	 * Get logger instance.
@@ -146,7 +146,7 @@ class WCST_Logger {
 	 */
 	private static function cleanup_old_logs() {
 		// Only run cleanup occasionally to avoid performance impact.
-		if ( 0 !== rand( 1, 100 ) ) {
+		if ( 0 !== wp_rand( 1, 100 ) ) {
 			return;
 		}
 

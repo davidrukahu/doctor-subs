@@ -29,7 +29,7 @@ class WCST_Expected_Behavior {
 	 */
 	private function safe_format_date( $date ) {
 		if ( empty( $date ) ) {
-			return __( 'unknown', 'dr-subs' );
+			return __( 'unknown', 'doctor-subs' );
 		}
 
 		if ( is_object( $date ) && method_exists( $date, 'format' ) ) {
@@ -40,7 +40,7 @@ class WCST_Expected_Behavior {
 			return $date;
 		}
 
-		return __( 'unknown', 'dr-subs' );
+		return __( 'unknown', 'doctor-subs' );
 	}
 
 	/**
@@ -53,13 +53,13 @@ class WCST_Expected_Behavior {
 	 */
 	public function analyze( $subscription_id ) {
 		if ( ! function_exists( 'wcs_get_subscription' ) ) {
-			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'dr-subs' ) );
+			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
 		}
 
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'dr-subs' ) );
+			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		return array(
@@ -121,7 +121,7 @@ class WCST_Expected_Behavior {
 
 		if ( ! $payment_method || ! function_exists( 'WC' ) ) {
 			return array(
-				'error' => __( 'Payment method not found or WooCommerce not available.', 'dr-subs' ),
+				'error' => __( 'Payment method not found or WooCommerce not available.', 'doctor-subs' ),
 			);
 		}
 
@@ -130,7 +130,7 @@ class WCST_Expected_Behavior {
 
 		if ( ! $gateway ) {
 			return array(
-				'error'      => __( 'Payment gateway not found.', 'dr-subs' ),
+				'error'      => __( 'Payment gateway not found.', 'doctor-subs' ),
 				'gateway_id' => $payment_method,
 			);
 		}
@@ -173,8 +173,8 @@ class WCST_Expected_Behavior {
 		if ( $is_manual ) {
 			return array(
 				'type'              => 'manual',
-				'description'       => __( 'Manual renewals require customer action to complete payments.', 'dr-subs' ),
-				'next_action'       => __( 'Customer must manually renew the subscription.', 'dr-subs' ),
+				'description'       => __( 'Manual renewals require customer action to complete payments.', 'doctor-subs' ),
+				'next_action'       => __( 'Customer must manually renew the subscription.', 'doctor-subs' ),
 				'automated_actions' => false,
 				'next_payment_date' => $next_payment,
 			);
@@ -186,10 +186,10 @@ class WCST_Expected_Behavior {
 		if ( 'action_scheduler' === $billing_control ) {
 			return array(
 				'type'              => 'action_scheduler',
-				'description'       => __( 'Renewals are handled by WordPress Action Scheduler.', 'dr-subs' ),
+				'description'       => __( 'Renewals are handled by WordPress Action Scheduler.', 'doctor-subs' ),
 				'next_action'       => sprintf(
 					/* translators: %s: next payment date */
-					__( 'Automated renewal scheduled for %s', 'dr-subs' ),
+					__( 'Automated renewal scheduled for %s', 'doctor-subs' ),
 					$this->safe_format_date( $next_payment )
 				),
 				'automated_actions' => true,
@@ -202,8 +202,8 @@ class WCST_Expected_Behavior {
 
 		return array(
 			'type'               => 'gateway_controlled',
-			'description'        => __( 'Renewals are controlled by the payment gateway.', 'dr-subs' ),
-			'next_action'        => __( 'Gateway will notify site when payment is processed.', 'dr-subs' ),
+			'description'        => __( 'Renewals are controlled by the payment gateway.', 'doctor-subs' ),
+			'next_action'        => __( 'Gateway will notify site when payment is processed.', 'doctor-subs' ),
 			'automated_actions'  => true,
 			'next_payment_date'  => $next_payment,
 			'gateway_control'    => true,
@@ -247,7 +247,7 @@ class WCST_Expected_Behavior {
 				break;
 			case 'cancelled':
 			case 'expired':
-				$expectations['next_events'] = array( __( 'No further automatic actions expected.', 'dr-subs' ) );
+				$expectations['next_events'] = array( __( 'No further automatic actions expected.', 'doctor-subs' ) );
 				break;
 		}
 
@@ -266,7 +266,7 @@ class WCST_Expected_Behavior {
 
 		if ( ! $parent_order ) {
 			return array(
-				'error' => __( 'No parent order found for this subscription.', 'dr-subs' ),
+				'error' => __( 'No parent order found for this subscription.', 'doctor-subs' ),
 			);
 		}
 
@@ -293,7 +293,7 @@ class WCST_Expected_Behavior {
 		if ( empty( $switch_data ) ) {
 			return array(
 				'has_switches' => false,
-				'description'  => __( 'No subscription switches detected.', 'dr-subs' ),
+				'description'  => __( 'No subscription switches detected.', 'doctor-subs' ),
 			);
 		}
 
@@ -301,11 +301,11 @@ class WCST_Expected_Behavior {
 			'has_switches'         => true,
 			'switch_data'          => $switch_data,
 			'switch_logs_location' => 'WooCommerce > Status > Logs > wcs-switch-cart-items',
-			'description'          => __( 'This subscription has been modified through subscription switching.', 'dr-subs' ),
+			'description'          => __( 'This subscription has been modified through subscription switching.', 'doctor-subs' ),
 			'expectations'         => array(
-				__( 'Switch logs should contain detailed information about the changes.', 'dr-subs' ),
-				__( 'Prorated amounts should be calculated based on timing and pricing.', 'dr-subs' ),
-				__( 'New billing schedule should reflect the switched product configuration.', 'dr-subs' ),
+				__( 'Switch logs should contain detailed information about the changes.', 'doctor-subs' ),
+				__( 'Prorated amounts should be calculated based on timing and pricing.', 'doctor-subs' ),
+				__( 'New billing schedule should reflect the switched product configuration.', 'doctor-subs' ),
 			),
 		);
 	}
@@ -404,17 +404,17 @@ class WCST_Expected_Behavior {
 	private function describe_action_scheduler_renewal_process() {
 		return array(
 			'steps'        => array(
-				__( 'WordPress cron triggers Action Scheduler', 'dr-subs' ),
-				__( 'Action Scheduler executes scheduled renewal action', 'dr-subs' ),
-				__( 'New renewal order is created', 'dr-subs' ),
-				__( 'Payment is processed via the payment gateway', 'dr-subs' ),
-				__( 'Subscription dates are updated', 'dr-subs' ),
-				__( 'Next renewal action is scheduled', 'dr-subs' ),
+				__( 'WordPress cron triggers Action Scheduler', 'doctor-subs' ),
+				__( 'Action Scheduler executes scheduled renewal action', 'doctor-subs' ),
+				__( 'New renewal order is created', 'doctor-subs' ),
+				__( 'Payment is processed via the payment gateway', 'doctor-subs' ),
+				__( 'Subscription dates are updated', 'doctor-subs' ),
+				__( 'Next renewal action is scheduled', 'doctor-subs' ),
 			),
 			'dependencies' => array(
-				__( 'WordPress cron must be functioning', 'dr-subs' ),
-				__( 'Action Scheduler must be operational', 'dr-subs' ),
-				__( 'Payment gateway must be available', 'dr-subs' ),
+				__( 'WordPress cron must be functioning', 'doctor-subs' ),
+				__( 'Action Scheduler must be operational', 'doctor-subs' ),
+				__( 'Payment gateway must be available', 'doctor-subs' ),
 			),
 		);
 	}
@@ -429,17 +429,17 @@ class WCST_Expected_Behavior {
 	private function describe_gateway_controlled_renewal_process( $payment_method ) {
 		return array(
 			'steps'          => array(
-				__( 'Payment gateway processes payment on their schedule', 'dr-subs' ),
-				__( 'Gateway sends webhook notification to your site', 'dr-subs' ),
-				__( 'Site receives and processes webhook', 'dr-subs' ),
-				__( 'New renewal order is created', 'dr-subs' ),
-				__( 'Subscription is updated with new payment information', 'dr-subs' ),
+				__( 'Payment gateway processes payment on their schedule', 'doctor-subs' ),
+				__( 'Gateway sends webhook notification to your site', 'doctor-subs' ),
+				__( 'Site receives and processes webhook', 'doctor-subs' ),
+				__( 'New renewal order is created', 'doctor-subs' ),
+				__( 'Subscription is updated with new payment information', 'doctor-subs' ),
 			),
 			'dependencies'   => array(
-				__( 'Gateway subscription must be active', 'dr-subs' ),
-				__( 'Webhook endpoint must be accessible', 'dr-subs' ),
-				__( 'Webhook authentication must be valid', 'dr-subs' ),
-				__( 'Site must be able to receive external requests', 'dr-subs' ),
+				__( 'Gateway subscription must be active', 'doctor-subs' ),
+				__( 'Webhook endpoint must be accessible', 'doctor-subs' ),
+				__( 'Webhook authentication must be valid', 'doctor-subs' ),
+				__( 'Site must be able to receive external requests', 'doctor-subs' ),
 			),
 			'payment_method' => $payment_method,
 		);
@@ -454,15 +454,15 @@ class WCST_Expected_Behavior {
 	 */
 	private function get_status_description( $status ) {
 		$descriptions = array(
-			'active'         => __( 'Subscription is active and should process renewals automatically.', 'dr-subs' ),
-			'on-hold'        => __( 'Subscription is suspended and will not process renewals until reactivated.', 'dr-subs' ),
-			'cancelled'      => __( 'Subscription has been cancelled and will not renew.', 'dr-subs' ),
-			'expired'        => __( 'Subscription has reached its natural end date.', 'dr-subs' ),
-			'pending-cancel' => __( 'Subscription is set to cancel at the end of the current billing period.', 'dr-subs' ),
-			'pending'        => __( 'Subscription is awaiting initial payment or activation.', 'dr-subs' ),
+			'active'         => __( 'Subscription is active and should process renewals automatically.', 'doctor-subs' ),
+			'on-hold'        => __( 'Subscription is suspended and will not process renewals until reactivated.', 'doctor-subs' ),
+			'cancelled'      => __( 'Subscription has been cancelled and will not renew.', 'doctor-subs' ),
+			'expired'        => __( 'Subscription has reached its natural end date.', 'doctor-subs' ),
+			'pending-cancel' => __( 'Subscription is set to cancel at the end of the current billing period.', 'doctor-subs' ),
+			'pending'        => __( 'Subscription is awaiting initial payment or activation.', 'doctor-subs' ),
 		);
 
-		return isset( $descriptions[ $status ] ) ? $descriptions[ $status ] : __( 'Unknown status.', 'dr-subs' );
+		return isset( $descriptions[ $status ] ) ? $descriptions[ $status ] : __( 'Unknown status.', 'doctor-subs' );
 	}
 
 	/**
@@ -500,7 +500,7 @@ class WCST_Expected_Behavior {
 		if ( $next_payment ) {
 			$events[] = sprintf(
 				/* translators: %s: next payment date */
-				__( 'Next renewal payment due: %s', 'dr-subs' ),
+				__( 'Next renewal payment due: %s', 'doctor-subs' ),
 				$this->safe_format_date( $next_payment )
 			);
 		}
@@ -508,13 +508,13 @@ class WCST_Expected_Behavior {
 		if ( $end_date ) {
 			$events[] = sprintf(
 				/* translators: %s: end date */
-				__( 'Subscription will expire on: %s', 'dr-subs' ),
+				__( 'Subscription will expire on: %s', 'doctor-subs' ),
 				$this->safe_format_date( $end_date )
 			);
 		}
 
 		if ( empty( $events ) ) {
-			$events[] = __( 'Subscription will continue indefinitely until cancelled.', 'dr-subs' );
+			$events[] = __( 'Subscription will continue indefinitely until cancelled.', 'doctor-subs' );
 		}
 
 		return $events;
@@ -529,9 +529,9 @@ class WCST_Expected_Behavior {
 	 */
 	private function get_on_hold_subscription_expectations( $subscription ) {
 		return array(
-			__( 'No automatic renewals will occur while subscription is on hold.', 'dr-subs' ),
-			__( 'Subscription must be reactivated to resume billing.', 'dr-subs' ),
-			__( 'Customer access to subscription content may be restricted.', 'dr-subs' ),
+			__( 'No automatic renewals will occur while subscription is on hold.', 'doctor-subs' ),
+			__( 'Subscription must be reactivated to resume billing.', 'doctor-subs' ),
+			__( 'Customer access to subscription content may be restricted.', 'doctor-subs' ),
 		);
 	}
 
@@ -549,16 +549,16 @@ class WCST_Expected_Behavior {
 			return array(
 				sprintf(
 					/* translators: %s: next payment date */
-					__( 'Subscription will be cancelled after the next payment on: %s', 'dr-subs' ),
+					__( 'Subscription will be cancelled after the next payment on: %s', 'doctor-subs' ),
 					$this->safe_format_date( $next_payment )
 				),
-				__( 'One final renewal payment will be processed.', 'dr-subs' ),
-				__( 'After final payment, status will change to cancelled.', 'dr-subs' ),
+				__( 'One final renewal payment will be processed.', 'doctor-subs' ),
+				__( 'After final payment, status will change to cancelled.', 'doctor-subs' ),
 			);
 		}
 
 		return array(
-			__( 'Subscription will be cancelled immediately as no next payment is scheduled.', 'dr-subs' ),
+			__( 'Subscription will be cancelled immediately as no next payment is scheduled.', 'doctor-subs' ),
 		);
 	}
 
@@ -586,10 +586,10 @@ class WCST_Expected_Behavior {
 			'subscription_created_after_order' => $time_diff > 0,
 			'time_difference_seconds'          => $time_diff,
 			'expected_process'                 => array(
-				__( 'Customer completes checkout with subscription product', 'dr-subs' ),
-				__( 'Parent order is created first', 'dr-subs' ),
-				__( 'Subscription is created as a copy of the parent order', 'dr-subs' ),
-				__( 'Future renewals are created as copies of the subscription', 'dr-subs' ),
+				__( 'Customer completes checkout with subscription product', 'doctor-subs' ),
+				__( 'Parent order is created first', 'doctor-subs' ),
+				__( 'Subscription is created as a copy of the parent order', 'doctor-subs' ),
+				__( 'Future renewals are created as copies of the subscription', 'doctor-subs' ),
 			),
 		);
 	}
@@ -608,29 +608,29 @@ class WCST_Expected_Behavior {
 
 		// Compare basic data.
 		if ( $subscription->get_currency() === $parent_order->get_currency() ) {
-			$matches[] = __( 'Currency matches', 'dr-subs' );
+			$matches[] = __( 'Currency matches', 'doctor-subs' );
 		} else {
-			$mismatches[] = __( 'Currency does not match parent order', 'dr-subs' );
+			$mismatches[] = __( 'Currency does not match parent order', 'doctor-subs' );
 		}
 
 		if ( $subscription->get_customer_id() === $parent_order->get_customer_id() ) {
-			$matches[] = __( 'Customer ID matches', 'dr-subs' );
+			$matches[] = __( 'Customer ID matches', 'doctor-subs' );
 		} else {
-			$mismatches[] = __( 'Customer ID does not match parent order', 'dr-subs' );
+			$mismatches[] = __( 'Customer ID does not match parent order', 'doctor-subs' );
 		}
 
 		// Compare payment method.
 		if ( $subscription->get_payment_method() === $parent_order->get_payment_method() ) {
-			$matches[] = __( 'Payment method matches', 'dr-subs' );
+			$matches[] = __( 'Payment method matches', 'doctor-subs' );
 		} else {
-			$mismatches[] = __( 'Payment method does not match parent order', 'dr-subs' );
+			$mismatches[] = __( 'Payment method does not match parent order', 'doctor-subs' );
 		}
 
 		return array(
 			'matches'       => $matches,
 			'mismatches'    => $mismatches,
 			'overall_match' => empty( $mismatches ),
-			'note'          => __( 'Some differences may be expected due to subscription switching, admin edits, or customizations.', 'dr-subs' ),
+			'note'          => __( 'Some differences may be expected due to subscription switching, admin edits, or customizations.', 'doctor-subs' ),
 		);
 	}
 
@@ -645,7 +645,7 @@ class WCST_Expected_Behavior {
 		$gateway_id = $gateway->id;
 		$mode_info  = array(
 			'mode'        => 'unknown',
-			'description' => __( 'Mode could not be determined', 'dr-subs' ),
+			'description' => __( 'Mode could not be determined', 'doctor-subs' ),
 			'is_test'     => false,
 		);
 
@@ -670,7 +670,7 @@ class WCST_Expected_Behavior {
 						if ( in_array( $pattern, array( 'test_mode', 'sandbox', 'debug_mode' ) ) ) {
 							$mode_info['mode']        = $value ? 'sandbox' : 'live';
 							$mode_info['is_test']     = $value;
-							$mode_info['description'] = $value ? __( 'Sandbox/Test Mode', 'dr-subs' ) : __( 'Live/Production Mode', 'dr-subs' );
+							$mode_info['description'] = $value ? __( 'Sandbox/Test Mode', 'doctor-subs' ) : __( 'Live/Production Mode', 'doctor-subs' );
 							break;
 						}
 					}
@@ -681,12 +681,12 @@ class WCST_Expected_Behavior {
 						if ( in_array( $value_lower, array( 'test', 'sandbox', 'false' ) ) ) {
 							$mode_info['mode']        = 'sandbox';
 							$mode_info['is_test']     = true;
-							$mode_info['description'] = __( 'Sandbox/Test Mode', 'dr-subs' );
+							$mode_info['description'] = __( 'Sandbox/Test Mode', 'doctor-subs' );
 							break;
 						} elseif ( in_array( $value_lower, array( 'live', 'production', 'true' ) ) ) {
 							$mode_info['mode']        = 'live';
 							$mode_info['is_test']     = false;
-							$mode_info['description'] = __( 'Live/Production Mode', 'dr-subs' );
+							$mode_info['description'] = __( 'Live/Production Mode', 'doctor-subs' );
 							break;
 						}
 					}
@@ -726,7 +726,7 @@ class WCST_Expected_Behavior {
 	private function detect_stripe_mode( $gateway ) {
 		$mode_info = array(
 			'mode'        => 'unknown',
-			'description' => __( 'Mode could not be determined', 'dr-subs' ),
+			'description' => __( 'Mode could not be determined', 'doctor-subs' ),
 			'is_test'     => false,
 		);
 
@@ -734,7 +734,7 @@ class WCST_Expected_Behavior {
 			$is_test                  = $gateway->settings['testmode'] === 'yes';
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
-			$mode_info['description'] = $is_test ? __( 'Stripe Test Mode', 'dr-subs' ) : __( 'Stripe Live Mode', 'dr-subs' );
+			$mode_info['description'] = $is_test ? __( 'Stripe Test Mode', 'doctor-subs' ) : __( 'Stripe Live Mode', 'doctor-subs' );
 		}
 
 		return $mode_info;
@@ -750,7 +750,7 @@ class WCST_Expected_Behavior {
 	private function detect_paypal_mode( $gateway ) {
 		$mode_info = array(
 			'mode'        => 'unknown',
-			'description' => __( 'Mode could not be determined', 'dr-subs' ),
+			'description' => __( 'Mode could not be determined', 'doctor-subs' ),
 			'is_test'     => false,
 		);
 
@@ -758,7 +758,7 @@ class WCST_Expected_Behavior {
 			$is_test                  = $gateway->settings['testmode'] === 'yes';
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
-			$mode_info['description'] = $is_test ? __( 'PayPal Sandbox Mode', 'dr-subs' ) : __( 'PayPal Live Mode', 'dr-subs' );
+			$mode_info['description'] = $is_test ? __( 'PayPal Sandbox Mode', 'doctor-subs' ) : __( 'PayPal Live Mode', 'doctor-subs' );
 		}
 
 		return $mode_info;
@@ -774,7 +774,7 @@ class WCST_Expected_Behavior {
 	private function detect_square_mode( $gateway ) {
 		$mode_info = array(
 			'mode'        => 'unknown',
-			'description' => __( 'Mode could not be determined', 'dr-subs' ),
+			'description' => __( 'Mode could not be determined', 'doctor-subs' ),
 			'is_test'     => false,
 		);
 
@@ -782,7 +782,7 @@ class WCST_Expected_Behavior {
 			$is_test                  = $gateway->settings['sandbox'] === 'yes';
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
-			$mode_info['description'] = $is_test ? __( 'Square Sandbox Mode', 'dr-subs' ) : __( 'Square Live Mode', 'dr-subs' );
+			$mode_info['description'] = $is_test ? __( 'Square Sandbox Mode', 'doctor-subs' ) : __( 'Square Live Mode', 'doctor-subs' );
 		}
 
 		return $mode_info;
@@ -798,7 +798,7 @@ class WCST_Expected_Behavior {
 	private function detect_braintree_mode( $gateway ) {
 		$mode_info = array(
 			'mode'        => 'unknown',
-			'description' => __( 'Mode could not be determined', 'dr-subs' ),
+			'description' => __( 'Mode could not be determined', 'doctor-subs' ),
 			'is_test'     => false,
 		);
 
@@ -806,7 +806,7 @@ class WCST_Expected_Behavior {
 			$is_test                  = $gateway->settings['sandbox'] === 'yes';
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
-			$mode_info['description'] = $is_test ? __( 'Braintree Sandbox Mode', 'dr-subs' ) : __( 'Braintree Live Mode', 'dr-subs' );
+			$mode_info['description'] = $is_test ? __( 'Braintree Sandbox Mode', 'doctor-subs' ) : __( 'Braintree Live Mode', 'doctor-subs' );
 		}
 
 		return $mode_info;
@@ -822,7 +822,7 @@ class WCST_Expected_Behavior {
 	private function detect_authorize_net_mode( $gateway ) {
 		$mode_info = array(
 			'mode'        => 'unknown',
-			'description' => __( 'Mode could not be determined', 'dr-subs' ),
+			'description' => __( 'Mode could not be determined', 'doctor-subs' ),
 			'is_test'     => false,
 		);
 
@@ -830,7 +830,7 @@ class WCST_Expected_Behavior {
 			$is_test                  = $gateway->settings['testmode'] === 'yes';
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
-			$mode_info['description'] = $is_test ? __( 'Authorize.net Test Mode', 'dr-subs' ) : __( 'Authorize.net Live Mode', 'dr-subs' );
+			$mode_info['description'] = $is_test ? __( 'Authorize.net Test Mode', 'doctor-subs' ) : __( 'Authorize.net Live Mode', 'doctor-subs' );
 		}
 
 		return $mode_info;
