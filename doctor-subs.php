@@ -36,6 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'WCST_PLUGIN_FILE', __FILE__ );
 define( 'WCST_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WCST_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'WCST_PLUGIN_VERSION', '1.0.0' );
 define( 'WCST_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 spl_autoload_register( 'wcst_autoloader' );
