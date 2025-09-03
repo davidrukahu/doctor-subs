@@ -50,8 +50,7 @@ class WCST_Ajax_Handler {
 			// Validate and sanitize input.
 			$subscription_id = WCST_Security::validate_subscription_id( $_POST['subscription_id'] ?? '' );
 
-			// Debug: Log the subscription ID being analyzed
-			WCST_Logger::log( 'info', 'Starting analysis for subscription ID: ' . $subscription_id );
+			// Keep logs minimal: only errors elsewhere
 
 			// Initialize analyzers with error checking.
 			if ( ! class_exists( 'WCST_Subscription_Anatomy' ) ) {
@@ -75,27 +74,39 @@ class WCST_Ajax_Handler {
 			$skipped_cycle_detector = new WCST_Skipped_Cycle_Detector();
 
 			// Step 1: Analyze anatomy.
-			WCST_Logger::log( 'info', 'Starting anatomy analysis' );
+			// Anatomy analysis
 			$anatomy_data = $anatomy_analyzer->analyze( $subscription_id );
 
 			// Step 2: Determine expected behavior.
-			WCST_Logger::log( 'info', 'Starting expected behavior analysis' );
+			// Expected behavior analysis
 			$expected_data = $expected_analyzer->analyze( $subscription_id );
 
 			// Step 3: Build timeline.
-			WCST_Logger::log( 'info', 'Starting timeline analysis' );
+			// Timeline analysis
 			$timeline_data = $timeline_builder->build( $subscription_id );
 
 			// Enhanced Detection: Analyze skipped cycles and issues.
-			WCST_Logger::log( 'info', 'Starting enhanced detection analysis' );
-			// Temporarily disable skipped cycle detector to test
+			// Enhanced detection analysis
+
+			// Set a timeout for the enhanced analysis to prevent hanging
+			set_time_limit( 30 ); // 30 seconds max
+
+			// Default enhanced data structure
 			$enhanced_data = array(
-				'skipped_cycles' => array(),
+				'skipped_cycles'     => array(),
 				'manual_completions' => array(),
-				'status_mismatches' => array(),
-				'action_scheduler' => array(),
-				'year_over_year' => array(),
+				'status_mismatches'  => array(),
+				'action_scheduler'   => array(),
+				'year_over_year'     => array(),
 			);
+
+			// Use the public analyzer entrypoint to avoid calling private methods
+			try {
+				$enhanced_data = $skipped_cycle_detector->analyze( $subscription_id );
+			} catch ( \Throwable $t ) {
+				WCST_Logger::log( 'error', 'Enhanced detection failed: ' . $t->getMessage() );
+				// Keep default empty enhanced data on failure
+			}
 
 			// Create summary with findings.
 			$summary_data = $this->create_summary( $anatomy_data, $expected_data, $timeline_data, $enhanced_data );
