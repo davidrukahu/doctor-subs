@@ -26,6 +26,7 @@ class WCST_Admin {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 		add_filter( 'plugin_action_links_' . WCST_PLUGIN_BASENAME, array( $this, 'add_plugin_action_links' ) );
+		add_filter( 'woocommerce_subscription_list_table_column_status_content', array( $this, 'add_doctor_subs_to_status_column' ), 10, 3 );
 	}
 
 	/**
@@ -70,14 +71,30 @@ class WCST_Admin {
 			true
 		);
 
+		// Check for subscription_id parameter and validate nonce.
+		$auto_analyze_id = null;
+		if ( isset( $_GET['subscription_id'] ) && isset( $_GET['wcst_nonce'] ) ) {
+			if ( wp_verify_nonce( $_GET['wcst_nonce'], 'wcst_subscription_action' ) ) {
+				$subscription_id = absint( $_GET['subscription_id'] );
+				if ( $subscription_id > 0 ) {
+					// Verify the subscription exists and user has permission.
+					$subscription = wcs_get_subscription( $subscription_id );
+					if ( $subscription && current_user_can( 'manage_woocommerce' ) ) {
+						$auto_analyze_id = $subscription_id;
+					}
+				}
+			}
+		}
+
 		// Localize script for AJAX.
 		wp_localize_script(
 			'wcst-admin-scripts',
 			'wcst_ajax',
 			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'wcst_nonce' ),
-				'strings'  => array(
+				'ajax_url'        => admin_url( 'admin-ajax.php' ),
+				'nonce'           => wp_create_nonce( 'wcst_nonce' ),
+				'auto_analyze_id' => $auto_analyze_id,
+				'strings'         => array(
 					'error'                   => __( 'An error occurred. Please try again.', 'doctor-subs' ),
 					'searching'               => __( 'Searching...', 'doctor-subs' ),
 					'analyzing'               => __( 'Analyzing subscription...', 'doctor-subs' ),
@@ -109,6 +126,53 @@ class WCST_Admin {
 		array_unshift( $links, $settings_link );
 
 		return $links;
+	}
+
+	/**
+	 * Add Doctor Subs action link to subscription status column.
+	 *
+	 * @since 1.0.0
+	 * @param string $column_content The status column content.
+	 * @param WC_Subscription $subscription The subscription object.
+	 * @param array $actions The existing actions array.
+	 * @return string Modified column content.
+	 */
+	public function add_doctor_subs_to_status_column( $column_content, $subscription, $actions ) {
+		// Check if user has permission to manage WooCommerce.
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			return $column_content;
+		}
+
+		$subscription_id = $subscription->get_id();
+		
+		// Create secure URL with nonce.
+		$doctor_subs_url = wp_nonce_url(
+			add_query_arg(
+				array(
+					'page'           => 'doctor-subs',
+					'subscription_id' => $subscription_id,
+				),
+				admin_url( 'admin.php' )
+			),
+			'wcst_subscription_action',
+			'wcst_nonce'
+		);
+
+		// Create Doctor Subs action link.
+		$doctor_subs_link = sprintf(
+			'<span class="doctor-subs"><a href="%s">%s</a></span>',
+			esc_url( $doctor_subs_url ),
+			__( 'Doctor Subs', 'doctor-subs' )
+		);
+
+		// Add Doctor Subs link to the row actions.
+		$column_content = str_replace(
+			'</div>',
+			' | ' . $doctor_subs_link . '</div>',
+			$column_content
+		);
+
+		return $column_content;
 	}
 
 	/**

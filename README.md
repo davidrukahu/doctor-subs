@@ -29,6 +29,13 @@ Doctor Subs analyzes WooCommerce subscriptions to identify common problems:
 
 ## How to Use
 
+### Quick Access from Subscriptions List
+1. Go to **WooCommerce > Subscriptions**
+2. Find any subscription in the list
+3. Click the **"Doctor Subs"** link in the Status column (next to Suspend/Cancel)
+4. The analysis will start automatically
+
+### Manual Analysis
 1. Go to **WooCommerce > Doctor Subs**
 2. Search for a subscription by ID or customer email
 3. Click on the search result to analyze

@@ -32,6 +32,22 @@
             // Initialize any default states
             $( '#wcst-results' ).hide();
             $( '#wcst-progress' ).hide();
+            
+            // Check if we should auto-analyze a subscription
+            if ( wcst_ajax.auto_analyze_id ) {
+                this.autoAnalyzeSubscription( wcst_ajax.auto_analyze_id );
+            }
+        },
+
+        autoAnalyzeSubscription: function( subscriptionId ) {
+            // Pre-fill the search input
+            $( '#wcst-subscription-search' ).val( subscriptionId );
+            
+            // Show progress indicator
+            $( '#wcst-progress' ).show();
+            
+            // Start analysis automatically
+            this.analyzeSubscription( subscriptionId );
         },
 
 
