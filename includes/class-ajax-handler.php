@@ -73,6 +73,11 @@ class WCST_Ajax_Handler {
 			}
 			$skipped_cycle_detector = new WCST_Skipped_Cycle_Detector();
 
+			if ( ! class_exists( 'WCST_Discrepancy_Detector' ) ) {
+				throw new Exception( 'WCST_Discrepancy_Detector class not found' );
+			}
+			$discrepancy_detector = new WCST_Discrepancy_Detector();
+
 			// Step 1: Analyze anatomy.
 			// Anatomy analysis
 			$anatomy_data = $anatomy_analyzer->analyze( $subscription_id );
@@ -84,6 +89,15 @@ class WCST_Ajax_Handler {
 			// Step 3: Build timeline.
 			// Timeline analysis
 			$timeline_data = $timeline_builder->build( $subscription_id );
+
+			// Discrepancy Detection: Check for Stripe and other gateway issues.
+			$discrepancy_data = array();
+			try {
+				$discrepancy_data = $discrepancy_detector->analyze_discrepancies( $subscription_id );
+			} catch ( \Throwable $t ) {
+				WCST_Logger::log( 'error', 'Discrepancy detection failed: ' . $t->getMessage() );
+				// Keep empty discrepancy data on failure
+			}
 
 			// Enhanced Detection: Analyze skipped cycles and issues.
 			// Enhanced detection analysis
@@ -109,7 +123,7 @@ class WCST_Ajax_Handler {
 			}
 
 			// Create summary with findings.
-			$summary_data = $this->create_summary( $anatomy_data, $expected_data, $timeline_data, $enhanced_data );
+			$summary_data = $this->create_summary( $anatomy_data, $expected_data, $timeline_data, $enhanced_data, $discrepancy_data );
 
 			// Prepare response data.
 			$response_data = array(
@@ -118,6 +132,7 @@ class WCST_Ajax_Handler {
 				'expected'        => $expected_data,
 				'timeline'        => $timeline_data,
 				'enhanced'        => $enhanced_data,
+				'discrepancies'   => $discrepancy_data,
 				'summary'         => $summary_data,
 				'timestamp'       => current_time( 'Y-m-d H:i:s' ),
 			);
@@ -173,9 +188,10 @@ class WCST_Ajax_Handler {
 	 * @param array $expected_data Expected behavior data.
 	 * @param array $timeline_data Timeline data.
 	 * @param array $enhanced_data Enhanced detection data.
+	 * @param array $discrepancy_data Discrepancy detection data.
 	 * @return array Summary data.
 	 */
-	private function create_summary( $anatomy_data, $expected_data, $timeline_data, $enhanced_data = array() ) {
+	private function create_summary( $anatomy_data, $expected_data, $timeline_data, $enhanced_data = array(), $discrepancy_data = array() ) {
 		$issues     = array();
 		$status     = 'healthy';
 		$next_steps = array();
@@ -261,6 +277,27 @@ class WCST_Ajax_Handler {
 					);
 				}
 				$status = 'issues_found';
+			}
+		}
+
+		// Check discrepancy detector for Stripe and gateway issues.
+		if ( ! empty( $discrepancy_data ) && is_array( $discrepancy_data ) ) {
+			foreach ( $discrepancy_data as $discrepancy ) {
+				$issues[] = array(
+					'severity'    => $discrepancy['severity'] ?? 'warning',
+					'type'        => $discrepancy['type'] ?? 'unknown',
+					'title'       => $discrepancy['description'] ?? __( 'Issue Detected', 'doctor-subs' ),
+					'description' => $discrepancy['recommendation'] ?? '',
+					'details'     => $discrepancy['details'] ?? array(),
+				);
+
+				// Update status based on severity.
+				$severity = $discrepancy['severity'] ?? 'warning';
+				if ( in_array( $severity, array( 'critical', 'high' ), true ) ) {
+					$status = 'issues_found';
+				} elseif ( 'warning' === $severity && 'healthy' === $status ) {
+					$status = 'warnings';
+				}
 			}
 		}
 
