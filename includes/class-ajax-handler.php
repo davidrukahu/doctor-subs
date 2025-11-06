@@ -319,14 +319,16 @@ class WCST_Ajax_Handler {
 					array_filter(
 						$issues,
 						function ( $issue ) {
-							return 'critical' === $issue['severity']; }
+							return in_array( $issue['severity'], array( 'critical', 'error', 'high' ), true );
+						}
 					)
 				),
 				'warnings'     => count(
 					array_filter(
 						$issues,
 						function ( $issue ) {
-							return 'warning' === $issue['severity']; }
+							return in_array( $issue['severity'], array( 'warning', 'medium' ), true );
+						}
 					)
 				),
 			),

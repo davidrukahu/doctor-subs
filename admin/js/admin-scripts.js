@@ -397,7 +397,15 @@
                 html += '<h3>Issues Detected</h3>';
                 html += '<div class="wcst-issues-list">';
                 summary.issues.forEach( ( issue ) => {
-                    const severityClass = 'critical' === issue.severity ? 'error' : 'warning';
+                    // Map severity levels to CSS classes
+                    let severityClass = 'info';
+                    if ( 'critical' === issue.severity || 'error' === issue.severity || 'high' === issue.severity ) {
+                        severityClass = 'error'; // Red
+                    } else if ( 'warning' === issue.severity || 'medium' === issue.severity ) {
+                        severityClass = 'warning'; // Yellow
+                    } else {
+                        severityClass = 'info'; // Blue/Gray
+                    }
                     html += '<div class="wcst-issue-item wcst-status-' + severityClass + '">';
                     html += '<h4>' + issue.title + '</h4>';
                     html += '<p>' + issue.description + '</p>';
