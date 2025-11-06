@@ -11,6 +11,7 @@ Doctor Subs analyzes WooCommerce subscriptions to identify common problems:
 - **Status Mismatches**: Identifies inconsistencies between subscription status and payment schedules
 - **Action Scheduler Issues**: Reviews scheduled events for failures or missing actions
 - **Timeline Analysis**: Creates visual timelines showing renewal patterns and missing payments
+- **Stripe Payment Method Detachment**: Detects detached payment methods caused by cloned/staging sites (fixes Stripe renewal failures)
 
 ## Installation
 
@@ -60,6 +61,7 @@ Documents what actually occurred to identify discrepancies
 - **Status Mismatches**: Finds inconsistencies between status and payments
 - **Action Scheduler**: Reviews scheduled events for failures
 - **Payment Gateway**: Checks gateway configuration and mode (live/sandbox)
+- **Stripe Payment Method Detachment**: Detects detached payment methods from cloned/staging sites
 
 ## Common Issues Detected
 
@@ -71,6 +73,8 @@ Documents what actually occurred to identify discrepancies
 - Gateway communication issues
 - Skipped payment cycles
 - Manual completion flags
+- **Stripe payment method detachment** (cloned site bug)
+- **Stripe API errors** in renewal orders
 
 ## Technical Details
 

@@ -459,6 +459,270 @@ class WCST_Discrepancy_Detector {
 			);
 		}
 
+		// Check for detached payment method error (cloned site issue)
+		$detached_payment_method_issue = $this->check_detached_payment_method( $subscription );
+		if ( ! empty( $detached_payment_method_issue ) ) {
+			$discrepancies[] = $detached_payment_method_issue;
+		}
+
+		// Check for cloned/staging site indicators
+		$cloned_site_issue = $this->check_cloned_site_indicators( $subscription );
+		if ( ! empty( $cloned_site_issue ) ) {
+			$discrepancies[] = $cloned_site_issue;
+		}
+
+		// Check renewal orders for Stripe API errors
+		$renewal_errors = $this->check_stripe_renewal_errors( $subscription );
+		$discrepancies   = array_merge( $discrepancies, $renewal_errors );
+
+		return $discrepancies;
+	}
+
+	/**
+	 * Check for detached payment method issues (cloned site bug)
+	 *
+	 * @since 1.1.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array|null Detached payment method discrepancy or null.
+	 */
+	private function check_detached_payment_method( $subscription ) {
+		// Check subscription notes for the specific Stripe error message
+		$notes = wc_get_order_notes(
+			array(
+				'order_id' => $subscription->get_id(),
+				'limit'    => 100,
+			)
+		);
+
+		$detached_error_patterns = array(
+			'The provided PaymentMethod was previously used',
+			'To use a PaymentMethod multiple times, you must attach it to a Customer first',
+			'payment_method_attached_to_another_customer',
+			'This PaymentMethod was previously used with a PaymentIntent',
+		);
+
+		$found_errors = array();
+		foreach ( $notes as $note ) {
+			$note_content = strtolower( $note->content );
+			foreach ( $detached_error_patterns as $pattern ) {
+				if ( false !== strpos( $note_content, strtolower( $pattern ) ) ) {
+					$found_errors[] = array(
+						'note_id'      => $note->id,
+						'date'         => $note->date_created,
+						'error_text'   => $pattern,
+						'note_content' => substr( $note->content, 0, 200 ),
+					);
+					break; // Found error in this note, move to next note
+				}
+			}
+		}
+
+		if ( ! empty( $found_errors ) ) {
+			return array(
+				'type'           => 'detached_payment_method',
+				'category'       => 'gateway_communication',
+				'severity'       => 'critical',
+				'description'    => __( 'Stripe payment method detachment detected - likely caused by cloned/staging site', 'doctor-subs' ),
+				'details'        => array(
+					'gateway'           => 'stripe',
+					'error_count'       => count( $found_errors ),
+					'errors'            => $found_errors,
+					'subscription_id'   => $subscription->get_id(),
+					'stripe_customer_id' => $subscription->get_meta( '_stripe_customer_id' ),
+				),
+				'recommendation' => __( 'This is a known issue when cloning sites with WooCommerce Subscriptions. Update to WooCommerce Stripe Gateway 7.x+ which includes fixes. If already updated, re-attach the payment method to the Stripe customer or contact Stripe support.', 'doctor-subs' ),
+			);
+		}
+
+		// Check if payment token exists but might be detached
+		$payment_token_id = $subscription->get_meta( '_payment_token_id' );
+		$stripe_customer  = $subscription->get_meta( '_stripe_customer_id' );
+		$stripe_source_id = $subscription->get_meta( '_stripe_source_id' );
+
+		if ( ! empty( $payment_token_id ) && ! empty( $stripe_customer ) ) {
+			// Check if there are failed renewal orders that might indicate detachment
+			$renewal_orders = $subscription->get_related_orders( 'ids', 'renewal' );
+			$failed_renewals = 0;
+			foreach ( $renewal_orders as $order_id ) {
+				$order = wc_get_order( $order_id );
+				if ( $order && in_array( $order->get_status(), array( 'failed', 'cancelled' ), true ) ) {
+					$order_notes = wc_get_order_notes( array( 'order_id' => $order_id, 'limit' => 10 ) );
+					foreach ( $order_notes as $order_note ) {
+						$note_lower = strtolower( $order_note->content );
+						foreach ( $detached_error_patterns as $pattern ) {
+							if ( false !== strpos( $note_lower, strtolower( $pattern ) ) ) {
+								$failed_renewals++;
+								break 2; // Break out of both loops
+							}
+						}
+					}
+				}
+			}
+
+			if ( $failed_renewals > 0 ) {
+				return array(
+					'type'           => 'potential_detached_payment_method',
+					'category'       => 'gateway_communication',
+					'severity'       => 'high',
+					'description'    => sprintf(
+						/* translators: %d: number of failed renewals */
+						__( 'Potential payment method detachment: %d failed renewal(s) with Stripe errors', 'doctor-subs' ),
+						$failed_renewals
+					),
+					'details'        => array(
+						'gateway'          => 'stripe',
+						'failed_renewals'  => $failed_renewals,
+						'payment_token_id' => $payment_token_id,
+						'stripe_customer_id' => $stripe_customer,
+					),
+					'recommendation' => __( 'Review failed renewal orders for Stripe payment method errors. This may indicate a detached payment method issue from cloned/staging sites.', 'doctor-subs' ),
+				);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Check for cloned/staging site indicators
+	 *
+	 * @since 1.1.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array|null Cloned site indicator discrepancy or null.
+	 */
+	private function check_cloned_site_indicators( $subscription ) {
+		// Check if WooCommerce Subscriptions duplicate site filter is active
+		if ( has_filter( 'woocommerce_subscriptions_is_duplicate_site' ) ) {
+			$is_duplicate_site = apply_filters( 'woocommerce_subscriptions_is_duplicate_site', false );
+			if ( $is_duplicate_site ) {
+				return array(
+					'type'           => 'cloned_site_detected',
+					'category'       => 'configuration',
+					'severity'       => 'warning',
+					'description'    => __( 'WooCommerce Subscriptions duplicate site detected - payment methods may be detached', 'doctor-subs' ),
+					'details'        => array(
+						'filter_active' => true,
+						'is_duplicate'  => $is_duplicate_site,
+					),
+					'recommendation' => __( 'Ensure WooCommerce Stripe Gateway 7.x+ is installed with fixes for cloned sites. Monitor subscription renewals closely.', 'doctor-subs' ),
+				);
+			}
+		}
+
+		// Check WordPress environment type
+		$environment_type = wp_get_environment_type();
+		if ( in_array( $environment_type, array( 'staging', 'development' ), true ) ) {
+			// Check if there are Stripe payment methods that might be affected
+			$stripe_customer = $subscription->get_meta( '_stripe_customer_id' );
+			if ( ! empty( $stripe_customer ) ) {
+				return array(
+					'type'           => 'staging_environment_stripe',
+					'category'       => 'configuration',
+					'severity'       => 'info',
+					'description'    => sprintf(
+						/* translators: %s: environment type */
+						__( 'Running in %s environment with Stripe - ensure payment methods are properly configured', 'doctor-subs' ),
+						$environment_type
+					),
+					'details'        => array(
+						'environment_type' => $environment_type,
+						'stripe_customer_id' => $stripe_customer,
+					),
+					'recommendation' => __( 'Staging/development environments can cause payment method detachment issues. Ensure WooCommerce Stripe Gateway has proper safeguards enabled.', 'doctor-subs' ),
+				);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Check renewal orders for Stripe API errors
+	 *
+	 * @since 1.1.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of Stripe renewal error discrepancies.
+	 */
+	private function check_stripe_renewal_errors( $subscription ) {
+		$discrepancies = array();
+		$renewal_orders = $subscription->get_related_orders( 'ids', 'renewal' );
+
+		$stripe_error_patterns = array(
+			'card_declined',
+			'insufficient_funds',
+			'expired_card',
+			'processing_error',
+			'authentication_required',
+			'payment_method_attached_to_another_customer',
+		);
+
+		$error_summary = array();
+		foreach ( $renewal_orders as $order_id ) {
+			$order = wc_get_order( $order_id );
+			if ( ! $order ) {
+				continue;
+			}
+
+			// Check order status
+			if ( in_array( $order->get_status(), array( 'failed', 'cancelled' ), true ) ) {
+				// Check order notes for Stripe errors
+				$order_notes = wc_get_order_notes(
+					array(
+						'order_id' => $order_id,
+						'limit'    => 20,
+					)
+				);
+
+				foreach ( $order_notes as $note ) {
+					$note_lower = strtolower( $note->content );
+					foreach ( $stripe_error_patterns as $pattern ) {
+						if ( false !== strpos( $note_lower, strtolower( $pattern ) ) ) {
+							if ( ! isset( $error_summary[ $pattern ] ) ) {
+								$error_summary[ $pattern ] = array(
+									'count'      => 0,
+									'order_ids'  => array(),
+									'last_seen'  => '',
+								);
+							}
+							$error_summary[ $pattern ]['count']++;
+							$error_summary[ $pattern ]['order_ids'][] = $order_id;
+							if ( empty( $error_summary[ $pattern ]['last_seen'] ) || $note->date_created > $error_summary[ $pattern ]['last_seen'] ) {
+								$error_summary[ $pattern ]['last_seen'] = $note->date_created;
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		// Create discrepancies for detected errors
+		foreach ( $error_summary as $error_type => $error_data ) {
+			if ( 'payment_method_attached_to_another_customer' === $error_type ) {
+				// This is handled separately in check_detached_payment_method
+				continue;
+			}
+
+			$discrepancies[] = array(
+				'type'           => 'stripe_renewal_error',
+				'category'       => 'gateway_communication',
+				'severity'       => 'high',
+				'description'    => sprintf(
+					/* translators: 1: error type, 2: count */
+					__( 'Stripe renewal error detected: %1$s (%2$d occurrence(s))', 'doctor-subs' ),
+					$error_type,
+					$error_data['count']
+				),
+				'details'        => array(
+					'error_type'  => $error_type,
+					'count'       => $error_data['count'],
+					'order_ids'   => $error_data['order_ids'],
+					'last_seen'   => $error_data['last_seen'],
+				),
+				'recommendation' => __( 'Review failed renewal orders and contact customer to resolve payment method issues.', 'doctor-subs' ),
+			);
+		}
+
 		return $discrepancies;
 	}
 
