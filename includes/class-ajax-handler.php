@@ -44,11 +44,13 @@ class WCST_Ajax_Handler {
 			}
 
 			// Security checks.
-			WCST_Security::verify_nonce( $_POST['nonce'] ?? '', 'wcst_nonce' );
+			// phpcs:disable WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Nonce verification and sanitization handled by WCST_Security class.
+			WCST_Security::verify_nonce( isset( $_POST['nonce'] ) ? wp_unslash( $_POST['nonce'] ) : '', 'wcst_nonce' );
 			WCST_Security::check_permissions( 'manage_woocommerce' );
 
 			// Validate and sanitize input.
-			$subscription_id = WCST_Security::validate_subscription_id( $_POST['subscription_id'] ?? '' );
+			$subscription_id = WCST_Security::validate_subscription_id( isset( $_POST['subscription_id'] ) ? wp_unslash( $_POST['subscription_id'] ) : '' );
+			// phpcs:enable
 
 			// Keep logs minimal: only errors elsewhere
 
@@ -103,6 +105,7 @@ class WCST_Ajax_Handler {
 			// Enhanced detection analysis
 
 			// Set a timeout for the enhanced analysis to prevent hanging
+			// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Necessary for long-running analysis operations.
 			set_time_limit( 30 ); // 30 seconds max
 
 			// Default enhanced data structure
@@ -154,11 +157,13 @@ class WCST_Ajax_Handler {
 	public function search_subscriptions() {
 		try {
 			// Security checks.
-			WCST_Security::verify_nonce( $_POST['nonce'] ?? '', 'wcst_nonce' );
+			// phpcs:disable WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Nonce verification and sanitization handled by WCST_Security class.
+			WCST_Security::verify_nonce( isset( $_POST['nonce'] ) ? wp_unslash( $_POST['nonce'] ) : '', 'wcst_nonce' );
 			WCST_Security::check_permissions( 'manage_woocommerce' );
 
 			// Validate and sanitize input.
-			$search_term = sanitize_text_field( $_POST['search_term'] ?? '' );
+			$search_term = isset( $_POST['search_term'] ) ? sanitize_text_field( wp_unslash( $_POST['search_term'] ) ) : '';
+			// phpcs:enable
 
 			if ( strlen( $search_term ) < 2 ) {
 				wp_send_json_success( array() );

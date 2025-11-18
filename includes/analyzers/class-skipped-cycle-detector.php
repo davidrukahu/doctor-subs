@@ -52,13 +52,13 @@ class WCST_Skipped_Cycle_Detector {
 	 */
 	public function analyze( $subscription_id ) {
 		if ( ! function_exists( 'wcs_get_subscription' ) ) {
-			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
 		}
 
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		return array(
@@ -127,6 +127,7 @@ class WCST_Skipped_Cycle_Detector {
 					'type'           => 'no_payments',
 					'severity'       => 'warning',
 					'description'    => sprintf(
+						/* translators: %s: start date */
 						__( 'No payments received since start date %s', 'doctor-subs' ),
 						gmdate( 'Y-m-d', $start_timestamp )
 					),
@@ -175,6 +176,7 @@ class WCST_Skipped_Cycle_Detector {
 						'type'                => 'skipped_cycle',
 						'severity'            => 'warning',
 						'description'         => sprintf(
+							/* translators: 1: expected payment date, 2: actual next payment date */
 							__( 'Payment cycle skipped — expected payment around %1$s, next payment was %2$s', 'doctor-subs' ),
 							gmdate( 'Y-m-d', $expected_timestamp ),
 							gmdate( 'Y-m-d', $next_payment )
@@ -216,6 +218,7 @@ class WCST_Skipped_Cycle_Detector {
 						'type'                => 'overdue_payment',
 						'severity'            => 'warning',
 						'description'         => sprintf(
+							/* translators: 1: expected payment date, 2: current date */
 							__( 'Payment overdue — expected payment around %1$s, now %2$s', 'doctor-subs' ),
 							gmdate( 'Y-m-d', $expected_timestamp ),
 							gmdate( 'Y-m-d', $current_time )
@@ -273,6 +276,7 @@ class WCST_Skipped_Cycle_Detector {
 					'type'           => 'manual_payment',
 					'severity'       => 'info',
 					'description'    => sprintf(
+						/* translators: %d: order ID */
 						__( 'Manual payment completion detected for order #%d', 'doctor-subs' ),
 						$order_id
 					),
@@ -293,6 +297,7 @@ class WCST_Skipped_Cycle_Detector {
 					'type'           => 'manual_completion',
 					'severity'       => 'warning',
 					'description'    => sprintf(
+						/* translators: %d: order ID */
 						__( 'Order #%d marked complete without transaction ID', 'doctor-subs' ),
 						$order_id
 					),
@@ -423,6 +428,7 @@ class WCST_Skipped_Cycle_Detector {
 				'type'           => 'failed_action',
 				'severity'       => 'error',
 				'description'    => sprintf(
+					/* translators: %s: action hook name */
 					__( 'Failed Action Scheduler event: %s', 'doctor-subs' ),
 					$action->get_hook()
 				),
@@ -490,6 +496,7 @@ class WCST_Skipped_Cycle_Detector {
 					$analysis[] = array(
 						'type'           => 'missing_year',
 						'severity'       => 'warning',
+						/* translators: %d: year */
 						'description'    => sprintf( __( 'No renewals found for year %d', 'doctor-subs' ), $year ),
 						'details'        => array(
 							'year'            => $year,

@@ -27,7 +27,7 @@ class WCST_Security {
 	 */
 	public static function verify_nonce( $nonce, $action ) {
 		if ( ! wp_verify_nonce( $nonce, $action ) ) {
-			throw new Exception( __( 'Security check failed. Please refresh the page and try again.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'Security check failed. Please refresh the page and try again.', 'doctor-subs' ) );
 		}
 	}
 
@@ -40,7 +40,7 @@ class WCST_Security {
 	 */
 	public static function check_permissions( $capability ) {
 		if ( ! current_user_can( $capability ) ) {
-			throw new Exception( __( 'You do not have permission to perform this action.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'You do not have permission to perform this action.', 'doctor-subs' ) );
 		}
 	}
 
@@ -56,7 +56,7 @@ class WCST_Security {
 		$id = absint( $subscription_id );
 
 		if ( 0 === $id ) {
-			throw new Exception( __( 'Invalid subscription ID provided.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'Invalid subscription ID provided.', 'doctor-subs' ) );
 		}
 
 		return $id;
@@ -105,14 +105,14 @@ class WCST_Security {
 			$current_count = (int) $current_count;
 
 			if ( $current_count >= $limit ) {
-				throw new Exception(
-					sprintf(
-						/* translators: 1: action name, 2: time window in seconds */
-						__( 'Rate limit exceeded for %1$s. Please wait %2$d seconds before trying again.', 'doctor-subs' ),
-						$action,
-						$time_window
-					)
-				);
+			throw new Exception(
+				esc_html( sprintf(
+					/* translators: 1: action name, 2: time window in seconds */
+					__( 'Rate limit exceeded for %1$s. Please wait %2$d seconds before trying again.', 'doctor-subs' ),
+					$action,
+					$time_window
+				) )
+			);
 			}
 
 			set_transient( $cache_key, $current_count + 1, $time_window );

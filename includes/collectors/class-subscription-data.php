@@ -108,6 +108,7 @@ class WCST_Subscription_Data {
 		$results = array();
 
 		// Search in postmeta for billing email.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Necessary for subscription search functionality.
 		$subscription_ids = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT p.ID 

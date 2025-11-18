@@ -41,7 +41,7 @@ class WCST_Discrepancy_Detector {
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		$discrepancies = array();
@@ -90,7 +90,8 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'payment_overdue',
 					'category'       => 'payment_timing',
 					'severity'       => 'critical',
-					'description'    => sprintf( __( 'Payment is %d days overdue', 'doctor-subs' ), abs( $days_until_next ) ),
+					/* translators: %d: number of days overdue */
+				'description'    => sprintf( __( 'Payment is %d days overdue', 'doctor-subs' ), abs( $days_until_next ) ),
 					'details'        => array(
 						'expected_date'       => $next_payment,
 						'days_overdue'        => abs( $days_until_next ),
@@ -106,7 +107,8 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'payment_due_soon',
 					'category'       => 'payment_timing',
 					'severity'       => 'warning',
-					'description'    => sprintf( __( 'Payment due in %d days', 'doctor-subs' ), $days_until_next ),
+					/* translators: %d: number of days until payment is due */
+				'description'    => sprintf( __( 'Payment due in %d days', 'doctor-subs' ), $days_until_next ),
 					'details'        => array(
 						'due_date'       => $next_payment,
 						'days_until_due' => $days_until_next,
@@ -155,19 +157,22 @@ class WCST_Discrepancy_Detector {
 		// Check for missing renewal actions
 		$expected_renewal_date = $subscription->get_date( 'next_payment' );
 		if ( $expected_renewal_date ) {
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table names are safe (wpdb prefix), necessary for Action Scheduler queries.
 			$renewal_actions = $wpdb->get_var(
 				$wpdb->prepare(
 					"
 				SELECT COUNT(*) FROM {$actions_table}
-				WHERE hook LIKE '%renewal%'
+				WHERE hook LIKE %s
 				AND args LIKE %s
 				AND scheduled_date >= %s
 				AND status IN ('pending', 'completed')
 			",
+					'%renewal%',
 					'%' . $wpdb->esc_like( $subscription_id ) . '%',
 					$expected_renewal_date
 				)
 			);
+			// phpcs:enable
 
 			if ( $renewal_actions == 0 ) {
 				$discrepancies[] = array(
@@ -185,6 +190,7 @@ class WCST_Discrepancy_Detector {
 		}
 
 		// Check for failed actions
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table names are safe (wpdb prefix), necessary for Action Scheduler queries.
 		$failed_actions = $wpdb->get_var(
 			$wpdb->prepare(
 				"
@@ -195,12 +201,14 @@ class WCST_Discrepancy_Detector {
 				'%' . $wpdb->esc_like( $subscription_id ) . '%'
 			)
 		);
+		// phpcs:enable
 
 		if ( $failed_actions > 0 ) {
 			$discrepancies[] = array(
 				'type'           => 'failed_actions',
 				'category'       => 'scheduler_issue',
 				'severity'       => 'high',
+				/* translators: %d: number of failed actions */
 				'description'    => sprintf( __( '%d failed actions detected', 'doctor-subs' ), $failed_actions ),
 				'details'        => array(
 					'failed_count'    => $failed_actions,
@@ -227,6 +235,7 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'unexpected_status',
 				'category'       => 'status_issue',
 				'severity'       => $current_status === 'on-hold' ? 'high' : 'medium',
+				/* translators: %s: subscription status */
 				'description'    => sprintf( __( 'Subscription in unexpected status: %s', 'doctor-subs' ), $current_status ),
 				'details'        => array(
 					'current_status'  => $current_status,
@@ -246,7 +255,8 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'stuck_status',
 					'category'       => 'status_issue',
 					'severity'       => 'high',
-					'description'    => sprintf( __( 'Subscription stuck in %1$s status for %2$d days', 'doctor-subs' ), $current_status, round( $days_since_modification ) ),
+					/* translators: 1: subscription status, 2: number of days */
+				'description'    => sprintf( __( 'Subscription stuck in %1$s status for %2$d days', 'doctor-subs' ), $current_status, round( $days_since_modification ) ),
 					'details'        => array(
 						'status'        => $current_status,
 						'days_stuck'    => round( $days_since_modification ),
@@ -306,7 +316,8 @@ class WCST_Discrepancy_Detector {
 					'type'           => 'expiring_payment_method',
 					'category'       => 'gateway_communication',
 					'severity'       => 'warning',
-					'description'    => sprintf( __( 'Payment method expires in %d days', 'doctor-subs' ), $days_until_expiry ),
+					/* translators: %d: number of days until payment method expires */
+				'description'    => sprintf( __( 'Payment method expires in %d days', 'doctor-subs' ), $days_until_expiry ),
 					'details'        => array(
 						'expiry_date'       => $expiry_date,
 						'days_until_expiry' => $days_until_expiry,
@@ -399,6 +410,7 @@ class WCST_Discrepancy_Detector {
 				'type'           => 'high_payment_retry_count',
 				'category'       => 'payment_method',
 				'severity'       => 'high',
+				/* translators: %d: number of retry attempts */
 				'description'    => sprintf( __( 'High payment retry count: %d attempts', 'doctor-subs' ), $retry_count ),
 				'details'        => array(
 					'retry_count' => $retry_count,
@@ -592,7 +604,9 @@ class WCST_Discrepancy_Detector {
 	 */
 	private function check_cloned_site_indicators( $subscription ) {
 		// Check if WooCommerce Subscriptions duplicate site filter is active
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce Subscriptions core filter.
 		if ( has_filter( 'woocommerce_subscriptions_is_duplicate_site' ) ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce Subscriptions core filter.
 			$is_duplicate_site = apply_filters( 'woocommerce_subscriptions_is_duplicate_site', false );
 			if ( $is_duplicate_site ) {
 				return array(

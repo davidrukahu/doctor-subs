@@ -53,13 +53,13 @@ class WCST_Expected_Behavior {
 	 */
 	public function analyze( $subscription_id ) {
 		if ( ! function_exists( 'wcs_get_subscription' ) ) {
-			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
 		}
 
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		return array(
@@ -500,7 +500,7 @@ class WCST_Expected_Behavior {
 		if ( $next_payment ) {
 			$events[] = sprintf(
 				/* translators: %s: next payment date */
-				__( 'Next renewal payment due: %s', 'doctor-subs' ),
+					__( 'Next renewal payment due: %s', 'doctor-subs' ),
 				$this->safe_format_date( $next_payment )
 			);
 		}
@@ -508,7 +508,7 @@ class WCST_Expected_Behavior {
 		if ( $end_date ) {
 			$events[] = sprintf(
 				/* translators: %s: end date */
-				__( 'Subscription will expire on: %s', 'doctor-subs' ),
+					__( 'Subscription will expire on: %s', 'doctor-subs' ),
 				$this->safe_format_date( $end_date )
 			);
 		}

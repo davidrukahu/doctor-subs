@@ -74,7 +74,8 @@ class WCST_Admin {
 		// Check for subscription_id parameter and validate nonce.
 		$auto_analyze_id = null;
 		if ( isset( $_GET['subscription_id'] ) && isset( $_GET['wcst_nonce'] ) ) {
-			if ( wp_verify_nonce( $_GET['wcst_nonce'], 'wcst_subscription_action' ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Nonce verification handles sanitization.
+			if ( wp_verify_nonce( wp_unslash( $_GET['wcst_nonce'] ), 'wcst_subscription_action' ) ) {
 				$subscription_id = absint( $_GET['subscription_id'] );
 				if ( $subscription_id > 0 ) {
 					// Verify the subscription exists and user has permission.
