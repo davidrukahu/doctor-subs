@@ -64,13 +64,13 @@ class WCST_Timeline_Builder {
 	 */
 	public function build( $subscription_id ) {
 		if ( ! function_exists( 'wcs_get_subscription' ) ) {
-			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
 		}
 
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		// Collect events from all sources.
@@ -360,6 +360,7 @@ class WCST_Timeline_Builder {
 		// Check if Action Scheduler tables exist.
 		$actions_table = $wpdb->prefix . 'actionscheduler_actions';
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Necessary for Action Scheduler table check.
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $actions_table ) ) !== $actions_table ) {
 			return $events;
 		}
@@ -367,17 +368,19 @@ class WCST_Timeline_Builder {
 		$subscription_id = $subscription->get_id();
 
 		// Get actions related to this subscription.
-		$query = $wpdb->prepare(
-			"
-			SELECT *
-			FROM {$actions_table}
-			WHERE args LIKE %s
-			ORDER BY scheduled_date_gmt ASC
-		",
-			'%' . $wpdb->esc_like( (string) $subscription_id ) . '%'
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table names are safe (wpdb prefix), necessary for Action Scheduler queries.
+		$actions = $wpdb->get_results(
+			$wpdb->prepare(
+				"
+				SELECT *
+				FROM {$actions_table}
+				WHERE args LIKE %s
+				ORDER BY scheduled_date_gmt ASC
+			",
+				'%' . $wpdb->esc_like( (string) $subscription_id ) . '%'
+			)
 		);
-
-		$actions = $wpdb->get_results( $query );
+		// phpcs:enable
 
 		foreach ( $actions as $action ) {
 			$events[] = array(

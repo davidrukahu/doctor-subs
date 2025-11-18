@@ -50,13 +50,13 @@ class WCST_Subscription_Anatomy {
 	public function analyze( $subscription_id ) {
 		// Validate subscription exists and is accessible.
 		if ( ! function_exists( 'wcs_get_subscription' ) ) {
-			throw new Exception( __( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'WooCommerce Subscriptions is not active or properly loaded.', 'doctor-subs' ) );
 		}
 
 		$subscription = wcs_get_subscription( $subscription_id );
 
 		if ( ! $subscription ) {
-			throw new Exception( __( 'Subscription not found.', 'doctor-subs' ) );
+			throw new Exception( esc_html__( 'Subscription not found.', 'doctor-subs' ) );
 		}
 
 		return array(
@@ -227,6 +227,7 @@ class WCST_Subscription_Anatomy {
 		$actions_table = $wpdb->prefix . 'actionscheduler_actions';
 		$groups_table  = $wpdb->prefix . 'actionscheduler_groups';
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Necessary for Action Scheduler table check.
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $actions_table ) ) !== $actions_table ) {
 			return array(
 				'error' => __( 'Action Scheduler tables not found.', 'doctor-subs' ),
@@ -236,18 +237,20 @@ class WCST_Subscription_Anatomy {
 		$subscription_id = $subscription->get_id();
 
 		// Get all actions related to this subscription.
-		$query = $wpdb->prepare(
-			"
-			SELECT a.*, ag.slug as group_slug
-			FROM {$actions_table} a
-			LEFT JOIN {$groups_table} ag ON a.group_id = ag.group_id
-			WHERE a.args LIKE %s
-			ORDER BY a.scheduled_date_gmt ASC
-		",
-			'%' . $wpdb->esc_like( (string) $subscription_id ) . '%'
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table names are safe (wpdb prefix), necessary for Action Scheduler queries.
+		$actions = $wpdb->get_results(
+			$wpdb->prepare(
+				"
+				SELECT a.*, ag.slug as group_slug
+				FROM {$actions_table} a
+				LEFT JOIN {$groups_table} ag ON a.group_id = ag.group_id
+				WHERE a.args LIKE %s
+				ORDER BY a.scheduled_date_gmt ASC
+			",
+				'%' . $wpdb->esc_like( (string) $subscription_id ) . '%'
+			)
 		);
-
-		$actions = $wpdb->get_results( $query );
+		// phpcs:enable
 
 		$formatted_actions = array(
 			'pending'     => array(),

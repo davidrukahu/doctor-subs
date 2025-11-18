@@ -13,9 +13,8 @@ declare( strict_types=1 );
  * Description: An intuitive WooCommerce Subscriptions troubleshooting tool that implements a simple 3-step diagnostic process.
  * Version: 1.2.2
  * Author: DavidR
- * Author URI: https://github.com/davidrukahu/doctor-subs
+ * Author URI: https://github.com/davidrukahu
  * Text Domain: doctor-subs
- * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.4
  * Requires PHP: 7.4
@@ -52,6 +51,7 @@ function wcst_check_dependencies() {
 	$woocommerce_active = false;
 
 	// Check regular plugin activation.
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core filter.
 	if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 		$woocommerce_active = true;
 	}
@@ -77,6 +77,7 @@ function wcst_check_dependencies() {
 	$subscriptions_active = false;
 
 	// Method 1: Check if the plugin file is active.
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core filter.
 	if ( in_array( 'woocommerce-subscriptions/woocommerce-subscriptions.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 		$subscriptions_active = true;
 	}
