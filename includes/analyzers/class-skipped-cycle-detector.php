@@ -1,12 +1,14 @@
 <?php
-declare( strict_types=1 );
 /**
  * Skipped Cycle Detector
  *
  * Detects when subscription payments have skipped expected billing cycles.
  *
  * @package Dr_Subs
+ * @since   1.0.0
  */
+
+declare( strict_types=1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -94,14 +96,14 @@ class WCST_Skipped_Cycle_Detector {
 			return $skipped_cycles;
 		}
 
-		// Get related orders with limit to prevent performance issues
+		// Get related orders with limit to prevent performance issues.
 		$related_orders = $subscription->get_related_orders();
-		
-		// Limit to last 24 orders to prevent infinite loops
+
+		// Limit to last 24 orders to prevent infinite loops.
 		if ( count( $related_orders ) > 24 ) {
 			$related_orders = array_slice( $related_orders, -24 );
 		}
-		
+
 		$order_dates = array();
 
 		foreach ( $related_orders as $order_id ) {
@@ -114,10 +116,10 @@ class WCST_Skipped_Cycle_Detector {
 			}
 		}
 
-		// Sort order dates chronologically
+		// Sort order dates chronologically.
 		sort( $order_dates );
 
-		// If no completed orders, check if we should have had payments by now
+		// If no completed orders, check if we should have had payments by now.
 		if ( empty( $order_dates ) ) {
 			$current_time           = current_time( 'timestamp' );
 			$expected_first_payment = $this->calculate_expected_next_payment( $start_timestamp, $billing_period, $billing_interval );
@@ -144,22 +146,22 @@ class WCST_Skipped_Cycle_Detector {
 			return $skipped_cycles;
 		}
 
-		// Check for gaps between payments
+		// Check for gaps between payments.
 		$billing_period_days = $this->get_billing_period_days( $billing_period, $billing_interval );
 
-		// Safety check: ensure we have valid order dates
+		// Safety check: ensure we have valid order dates.
 		if ( empty( $order_dates ) || count( $order_dates ) < 2 ) {
 			return $skipped_cycles;
 		}
 
-		// Limit the number of comparisons to prevent performance issues
+		// Limit the number of comparisons to prevent performance issues.
 		$max_comparisons = min( count( $order_dates ) - 1, 20 );
-		
+
 		for ( $i = 0; $i < $max_comparisons; $i++ ) {
 			$current_payment = $order_dates[ $i ];
 			$next_payment    = $order_dates[ $i + 1 ];
 
-			// Safety check: ensure timestamps are valid
+			// Safety check: ensure timestamps are valid.
 			if ( ! is_numeric( $current_payment ) || ! is_numeric( $next_payment ) ) {
 				continue;
 			}
@@ -170,7 +172,7 @@ class WCST_Skipped_Cycle_Detector {
 			if ( $expected_timestamp ) {
 				$days_difference = ( $next_payment - $expected_timestamp ) / DAY_IN_SECONDS;
 
-				// If the gap is more than one billing period, it's a skipped cycle
+				// If the gap is more than one billing period, it's a skipped cycle.
 				if ( $days_difference > $billing_period_days ) {
 					$skipped_cycles[] = array(
 						'type'                => 'skipped_cycle',
@@ -197,14 +199,14 @@ class WCST_Skipped_Cycle_Detector {
 			}
 		}
 
-		// Check if the last payment was too long ago
+		// Check if the last payment was too long ago.
 		$last_payment_timestamp = end( $order_dates );
-		
-		// Safety check: ensure last payment timestamp is valid
+
+		// Safety check: ensure last payment timestamp is valid.
 		if ( ! $last_payment_timestamp || ! is_numeric( $last_payment_timestamp ) ) {
 			return $skipped_cycles;
 		}
-		
+
 		$current_time             = current_time( 'timestamp' );
 		$expected_next_after_last = $this->calculate_expected_next_payment( $last_payment_timestamp, $billing_period, $billing_interval );
 
@@ -252,8 +254,8 @@ class WCST_Skipped_Cycle_Detector {
 		$manual_completions = array();
 
 		$related_orders = $subscription->get_related_orders();
-		
-		// Limit to last 24 orders to prevent performance issues
+
+		// Limit to last 24 orders to prevent performance issues.
 		if ( count( $related_orders ) > 24 ) {
 			$related_orders = array_slice( $related_orders, -24 );
 		}
@@ -268,7 +270,7 @@ class WCST_Skipped_Cycle_Detector {
 			$payment_method = $order->get_payment_method();
 			$transaction_id = $order->get_transaction_id();
 
-			// Check for manual payment methods
+			// Check for manual payment methods.
 			$manual_methods = array( 'cheque', 'bacs', 'cod', 'bank_transfer' );
 
 			if ( in_array( $payment_method, $manual_methods, true ) ) {
@@ -291,7 +293,7 @@ class WCST_Skipped_Cycle_Detector {
 				);
 			}
 
-			// Check for orders marked complete without transaction ID
+			// Check for orders marked complete without transaction ID.
 			if ( 'completed' === $order->get_status() && empty( $transaction_id ) && ! in_array( $payment_method, $manual_methods, true ) ) {
 				$manual_completions[] = array(
 					'type'           => 'manual_completion',
@@ -329,7 +331,7 @@ class WCST_Skipped_Cycle_Detector {
 		$next_payment = $subscription->get_date( 'next_payment' );
 		$end_date     = $subscription->get_date( 'end' );
 
-		// Check for expired status with future next payment
+		// Check for expired status with future next payment.
 		if ( 'expired' === $status && $next_payment ) {
 			$next_timestamp = $this->safe_get_timestamp( $next_payment );
 			$now            = current_time( 'timestamp' );
@@ -349,7 +351,7 @@ class WCST_Skipped_Cycle_Detector {
 			}
 		}
 
-		// Check for active status with past end date
+		// Check for active status with past end date.
 		if ( 'active' === $status && $end_date ) {
 			$end_timestamp = $this->safe_get_timestamp( $end_date );
 			$now           = current_time( 'timestamp' );
@@ -389,7 +391,7 @@ class WCST_Skipped_Cycle_Detector {
 		$subscription_id = $subscription->get_id();
 		$store           = ActionScheduler_Store::instance();
 
-		// Check for scheduled subscription payments
+		// Check for scheduled subscription payments.
 		$payment_actions = $store->query_actions(
 			array(
 				'hook'     => 'woocommerce_scheduled_subscription_payment',
@@ -412,7 +414,7 @@ class WCST_Skipped_Cycle_Detector {
 			);
 		}
 
-		// Check for failed actions
+		// Check for failed actions.
 		$failed_actions = $store->query_actions(
 			array(
 				'hook'     => array( 'woocommerce_scheduled_subscription_payment', 'woocommerce_scheduled_subscription_expiration' ),
@@ -456,13 +458,13 @@ class WCST_Skipped_Cycle_Detector {
 	private function year_over_year_analysis( $subscription ) {
 		$analysis = array();
 
-		$related_orders   = $subscription->get_related_orders();
-		
-		// Limit to last 24 orders to prevent performance issues
+		$related_orders = $subscription->get_related_orders();
+
+		// Limit to last 24 orders to prevent performance issues.
 		if ( count( $related_orders ) > 24 ) {
 			$related_orders = array_slice( $related_orders, -24 );
 		}
-		
+
 		$renewals_by_year = array();
 
 		foreach ( $related_orders as $order_id ) {
@@ -472,7 +474,7 @@ class WCST_Skipped_Cycle_Detector {
 				continue;
 			}
 
-			// Only count renewal orders
+			// Only count renewal orders.
 			if ( 'renewal' === $order->get_meta( '_subscription_renewal' ) ) {
 				$year = $order->get_date_created()->format( 'Y' );
 				if ( ! isset( $renewals_by_year[ $year ] ) ) {
@@ -482,10 +484,10 @@ class WCST_Skipped_Cycle_Detector {
 			}
 		}
 
-		// Sort years
+		// Sort years.
 		ksort( $renewals_by_year );
 
-		// Check for missing years
+		// Check for missing years.
 		$years = array_keys( $renewals_by_year );
 		if ( count( $years ) > 1 ) {
 			$min_year = min( $years );

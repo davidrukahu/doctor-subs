@@ -1,10 +1,12 @@
 <?php
-declare( strict_types=1 );
 /**
  * Main Plugin Class
  *
  * @package Dr_Subs
+ * @since   1.0.0
  */
+
+declare( strict_types=1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

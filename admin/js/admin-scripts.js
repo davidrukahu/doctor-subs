@@ -133,11 +133,46 @@
                         this.analysisData = response.data;
                         this.displayResults( response.data );
                     } else {
-                        this.showError( response.data || 'Analysis failed. Please try again.' );
+                        // Handle detailed error response.
+                        let errorMessage = 'Analysis failed. Please try again.';
+                        if ( response.data ) {
+                            if ( typeof response.data === 'string' ) {
+                                errorMessage = response.data;
+                            } else if ( response.data.message ) {
+                                errorMessage = response.data.message;
+                                // Include debug info if available.
+                                if ( response.data.debug && window.console ) {
+                                    console.error( 'Doctor Subs Error:', response.data.debug );
+                                }
+                            }
+                        }
+                        this.showError( errorMessage );
+                        // Log to console for debugging.
+                        if ( window.console ) {
+                            console.error( 'Doctor Subs Analysis Error:', response );
+                        }
                     }
                 },
-                error: () => {
-                    this.showError( 'Analysis failed. Please try again.' );
+                error: ( xhr, status, error ) => {
+                    let errorMessage = 'Analysis failed. Please try again.';
+                    // Try to parse error response.
+                    if ( xhr.responseJSON && xhr.responseJSON.data ) {
+                        if ( typeof xhr.responseJSON.data === 'string' ) {
+                            errorMessage = xhr.responseJSON.data;
+                        } else if ( xhr.responseJSON.data.message ) {
+                            errorMessage = xhr.responseJSON.data.message;
+                        }
+                    }
+                    this.showError( errorMessage );
+                    // Log full error to console for debugging.
+                    if ( window.console ) {
+                        console.error( 'Doctor Subs AJAX Error:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText,
+                            xhr: xhr
+                        } );
+                    }
                 },
                 complete: () => {
                     this.hideProgress();
@@ -452,9 +487,18 @@
         },
 
         showError: function( message ) {
+            // Show error in results area.
             const html = '<div class="wcst-error">' + message + '</div>';
             $( '#wcst-results' ).html( html ).show();
             $( '#wcst-progress' ).hide();
+            
+            // Also show error near search input for better visibility.
+            $( '#wcst-search-results' ).html( '<div class="wcst-error" style="margin-top: 10px; padding: 10px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px;">' + message + '</div>' ).show();
+            
+            // Log to console for debugging.
+            if ( window.console ) {
+                console.error( 'Doctor Subs Error:', message );
+            }
         },
 
         // Helper functions

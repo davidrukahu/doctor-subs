@@ -1,10 +1,12 @@
 <?php
-declare( strict_types=1 );
 /**
  * Admin Interface Controller
  *
  * @package Dr_Subs
+ * @since   1.0.0
  */
+
+declare( strict_types=1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -74,9 +76,10 @@ class WCST_Admin {
 		// Check for subscription_id parameter and validate nonce.
 		$auto_analyze_id = null;
 		if ( isset( $_GET['subscription_id'] ) && isset( $_GET['wcst_nonce'] ) ) {
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Nonce verification handles sanitization.
-			if ( wp_verify_nonce( wp_unslash( $_GET['wcst_nonce'] ), 'wcst_subscription_action' ) ) {
-				$subscription_id = absint( $_GET['subscription_id'] );
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- wp_unslash() is applied below.
+			if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['wcst_nonce'] ) ), 'wcst_subscription_action' ) ) {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- wp_unslash() is applied below.
+				$subscription_id = absint( wp_unslash( $_GET['subscription_id'] ) );
 				if ( $subscription_id > 0 ) {
 					// Verify the subscription exists and user has permission.
 					$subscription = wcs_get_subscription( $subscription_id );
@@ -133,9 +136,9 @@ class WCST_Admin {
 	 * Add Doctor Subs action link to subscription status column.
 	 *
 	 * @since 1.0.0
-	 * @param string $column_content The status column content.
+	 * @param string          $column_content The status column content.
 	 * @param WC_Subscription $subscription The subscription object.
-	 * @param array $actions The existing actions array.
+	 * @param array           $actions The existing actions array.
 	 * @return string Modified column content.
 	 */
 	public function add_doctor_subs_to_status_column( $column_content, $subscription, $actions ) {
@@ -145,12 +148,12 @@ class WCST_Admin {
 		}
 
 		$subscription_id = $subscription->get_id();
-		
+
 		// Create secure URL with nonce.
 		$doctor_subs_url = wp_nonce_url(
 			add_query_arg(
 				array(
-					'page'           => 'doctor-subs',
+					'page'            => 'doctor-subs',
 					'subscription_id' => $subscription_id,
 				),
 				admin_url( 'admin.php' )

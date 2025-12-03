@@ -1,5 +1,4 @@
 <?php
-declare( strict_types=1 );
 /**
  * Expected Behavior Analyzer
  *
@@ -7,7 +6,10 @@ declare( strict_types=1 );
  * "Determine What Should Happen"
  *
  * @package Dr_Subs
+ * @since   1.0.0
  */
+
+declare( strict_types=1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -184,9 +186,11 @@ class WCST_Expected_Behavior {
 		$billing_control = $this->determine_billing_schedule_control( $subscription );
 
 		if ( 'action_scheduler' === $billing_control ) {
+			$description = __( 'Renewals are handled by WordPress Action Scheduler.', 'doctor-subs' );
+
 			return array(
 				'type'              => 'action_scheduler',
-				'description'       => __( 'Renewals are handled by WordPress Action Scheduler.', 'doctor-subs' ),
+				'description'       => $description,
 				'next_action'       => sprintf(
 					/* translators: %s: next payment date */
 					__( 'Automated renewal scheduled for %s', 'doctor-subs' ),
@@ -500,7 +504,7 @@ class WCST_Expected_Behavior {
 		if ( $next_payment ) {
 			$events[] = sprintf(
 				/* translators: %s: next payment date */
-					__( 'Next renewal payment due: %s', 'doctor-subs' ),
+				__( 'Next renewal payment due: %s', 'doctor-subs' ),
 				$this->safe_format_date( $next_payment )
 			);
 		}
@@ -508,7 +512,7 @@ class WCST_Expected_Behavior {
 		if ( $end_date ) {
 			$events[] = sprintf(
 				/* translators: %s: end date */
-					__( 'Subscription will expire on: %s', 'doctor-subs' ),
+				__( 'Subscription will expire on: %s', 'doctor-subs' ),
 				$this->safe_format_date( $end_date )
 			);
 		}
@@ -527,7 +531,7 @@ class WCST_Expected_Behavior {
 	 * @param WC_Subscription $subscription Subscription object.
 	 * @return array Expected events.
 	 */
-	private function get_on_hold_subscription_expectations( $subscription ) {
+	private function get_on_hold_subscription_expectations( $subscription ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Parameter reserved for future use.
 		return array(
 			__( 'No automatic renewals will occur while subscription is on hold.', 'doctor-subs' ),
 			__( 'Subscription must be reactivated to resume billing.', 'doctor-subs' ),
@@ -576,7 +580,7 @@ class WCST_Expected_Behavior {
 
 		$time_diff = null;
 		if ( $sub_date && $order_date ) {
-			// Handle both DateTime objects and timestamp strings (HPOS compatibility)
+			// Handle both DateTime objects and timestamp strings (HPOS compatibility).
 			$sub_timestamp   = is_object( $sub_date ) ? $sub_date->getTimestamp() : strtotime( $sub_date );
 			$order_timestamp = is_object( $order_date ) ? $order_date->getTimestamp() : strtotime( $order_date );
 			$time_diff       = $sub_timestamp - $order_timestamp;
@@ -649,7 +653,7 @@ class WCST_Expected_Behavior {
 			'is_test'     => false,
 		);
 
-		// Common mode detection patterns
+		// Common mode detection patterns.
 		$mode_patterns = array(
 			'test_mode',
 			'sandbox',
@@ -659,15 +663,15 @@ class WCST_Expected_Behavior {
 			'debug_mode',
 		);
 
-		// Check gateway settings for mode indicators
+		// Check gateway settings for mode indicators.
 		if ( isset( $gateway->settings ) && is_array( $gateway->settings ) ) {
 			foreach ( $mode_patterns as $pattern ) {
 				if ( isset( $gateway->settings[ $pattern ] ) ) {
 					$value = $gateway->settings[ $pattern ];
 
-					// Check for boolean values
+					// Check for boolean values.
 					if ( is_bool( $value ) ) {
-						if ( in_array( $pattern, array( 'test_mode', 'sandbox', 'debug_mode' ) ) ) {
+						if ( in_array( $pattern, array( 'test_mode', 'sandbox', 'debug_mode' ), true ) ) {
 							$mode_info['mode']        = $value ? 'sandbox' : 'live';
 							$mode_info['is_test']     = $value;
 							$mode_info['description'] = $value ? __( 'Sandbox/Test Mode', 'doctor-subs' ) : __( 'Live/Production Mode', 'doctor-subs' );
@@ -675,15 +679,15 @@ class WCST_Expected_Behavior {
 						}
 					}
 
-					// Check for string values
+					// Check for string values.
 					if ( is_string( $value ) ) {
 						$value_lower = strtolower( $value );
-						if ( in_array( $value_lower, array( 'test', 'sandbox', 'false' ) ) ) {
+						if ( in_array( $value_lower, array( 'test', 'sandbox', 'false' ), true ) ) {
 							$mode_info['mode']        = 'sandbox';
 							$mode_info['is_test']     = true;
 							$mode_info['description'] = __( 'Sandbox/Test Mode', 'doctor-subs' );
 							break;
-						} elseif ( in_array( $value_lower, array( 'live', 'production', 'true' ) ) ) {
+						} elseif ( in_array( $value_lower, array( 'live', 'production', 'true' ), true ) ) {
 							$mode_info['mode']        = 'live';
 							$mode_info['is_test']     = false;
 							$mode_info['description'] = __( 'Live/Production Mode', 'doctor-subs' );
@@ -694,7 +698,7 @@ class WCST_Expected_Behavior {
 			}
 		}
 
-		// Gateway-specific detection
+		// Gateway-specific detection.
 		switch ( $gateway_id ) {
 			case 'stripe':
 				$mode_info = $this->detect_stripe_mode( $gateway );
@@ -731,7 +735,7 @@ class WCST_Expected_Behavior {
 		);
 
 		if ( isset( $gateway->settings['testmode'] ) ) {
-			$is_test                  = $gateway->settings['testmode'] === 'yes';
+			$is_test                  = ( 'yes' === $gateway->settings['testmode'] );
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
 			$mode_info['description'] = $is_test ? __( 'Stripe Test Mode', 'doctor-subs' ) : __( 'Stripe Live Mode', 'doctor-subs' );
@@ -755,7 +759,7 @@ class WCST_Expected_Behavior {
 		);
 
 		if ( isset( $gateway->settings['testmode'] ) ) {
-			$is_test                  = $gateway->settings['testmode'] === 'yes';
+			$is_test                  = ( 'yes' === $gateway->settings['testmode'] );
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
 			$mode_info['description'] = $is_test ? __( 'PayPal Sandbox Mode', 'doctor-subs' ) : __( 'PayPal Live Mode', 'doctor-subs' );
@@ -779,7 +783,7 @@ class WCST_Expected_Behavior {
 		);
 
 		if ( isset( $gateway->settings['sandbox'] ) ) {
-			$is_test                  = $gateway->settings['sandbox'] === 'yes';
+			$is_test                  = ( 'yes' === $gateway->settings['sandbox'] );
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
 			$mode_info['description'] = $is_test ? __( 'Square Sandbox Mode', 'doctor-subs' ) : __( 'Square Live Mode', 'doctor-subs' );
@@ -803,7 +807,7 @@ class WCST_Expected_Behavior {
 		);
 
 		if ( isset( $gateway->settings['sandbox'] ) ) {
-			$is_test                  = $gateway->settings['sandbox'] === 'yes';
+			$is_test                  = ( 'yes' === $gateway->settings['sandbox'] );
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
 			$mode_info['description'] = $is_test ? __( 'Braintree Sandbox Mode', 'doctor-subs' ) : __( 'Braintree Live Mode', 'doctor-subs' );
@@ -827,7 +831,7 @@ class WCST_Expected_Behavior {
 		);
 
 		if ( isset( $gateway->settings['testmode'] ) ) {
-			$is_test                  = $gateway->settings['testmode'] === 'yes';
+			$is_test                  = ( 'yes' === $gateway->settings['testmode'] );
 			$mode_info['mode']        = $is_test ? 'sandbox' : 'live';
 			$mode_info['is_test']     = $is_test;
 			$mode_info['description'] = $is_test ? __( 'Authorize.net Test Mode', 'doctor-subs' ) : __( 'Authorize.net Live Mode', 'doctor-subs' );

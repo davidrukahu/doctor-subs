@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<ruleset name="Doctor Subs">
+	<description>Custom ruleset for Doctor Subs plugin</description>
+	
+	<!-- Exclude vendor and node_modules -->
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	
+	<!-- Use WordPress Coding Standards -->
+	<rule ref="WordPress">
+		<!-- Exclude file naming convention - files are already named consistently -->
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+	</rule>
+	
+	<!-- Check all PHP files -->
+	<file>.</file>
+</ruleset>
+
+
