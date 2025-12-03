@@ -3,12 +3,18 @@
  * Discrepancy Detector
  *
  * @package Dr_Subs
+ * @since   1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Detects discrepancies in subscription data.
+ *
+ * @since 1.0.0
+ */
 class WCST_Discrepancy_Detector {
 
 	/**
@@ -35,7 +41,12 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Analyze discrepancies
+	 * Analyze discrepancies.
+	 *
+	 * @since 1.0.0
+	 * @param int $subscription_id Subscription ID.
+	 * @return array Array of discrepancies.
+	 * @throws Exception If subscription not found.
 	 */
 	public function analyze_discrepancies( $subscription_id ) {
 		$subscription = wcs_get_subscription( $subscription_id );
@@ -46,32 +57,36 @@ class WCST_Discrepancy_Detector {
 
 		$discrepancies = array();
 
-		// Check payment timing discrepancies
+		// Check payment timing discrepancies.
 		$discrepancies = array_merge( $discrepancies, $this->check_payment_timing( $subscription ) );
 
-		// Check missing actions
+		// Check missing actions.
 		$discrepancies = array_merge( $discrepancies, $this->check_missing_actions( $subscription ) );
 
-		// Check status transition issues
+		// Check status transition issues.
 		$discrepancies = array_merge( $discrepancies, $this->check_status_transitions( $subscription ) );
 
-		// Check gateway communication failures
+		// Check gateway communication failures.
 		$discrepancies = array_merge( $discrepancies, $this->check_gateway_communications( $subscription ) );
 
-		// Check email notification gaps
+		// Check email notification gaps.
 		$discrepancies = array_merge( $discrepancies, $this->check_notifications( $subscription ) );
 
-		// Check payment method issues
+		// Check payment method issues.
 		$discrepancies = array_merge( $discrepancies, $this->check_payment_method_issues( $subscription ) );
 
-		// Check configuration issues
+		// Check configuration issues.
 		$discrepancies = array_merge( $discrepancies, $this->check_configuration_issues( $subscription ) );
 
 		return $this->prioritize_discrepancies( $discrepancies );
 	}
 
 	/**
-	 * Check payment timing discrepancies
+	 * Check payment timing discrepancies.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of discrepancies.
 	 */
 	private function check_payment_timing( $subscription ) {
 		$discrepancies = array();
@@ -84,14 +99,14 @@ class WCST_Discrepancy_Detector {
 			$next_payment_timestamp = $this->safe_get_timestamp( $next_payment );
 			$days_until_next        = ceil( ( $next_payment_timestamp - $now ) / DAY_IN_SECONDS );
 
-			// Check for overdue payments
+			// Check for overdue payments.
 			if ( $days_until_next < 0 ) {
 				$discrepancies[] = array(
 					'type'           => 'payment_overdue',
 					'category'       => 'payment_timing',
 					'severity'       => 'critical',
 					/* translators: %d: number of days overdue */
-				'description'    => sprintf( __( 'Payment is %d days overdue', 'doctor-subs' ), abs( $days_until_next ) ),
+					'description'    => sprintf( __( 'Payment is %d days overdue', 'doctor-subs' ), abs( $days_until_next ) ),
 					'details'        => array(
 						'expected_date'       => $next_payment,
 						'days_overdue'        => abs( $days_until_next ),
@@ -101,14 +116,14 @@ class WCST_Discrepancy_Detector {
 				);
 			}
 
-			// Check for payments due soon
+			// Check for payments due soon.
 			if ( $days_until_next >= 0 && $days_until_next <= 3 ) {
 				$discrepancies[] = array(
 					'type'           => 'payment_due_soon',
 					'category'       => 'payment_timing',
 					'severity'       => 'warning',
 					/* translators: %d: number of days until payment is due */
-				'description'    => sprintf( __( 'Payment due in %d days', 'doctor-subs' ), $days_until_next ),
+					'description'    => sprintf( __( 'Payment due in %d days', 'doctor-subs' ), $days_until_next ),
 					'details'        => array(
 						'due_date'       => $next_payment,
 						'days_until_due' => $days_until_next,
@@ -118,7 +133,7 @@ class WCST_Discrepancy_Detector {
 			}
 		}
 
-		// Check for irregular payment intervals
+		// Check for irregular payment intervals.
 		if ( $last_payment && $next_payment ) {
 			$expected_interval   = $this->calculate_expected_interval( $subscription );
 			$actual_interval     = $this->safe_get_timestamp( $next_payment ) - $this->safe_get_timestamp( $last_payment );
@@ -144,7 +159,11 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Check missing actions
+	 * Check missing actions.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of discrepancies.
 	 */
 	private function check_missing_actions( $subscription ) {
 		$discrepancies = array();
@@ -154,27 +173,34 @@ class WCST_Discrepancy_Detector {
 		$actions_table   = $wpdb->prefix . 'actionscheduler_actions';
 		$subscription_id = $subscription->get_id();
 
-		// Check for missing renewal actions
+		// Check for missing renewal actions.
 		$expected_renewal_date = $subscription->get_date( 'next_payment' );
 		if ( $expected_renewal_date ) {
 			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table names are safe (wpdb prefix), necessary for Action Scheduler queries.
+			// Check if scheduled_date_gmt column exists (newer Action Scheduler versions).
+			$date_column   = 'scheduled_date_gmt';
+			$table_columns = $wpdb->get_col( "DESC {$actions_table}" );
+			if ( ! in_array( 'scheduled_date_gmt', $table_columns, true ) ) {
+				$date_column = 'scheduled_date';
+			}
+
 			$renewal_actions = $wpdb->get_var(
 				$wpdb->prepare(
 					"
 				SELECT COUNT(*) FROM {$actions_table}
 				WHERE hook LIKE %s
 				AND args LIKE %s
-				AND scheduled_date >= %s
+				AND {$date_column} >= %s
 				AND status IN ('pending', 'completed')
 			",
 					'%renewal%',
-					'%' . $wpdb->esc_like( $subscription_id ) . '%',
+					'%' . $wpdb->esc_like( (string) $subscription_id ) . '%',
 					$expected_renewal_date
 				)
 			);
 			// phpcs:enable
 
-			if ( $renewal_actions == 0 ) {
+			if ( 0 === (int) $renewal_actions ) {
 				$discrepancies[] = array(
 					'type'           => 'missing_renewal_action',
 					'category'       => 'scheduler_issue',
@@ -189,7 +215,7 @@ class WCST_Discrepancy_Detector {
 			}
 		}
 
-		// Check for failed actions
+		// Check for failed actions.
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table names are safe (wpdb prefix), necessary for Action Scheduler queries.
 		$failed_actions = $wpdb->get_var(
 			$wpdb->prepare(
@@ -222,19 +248,23 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Check status transition issues
+	 * Check status transition issues.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of discrepancies.
 	 */
 	private function check_status_transitions( $subscription ) {
 		$discrepancies  = array();
 		$current_status = $subscription->get_status();
 
-		// Check for unexpected status
+		// Check for unexpected status.
 		$unexpected_statuses = array( 'pending', 'on-hold' );
-		if ( in_array( $current_status, $unexpected_statuses ) ) {
+		if ( in_array( $current_status, $unexpected_statuses, true ) ) {
 			$discrepancies[] = array(
 				'type'           => 'unexpected_status',
 				'category'       => 'status_issue',
-				'severity'       => $current_status === 'on-hold' ? 'high' : 'medium',
+				'severity'       => ( 'on-hold' === $current_status ) ? 'high' : 'medium',
 				/* translators: %s: subscription status */
 				'description'    => sprintf( __( 'Subscription in unexpected status: %s', 'doctor-subs' ), $current_status ),
 				'details'        => array(
@@ -245,18 +275,18 @@ class WCST_Discrepancy_Detector {
 			);
 		}
 
-		// Check for stuck status
+		// Check for stuck status.
 		$last_modified = $subscription->get_date( 'date_modified' );
 		if ( $last_modified ) {
 			$days_since_modification = ( current_time( 'timestamp' ) - $this->safe_get_timestamp( $last_modified ) ) / DAY_IN_SECONDS;
 
-			if ( $days_since_modification > 7 && in_array( $current_status, array( 'pending', 'on-hold' ) ) ) {
+			if ( $days_since_modification > 7 && in_array( $current_status, array( 'pending', 'on-hold' ), true ) ) {
 				$discrepancies[] = array(
 					'type'           => 'stuck_status',
 					'category'       => 'status_issue',
 					'severity'       => 'high',
 					/* translators: 1: subscription status, 2: number of days */
-				'description'    => sprintf( __( 'Subscription stuck in %1$s status for %2$d days', 'doctor-subs' ), $current_status, round( $days_since_modification ) ),
+					'description'    => sprintf( __( 'Subscription stuck in %1$s status for %2$d days', 'doctor-subs' ), $current_status, round( $days_since_modification ) ),
 					'details'        => array(
 						'status'        => $current_status,
 						'days_stuck'    => round( $days_since_modification ),
@@ -271,15 +301,19 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Check gateway communication failures
+	 * Check gateway communication failures.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of discrepancies.
 	 */
 	private function check_gateway_communications( $subscription ) {
 		$discrepancies  = array();
 		$payment_method = $subscription->get_payment_method();
 
-		// Check for missing gateway tokens
+		// Check for missing gateway tokens.
 		$token_id = $subscription->get_meta( '_payment_token_id' );
-		if ( empty( $token_id ) && ! in_array( $payment_method, array( 'cheque', 'bacs', 'cod' ) ) ) {
+		if ( empty( $token_id ) && ! in_array( $payment_method, array( 'cheque', 'bacs', 'cod' ), true ) ) {
 			$discrepancies[] = array(
 				'type'           => 'missing_payment_token',
 				'category'       => 'gateway_communication',
@@ -293,7 +327,7 @@ class WCST_Discrepancy_Detector {
 			);
 		}
 
-		// Check for expired payment methods
+		// Check for expired payment methods.
 		$expiry_date = $subscription->get_meta( '_payment_token_expiry' );
 		if ( $expiry_date ) {
 			$expiry_timestamp  = $this->safe_get_timestamp( $expiry_date );
@@ -317,7 +351,7 @@ class WCST_Discrepancy_Detector {
 					'category'       => 'gateway_communication',
 					'severity'       => 'warning',
 					/* translators: %d: number of days until payment method expires */
-				'description'    => sprintf( __( 'Payment method expires in %d days', 'doctor-subs' ), $days_until_expiry ),
+					'description'    => sprintf( __( 'Payment method expires in %d days', 'doctor-subs' ), $days_until_expiry ),
 					'details'        => array(
 						'expiry_date'       => $expiry_date,
 						'days_until_expiry' => $days_until_expiry,
@@ -327,7 +361,7 @@ class WCST_Discrepancy_Detector {
 			}
 		}
 
-		// Check for gateway-specific issues
+		// Check for gateway-specific issues.
 		switch ( $payment_method ) {
 			case 'stripe':
 				$discrepancies = array_merge( $discrepancies, $this->check_stripe_issues( $subscription ) );
@@ -341,17 +375,21 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Check notifications
+	 * Check notifications.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of discrepancies.
 	 */
 	private function check_notifications( $subscription ) {
 		$discrepancies = array();
 
-		// Check for missing email notifications
+		// Check for missing email notifications.
 		$email_settings = get_option( 'woocommerce_email_settings', array() );
 
-		// Check renewal reminder emails
+		// Check renewal reminder emails.
 		if ( ! isset( $email_settings['woocommerce_subscription_renewal_reminder_enabled'] ) ||
-			$email_settings['woocommerce_subscription_renewal_reminder_enabled'] !== 'yes' ) {
+			( 'yes' !== $email_settings['woocommerce_subscription_renewal_reminder_enabled'] ) ) {
 			$discrepancies[] = array(
 				'type'           => 'missing_renewal_reminders',
 				'category'       => 'notification_gap',
@@ -364,9 +402,9 @@ class WCST_Discrepancy_Detector {
 			);
 		}
 
-		// Check payment failed emails
+		// Check payment failed emails.
 		if ( ! isset( $email_settings['woocommerce_subscription_payment_failed_enabled'] ) ||
-			$email_settings['woocommerce_subscription_payment_failed_enabled'] !== 'yes' ) {
+			( 'yes' !== $email_settings['woocommerce_subscription_payment_failed_enabled'] ) ) {
 			$discrepancies[] = array(
 				'type'           => 'missing_payment_failed_emails',
 				'category'       => 'notification_gap',
@@ -383,14 +421,18 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Check payment method issues
+	 * Check payment method issues.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of discrepancies.
 	 */
 	private function check_payment_method_issues( $subscription ) {
 		$discrepancies  = array();
 		$payment_method = $subscription->get_payment_method();
 
-		// Check for manual renewal requirement
-		if ( in_array( $payment_method, array( 'cheque', 'bacs', 'cod' ) ) ) {
+		// Check for manual renewal requirement.
+		if ( in_array( $payment_method, array( 'cheque', 'bacs', 'cod' ), true ) ) {
 			$discrepancies[] = array(
 				'type'           => 'manual_renewal_required',
 				'category'       => 'payment_method',
@@ -403,7 +445,7 @@ class WCST_Discrepancy_Detector {
 			);
 		}
 
-		// Check for high retry count
+		// Check for high retry count.
 		$retry_count = $subscription->get_meta( '_payment_retry_count' );
 		if ( $retry_count && $retry_count > 3 ) {
 			$discrepancies[] = array(
@@ -423,12 +465,16 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Check configuration issues
+	 * Check configuration issues.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of discrepancies.
 	 */
 	private function check_configuration_issues( $subscription ) {
 		$discrepancies = array();
 
-		// Check for missing product configuration
+		// Check for missing product configuration.
 		$items = $subscription->get_items();
 		foreach ( $items as $item ) {
 			$product = $item->get_product();
@@ -451,12 +497,16 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Check Stripe-specific issues
+	 * Check Stripe-specific issues.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of discrepancies.
 	 */
 	private function check_stripe_issues( $subscription ) {
 		$discrepancies = array();
 
-		// Check for missing Stripe customer ID
+		// Check for missing Stripe customer ID.
 		$stripe_customer_id = $subscription->get_meta( '_stripe_customer_id' );
 		if ( empty( $stripe_customer_id ) ) {
 			$discrepancies[] = array(
@@ -471,21 +521,21 @@ class WCST_Discrepancy_Detector {
 			);
 		}
 
-		// Check for detached payment method error (cloned site issue)
+		// Check for detached payment method error (cloned site issue).
 		$detached_payment_method_issue = $this->check_detached_payment_method( $subscription );
 		if ( ! empty( $detached_payment_method_issue ) ) {
 			$discrepancies[] = $detached_payment_method_issue;
 		}
 
-		// Check for cloned/staging site indicators
+		// Check for cloned/staging site indicators.
 		$cloned_site_issue = $this->check_cloned_site_indicators( $subscription );
 		if ( ! empty( $cloned_site_issue ) ) {
 			$discrepancies[] = $cloned_site_issue;
 		}
 
-		// Check renewal orders for Stripe API errors
+		// Check renewal orders for Stripe API errors.
 		$renewal_errors = $this->check_stripe_renewal_errors( $subscription );
-		$discrepancies   = array_merge( $discrepancies, $renewal_errors );
+		$discrepancies  = array_merge( $discrepancies, $renewal_errors );
 
 		return $discrepancies;
 	}
@@ -498,7 +548,7 @@ class WCST_Discrepancy_Detector {
 	 * @return array|null Detached payment method discrepancy or null.
 	 */
 	private function check_detached_payment_method( $subscription ) {
-		// Check subscription notes for the specific Stripe error message
+		// Check subscription notes for the specific Stripe error message.
 		$notes = wc_get_order_notes(
 			array(
 				'order_id' => $subscription->get_id(),
@@ -524,7 +574,7 @@ class WCST_Discrepancy_Detector {
 						'error_text'   => $pattern,
 						'note_content' => substr( $note->content, 0, 200 ),
 					);
-					break; // Found error in this note, move to next note
+					break; // Found error in this note, move to next note.
 				}
 			}
 		}
@@ -536,35 +586,40 @@ class WCST_Discrepancy_Detector {
 				'severity'       => 'critical',
 				'description'    => __( 'Stripe payment method detachment detected - likely caused by cloned/staging site', 'doctor-subs' ),
 				'details'        => array(
-					'gateway'           => 'stripe',
-					'error_count'       => count( $found_errors ),
-					'errors'            => $found_errors,
-					'subscription_id'   => $subscription->get_id(),
+					'gateway'            => 'stripe',
+					'error_count'        => count( $found_errors ),
+					'errors'             => $found_errors,
+					'subscription_id'    => $subscription->get_id(),
 					'stripe_customer_id' => $subscription->get_meta( '_stripe_customer_id' ),
 				),
 				'recommendation' => __( 'This is a known issue when cloning sites with WooCommerce Subscriptions. Update to WooCommerce Stripe Gateway 7.x+ which includes fixes. If already updated, re-attach the payment method to the Stripe customer or contact Stripe support.', 'doctor-subs' ),
 			);
 		}
 
-		// Check if payment token exists but might be detached
+		// Check if payment token exists but might be detached.
 		$payment_token_id = $subscription->get_meta( '_payment_token_id' );
 		$stripe_customer  = $subscription->get_meta( '_stripe_customer_id' );
 		$stripe_source_id = $subscription->get_meta( '_stripe_source_id' );
 
 		if ( ! empty( $payment_token_id ) && ! empty( $stripe_customer ) ) {
-			// Check if there are failed renewal orders that might indicate detachment
-			$renewal_orders = $subscription->get_related_orders( 'ids', 'renewal' );
+			// Check if there are failed renewal orders that might indicate detachment.
+			$renewal_orders  = $subscription->get_related_orders( 'ids', 'renewal' );
 			$failed_renewals = 0;
 			foreach ( $renewal_orders as $order_id ) {
 				$order = wc_get_order( $order_id );
 				if ( $order && in_array( $order->get_status(), array( 'failed', 'cancelled' ), true ) ) {
-					$order_notes = wc_get_order_notes( array( 'order_id' => $order_id, 'limit' => 10 ) );
+					$order_notes = wc_get_order_notes(
+						array(
+							'order_id' => $order_id,
+							'limit'    => 10,
+						)
+					);
 					foreach ( $order_notes as $order_note ) {
 						$note_lower = strtolower( $order_note->content );
 						foreach ( $detached_error_patterns as $pattern ) {
 							if ( false !== strpos( $note_lower, strtolower( $pattern ) ) ) {
-								$failed_renewals++;
-								break 2; // Break out of both loops
+								++$failed_renewals;
+								break 2; // Break out of both loops.
 							}
 						}
 					}
@@ -582,9 +637,9 @@ class WCST_Discrepancy_Detector {
 						$failed_renewals
 					),
 					'details'        => array(
-						'gateway'          => 'stripe',
-						'failed_renewals'  => $failed_renewals,
-						'payment_token_id' => $payment_token_id,
+						'gateway'            => 'stripe',
+						'failed_renewals'    => $failed_renewals,
+						'payment_token_id'   => $payment_token_id,
 						'stripe_customer_id' => $stripe_customer,
 					),
 					'recommendation' => __( 'Review failed renewal orders for Stripe payment method errors. This may indicate a detached payment method issue from cloned/staging sites.', 'doctor-subs' ),
@@ -603,7 +658,7 @@ class WCST_Discrepancy_Detector {
 	 * @return array|null Cloned site indicator discrepancy or null.
 	 */
 	private function check_cloned_site_indicators( $subscription ) {
-		// Check if WooCommerce Subscriptions duplicate site filter is active
+		// Check if WooCommerce Subscriptions duplicate site filter is active.
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce Subscriptions core filter.
 		if ( has_filter( 'woocommerce_subscriptions_is_duplicate_site' ) ) {
 			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce Subscriptions core filter.
@@ -623,10 +678,10 @@ class WCST_Discrepancy_Detector {
 			}
 		}
 
-		// Check WordPress environment type
+		// Check WordPress environment type.
 		$environment_type = wp_get_environment_type();
 		if ( in_array( $environment_type, array( 'staging', 'development' ), true ) ) {
-			// Check if there are Stripe payment methods that might be affected
+			// Check if there are Stripe payment methods that might be affected.
 			$stripe_customer = $subscription->get_meta( '_stripe_customer_id' );
 			if ( ! empty( $stripe_customer ) ) {
 				return array(
@@ -639,7 +694,7 @@ class WCST_Discrepancy_Detector {
 						$environment_type
 					),
 					'details'        => array(
-						'environment_type' => $environment_type,
+						'environment_type'   => $environment_type,
 						'stripe_customer_id' => $stripe_customer,
 					),
 					'recommendation' => __( 'Staging/development environments can cause payment method detachment issues. Ensure WooCommerce Stripe Gateway has proper safeguards enabled.', 'doctor-subs' ),
@@ -658,7 +713,7 @@ class WCST_Discrepancy_Detector {
 	 * @return array Array of Stripe renewal error discrepancies.
 	 */
 	private function check_stripe_renewal_errors( $subscription ) {
-		$discrepancies = array();
+		$discrepancies  = array();
 		$renewal_orders = $subscription->get_related_orders( 'ids', 'renewal' );
 
 		$stripe_error_patterns = array(
@@ -677,9 +732,9 @@ class WCST_Discrepancy_Detector {
 				continue;
 			}
 
-			// Check order status
+			// Check order status.
 			if ( in_array( $order->get_status(), array( 'failed', 'cancelled' ), true ) ) {
-				// Check order notes for Stripe errors
+				// Check order notes for Stripe errors.
 				$order_notes = wc_get_order_notes(
 					array(
 						'order_id' => $order_id,
@@ -693,12 +748,12 @@ class WCST_Discrepancy_Detector {
 						if ( false !== strpos( $note_lower, strtolower( $pattern ) ) ) {
 							if ( ! isset( $error_summary[ $pattern ] ) ) {
 								$error_summary[ $pattern ] = array(
-									'count'      => 0,
-									'order_ids'  => array(),
-									'last_seen'  => '',
+									'count'     => 0,
+									'order_ids' => array(),
+									'last_seen' => '',
 								);
 							}
-							$error_summary[ $pattern ]['count']++;
+							++$error_summary[ $pattern ]['count'];
 							$error_summary[ $pattern ]['order_ids'][] = $order_id;
 							if ( empty( $error_summary[ $pattern ]['last_seen'] ) || $note->date_created > $error_summary[ $pattern ]['last_seen'] ) {
 								$error_summary[ $pattern ]['last_seen'] = $note->date_created;
@@ -710,10 +765,10 @@ class WCST_Discrepancy_Detector {
 			}
 		}
 
-		// Create discrepancies for detected errors
+		// Create discrepancies for detected errors.
 		foreach ( $error_summary as $error_type => $error_data ) {
 			if ( 'payment_method_attached_to_another_customer' === $error_type ) {
-				// This is handled separately in check_detached_payment_method
+				// This is handled separately in check_detached_payment_method.
 				continue;
 			}
 
@@ -728,10 +783,10 @@ class WCST_Discrepancy_Detector {
 					$error_data['count']
 				),
 				'details'        => array(
-					'error_type'  => $error_type,
-					'count'       => $error_data['count'],
-					'order_ids'   => $error_data['order_ids'],
-					'last_seen'   => $error_data['last_seen'],
+					'error_type' => $error_type,
+					'count'      => $error_data['count'],
+					'order_ids'  => $error_data['order_ids'],
+					'last_seen'  => $error_data['last_seen'],
 				),
 				'recommendation' => __( 'Review failed renewal orders and contact customer to resolve payment method issues.', 'doctor-subs' ),
 			);
@@ -741,12 +796,16 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Check PayPal-specific issues
+	 * Check PayPal-specific issues.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return array Array of discrepancies.
 	 */
 	private function check_paypal_issues( $subscription ) {
 		$discrepancies = array();
 
-		// Check for missing PayPal subscription ID
+		// Check for missing PayPal subscription ID.
 		$paypal_subscription_id = $subscription->get_meta( '_paypal_subscription_id' );
 		if ( empty( $paypal_subscription_id ) ) {
 			$discrepancies[] = array(
@@ -765,7 +824,11 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Prioritize discrepancies by severity
+	 * Prioritize discrepancies by severity.
+	 *
+	 * @since 1.0.0
+	 * @param array $discrepancies Array of discrepancies.
+	 * @return array Prioritized discrepancies.
 	 */
 	private function prioritize_discrepancies( $discrepancies ) {
 		$severity_order = array( 'critical', 'high', 'medium', 'warning', 'info' );
@@ -773,8 +836,8 @@ class WCST_Discrepancy_Detector {
 		usort(
 			$discrepancies,
 			function ( $a, $b ) use ( $severity_order ) {
-				$a_index = array_search( $a['severity'], $severity_order );
-				$b_index = array_search( $b['severity'], $severity_order );
+				$a_index = array_search( $a['severity'], $severity_order, true );
+				$b_index = array_search( $b['severity'], $severity_order, true );
 
 				if ( $a_index === $b_index ) {
 					return 0;
@@ -788,7 +851,11 @@ class WCST_Discrepancy_Detector {
 	}
 
 	/**
-	 * Helper methods
+	 * Calculate expected payment interval.
+	 *
+	 * @since 1.0.0
+	 * @param WC_Subscription $subscription Subscription object.
+	 * @return int Expected interval in seconds.
 	 */
 	private function calculate_expected_interval( $subscription ) {
 		$interval = $subscription->get_billing_interval();

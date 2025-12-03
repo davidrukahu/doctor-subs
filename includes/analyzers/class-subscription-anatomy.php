@@ -1,5 +1,4 @@
 <?php
-declare( strict_types=1 );
 /**
  * Subscription Anatomy Analyzer
  *
@@ -7,7 +6,10 @@ declare( strict_types=1 );
  * "Understand the Anatomy of a Subscription"
  *
  * @package Dr_Subs
+ * @since   1.0.0
  */
+
+declare( strict_types=1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -172,7 +174,7 @@ class WCST_Subscription_Anatomy {
 				'id'            => $note->id,
 				'content'       => $note->content,
 				'date_created'  => $note->date_created,
-				'note_type'     => $note->note_type,
+				'note_type'     => isset( $note->note_type ) ? $note->note_type : '',
 				'customer_note' => (bool) $note->customer_note,
 				'added_by'      => $note->added_by,
 			);

@@ -1,5 +1,4 @@
 <?php
-declare( strict_types=1 );
 /**
  * Timeline Builder
  *
@@ -7,7 +6,10 @@ declare( strict_types=1 );
  * "Create a Timeline"
  *
  * @package Dr_Subs
+ * @since   1.0.0
  */
+
+declare( strict_types=1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -29,29 +31,29 @@ class WCST_Timeline_Builder {
 	 */
 	private function safe_format_date( $date ) {
 		if ( empty( $date ) ) {
-			return '1970-01-01 00:00:00'; // Return sortable default
+			return '1970-01-01 00:00:00'; // Return sortable default.
 		}
 
-		// Handle DateTime/WC_DateTime objects
+		// Handle DateTime/WC_DateTime objects.
 		if ( is_object( $date ) && method_exists( $date, 'format' ) ) {
 			return $date->format( 'Y-m-d H:i:s' );
 		}
 
-		// Handle timestamp integers
+		// Handle timestamp integers.
 		if ( is_numeric( $date ) ) {
 			return gmdate( 'Y-m-d H:i:s', (int) $date );
 		}
 
-		// Handle string dates - try to normalize format
+		// Handle string dates - try to normalize format.
 		if ( is_string( $date ) ) {
 			$timestamp = strtotime( $date );
-			if ( $timestamp !== false ) {
+			if ( false !== $timestamp ) {
 				return gmdate( 'Y-m-d H:i:s', $timestamp );
 			}
-			return $date; // Return as-is if can't parse
+			return $date; // Return as-is if can't parse.
 		}
 
-		return '1970-01-01 00:00:00'; // Fallback for unknown types
+		return '1970-01-01 00:00:00'; // Fallback for unknown types.
 	}
 
 	/**
@@ -95,17 +97,17 @@ class WCST_Timeline_Builder {
 		usort(
 			$events,
 			function ( $a, $b ) {
-				// Ensure both events have timestamp keys
+				// Ensure both events have timestamp keys.
 				$raw_a = isset( $a['timestamp'] ) ? $a['timestamp'] : null;
 				$raw_b = isset( $b['timestamp'] ) ? $b['timestamp'] : null;
 
-				// Format both timestamps safely
+				// Format both timestamps safely.
 				$timestamp_a = $this->safe_format_date( $raw_a );
 				$timestamp_b = $this->safe_format_date( $raw_b );
 
-				// Final safety check - ensure both are strings
+				// Final safety check - ensure both are strings.
 				if ( ! is_string( $timestamp_a ) || ! is_string( $timestamp_b ) ) {
-					// Force string conversion
+					// Force string conversion.
 					$timestamp_a = (string) $timestamp_a;
 					$timestamp_b = (string) $timestamp_b;
 				}
@@ -187,7 +189,7 @@ class WCST_Timeline_Builder {
 				'status'      => $this->determine_note_status( $note->content ),
 				'metadata'    => array(
 					'note_id'       => $note->id,
-					'note_type'     => $note->note_type,
+					'note_type'     => isset( $note->note_type ) ? $note->note_type : '',
 					'customer_note' => (bool) $note->customer_note,
 					'added_by'      => $note->added_by,
 				),
@@ -414,12 +416,12 @@ class WCST_Timeline_Builder {
 	private function get_payment_events( $subscription ) {
 		$events = array();
 
-		// This would be expanded to check gateway-specific logs
-		// For now, we'll extract payment events from order notes
+		// This would be expanded to check gateway-specific logs.
+		// For now, we'll extract payment events from order notes.
 		$payment_method = $subscription->get_payment_method();
 
 		if ( $payment_method ) {
-			// Check WooCommerce logs for payment gateway events
+			// Check WooCommerce logs for payment gateway events.
 			$log_files = $this->get_payment_gateway_logs( $payment_method );
 
 			foreach ( $log_files as $log_entry ) {
@@ -451,7 +453,7 @@ class WCST_Timeline_Builder {
 	private function get_server_log_events( $subscription ) {
 		$events = array();
 
-		// Check WooCommerce logs for subscription-related entries
+		// Check WooCommerce logs for subscription-related entries.
 		if ( function_exists( 'wc_get_log_file_path' ) ) {
 			$log_files = array(
 				'wcs-switch-cart-items',
@@ -666,11 +668,11 @@ class WCST_Timeline_Builder {
 	 * @param WC_Subscription $subscription Subscription object.
 	 * @return array Missing renewal discrepancies.
 	 */
-	private function check_missing_renewals( $events, $subscription ) {
+	private function check_missing_renewals( $events, $subscription ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Placeholder method for future implementation.
 		$discrepancies = array();
 
-		// This would implement logic to detect missing renewals
-		// based on billing schedule and timeline events
+		// This would implement logic to detect missing renewals.
+		// Based on billing schedule and timeline events.
 
 		return $discrepancies;
 	}
@@ -713,11 +715,11 @@ class WCST_Timeline_Builder {
 	 * @param WC_Subscription $subscription Subscription object.
 	 * @return array Payment gap discrepancies.
 	 */
-	private function check_payment_gaps( $events, $subscription ) {
+	private function check_payment_gaps( $events, $subscription ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Placeholder method for future implementation.
 		$discrepancies = array();
 
-		// This would implement logic to detect unexpected gaps
-		// in payment processing based on billing schedule
+		// This would implement logic to detect unexpected gaps.
+		// In payment processing based on billing schedule.
 
 		return $discrepancies;
 	}
@@ -730,23 +732,23 @@ class WCST_Timeline_Builder {
 	 * @param WC_Subscription $subscription Subscription object.
 	 * @return array Status inconsistency discrepancies.
 	 */
-	private function check_status_inconsistencies( $events, $subscription ) {
+	private function check_status_inconsistencies( $events, $subscription ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Placeholder method for future implementation.
 		$discrepancies = array();
 
-		// This would implement logic to detect inconsistent
-		// status changes or unexpected status transitions
+		// This would implement logic to detect inconsistent.
+		// Status changes or unexpected status transitions.
 
 		return $discrepancies;
 	}
 
 	// Additional helper methods would be implemented here for:
-	// - get_payment_gateway_logs()
-	// - log_entry_relates_to_subscription()
-	// - parse_log_file()
-	// - analyze_renewal_pattern()
-	// - analyze_payment_pattern()
-	// - analyze_error_pattern()
-	// - detect_timeline_gaps()
+	// - get_payment_gateway_logs().
+	// - log_entry_relates_to_subscription().
+	// - parse_log_file().
+	// - analyze_renewal_pattern().
+	// - analyze_payment_pattern().
+	// - analyze_error_pattern().
+	// - detect_timeline_gaps().
 
 	/**
 	 * Placeholder for payment gateway logs.
@@ -755,8 +757,8 @@ class WCST_Timeline_Builder {
 	 * @param string $payment_method Payment method ID.
 	 * @return array Log entries.
 	 */
-	private function get_payment_gateway_logs( $payment_method ) {
-		// This would be implemented to read gateway-specific logs
+	private function get_payment_gateway_logs( $payment_method ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Placeholder method for future implementation.
+		// This would be implemented to read gateway-specific logs.
 		return array();
 	}
 
@@ -768,8 +770,8 @@ class WCST_Timeline_Builder {
 	 * @param WC_Subscription $subscription Subscription object.
 	 * @return bool True if related.
 	 */
-	private function log_entry_relates_to_subscription( $log_entry, $subscription ) {
-		// This would be implemented to check if log entry relates to subscription
+	private function log_entry_relates_to_subscription( $log_entry, $subscription ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Placeholder method for future implementation.
+		// This would be implemented to check if log entry relates to subscription.
 		return false;
 	}
 
@@ -781,8 +783,8 @@ class WCST_Timeline_Builder {
 	 * @param WC_Subscription $subscription Subscription object.
 	 * @return array Log entries.
 	 */
-	private function parse_log_file( $log_handle, $subscription ) {
-		// This would be implemented to parse WooCommerce log files
+	private function parse_log_file( $log_handle, $subscription ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Placeholder method for future implementation.
+		// This would be implemented to parse WooCommerce log files.
 		return array();
 	}
 
@@ -808,7 +810,7 @@ class WCST_Timeline_Builder {
 	 * @param array $events Timeline events.
 	 * @return array Payment pattern analysis.
 	 */
-	private function analyze_payment_pattern( $events ) {
+	private function analyze_payment_pattern( $events ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Placeholder method for future implementation.
 		return array(
 			'successful_payments' => 0,
 			'failed_payments'     => 0,
@@ -846,7 +848,7 @@ class WCST_Timeline_Builder {
 	 * @param WC_Subscription $subscription Subscription object.
 	 * @return array Detected gaps.
 	 */
-	private function detect_timeline_gaps( $events, $subscription ) {
+	private function detect_timeline_gaps( $events, $subscription ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Placeholder method for future implementation.
 		return array(
 			'gaps_detected' => false,
 			'gap_details'   => array(),
