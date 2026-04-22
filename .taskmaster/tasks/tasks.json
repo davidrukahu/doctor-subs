@@ -674,7 +674,7 @@
         "dependencies": [
           "9"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -735,7 +735,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:45:33.924Z"
+        "updatedAt": "2026-04-22T22:46:32.295Z"
       },
       {
         "id": "11",
@@ -748,7 +748,7 @@
           "9",
           "10"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -808,7 +808,8 @@
             "testStrategy": "run_scan test: call twice in parallel, verify second call returns 'Scan already running'. Verify wp_schedule_single_event called with dr_subs_run_health_scan hook. cancel_scan test: start scan, call cancel, verify transient dr_subs_scan_cancel=true. save_settings test: send invalid email, verify rejection. Send valid settings, verify dr_subs_settings option updated. Test journal_retention_days=20 (below 30), verify error.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:46:33.798Z"
       },
       {
         "id": "12",
@@ -1103,9 +1104,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:45:33.925Z",
+      "lastModified": "2026-04-22T22:46:33.798Z",
       "taskCount": 15,
-      "completedCount": 9,
+      "completedCount": 10,
       "tags": [
         "master"
       ]
