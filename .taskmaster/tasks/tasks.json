@@ -157,7 +157,7 @@
         "dependencies": [
           "1"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -219,7 +219,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:28:08.311Z"
+        "updatedAt": "2026-04-22T22:30:34.804Z"
       },
       {
         "id": "4",
@@ -232,7 +232,7 @@
           "2",
           "3"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -291,7 +291,8 @@
             "testStrategy": "Integration test: fresh WP install with plugin activated, zero rows in dr_subs_sub_health → navigate to Doctor Subs → verify first-run.php content (\"First visit\" kicker, \"Let's check your subscriptions\" hero). Insert 1 row into dr_subs_sub_health with last_scanned_at = NOW() → reload page → verify dashboard.php loads instead. Test with missing view file (rename fix-history.php) → navigate to ?tab=history → verify fallback to dashboard.php, check error_log for file_exists() failure.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:30:36.305Z"
       },
       {
         "id": "5",
@@ -1096,9 +1097,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:28:08.312Z",
+      "lastModified": "2026-04-22T22:30:36.305Z",
       "taskCount": 15,
-      "completedCount": 2,
+      "completedCount": 3,
       "tags": [
         "master"
       ]
