@@ -9,7 +9,7 @@
         "testStrategy": "Unit test: autoloader resolves DR_Subs_Plugin, DR_Subs_Admin, DR_Subs_Security correctly. Integration test: activate plugin, verify admin menu appears, no PHP errors. Verify class_alias shims log deprecation warnings when accessed.",
         "priority": "high",
         "dependencies": [],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -70,7 +70,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:18:44.187Z"
+        "updatedAt": "2026-04-22T22:26:05.369Z"
       },
       {
         "id": "2",
@@ -82,7 +82,7 @@
         "dependencies": [
           "1"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -144,7 +144,8 @@
             "testStrategy": "Integration test on fresh install: activate plugin, verify dr_subs_sub_health and dr_subs_fix_journal tables exist, dr_subs_settings option set with defaults, dr_subs_db_version matches plugin version. Test upgrade: deactivate, modify wcst_settings, reactivate, verify migration preserves data.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:26:06.858Z"
       },
       {
         "id": "3",
@@ -1094,9 +1095,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:18:44.188Z",
+      "lastModified": "2026-04-22T22:26:06.859Z",
       "taskCount": 15,
-      "completedCount": 0,
+      "completedCount": 1,
       "tags": [
         "master"
       ]
