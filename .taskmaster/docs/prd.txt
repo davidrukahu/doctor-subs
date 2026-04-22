@@ -1,0 +1,349 @@
+<context>
+# Overview
+
+Doctor Subs v2 is a WooCommerce Subscriptions diagnostic + one-click fix plugin for WordPress, shipped on the WP.org plugin directory. It helps non-technical store owners (20-500 subscriptions) detect and repair three specific broken-subscription patterns without needing to read logs, open a support ticket, or hire a developer.
+
+Primary user: solo, non-technical store owner in panic mode when revenue dips or a customer complains. Secondary user: agency developer managing multiple client stores. The plugin lives inside /wp-admin/ as a menu item under WooCommerce.
+
+v1.2.4 exists on WP.org today with a 3-step diagnostic UI that assumes log-reading skill and does not actually fix anything. v2 is a full rewrite that:
+- Detects 3 specific high-confidence broken-subscription patterns
+- Fixes them with one-click preview + reversible journal
+- Scans the whole store daily in the background
+- Alerts the admin via email when something new breaks
+- Ships in 20 major languages via AI-translated .po/.mo files
+
+Complete planning artifacts already exist at:
+- Design doc: ~/.gstack/projects/davidrukahu-doctor-subs/david-main-design-20260422-222612.md (status: APPROVED)
+- Test plan: ~/.gstack/projects/davidrukahu-doctor-subs/david-main-eng-review-test-plan-20260422-223000.md
+- Production design assets: design-brief/v2-assets/ (3 CSS files, 9 woff2 fonts, 7 PHP view templates, vanilla admin.js) - all reviewed via /plan-design-review + impeccable /audit /critique /harden /colorize /polish (final scores: 19/20 technical, 39/40 design)
+- TODOs: TODOS.md
+- Brief context: design-brief/01-product.md through design-brief/06-constraints.md
+
+# Core Features
+
+## 1. Traffic-light dashboard (the primary surface)
+Three counter cards - Healthy / At risk / Broken - with plain-English reasons in a "Needs attention" table. Counters are clickable filters. Every row has a Fix button that opens the preview modal.
+
+## 2. Three detection rules (v1 scope)
+- **Ghost Sub (high confidence)**: active status + past next_payment + no pending Action Scheduler event. Fix: re-enqueue the AS payment event.
+- **On-hold with paid renewal (Stripe only in v1)**: sub is on-hold + latest renewal order has `_stripe_charge_captured` meta. Fix: flip order to completed + sub to active.
+- **Repeated AS failures (medium confidence)**: >=2 failed `woocommerce_scheduled_subscription_payment` actions for this sub in last 30 days. Fix: retry the latest failed action once (no loop).
+
+Each rule ships as its own class implementing:
+- `detect_batch(array $sub_ids, ScanContext $ctx): RuleMatch[]`
+- `preview_fix(WC_Subscription $sub): FixPreview`
+- `apply_fix(WC_Subscription $sub): FixResult` (state-guarded via allow-listed field compare)
+- `revert_fix(FixJournalEntry $entry): RevertResult` (with already-executed-AS warning)
+- `template(RuleMatch $match): string` (narrator, no AI)
+
+## 3. Background scanner
+Scheduled via Action Scheduler (recurring action `dr_subs_daily_health_scan`) with a WP-Cron watchdog (`dr_subs_cron_watchdog`) hourly that triggers if AS missed >36h. Builds a shared ScanContext once per run (pending AS events grouped by sub_id, failed AS events in last 30d grouped by sub_id) so rules query O(1) not N+1. Iterates active subs in batches of 100. Writes one row per sub to `dr_subs_sub_health`. Generates narrator output at scan time and persists on the health row.
+
+## 4. Fix journal with revert
+Every applied fix is a journaled transaction. Schema: timestamp, sub_id, rule_id, batch_id, before_state (JSON of fields the rule will change), before_state_hash (sha256 for state-guard), after_state (JSON), side_effects (JSON list including hook+args+id for AS revert), user_id, status (applied/reverted). Apply is state-guarded: rule declares allow-listed fields (e.g. Ghost Sub declares ['status','next_payment']) and apply aborts if current state != before_state on those fields. Revert checks state drift and warns before applying. Already-executed AS action special case: revert shows explicit modal warning ("the payment already went through...").
+
+## 5. Daily email digest
+When scanner completion detects new broken subs since last run, sends a digest email. Configurable via settings (enabled/disabled, target email, defaults to admin_email). Respects a `suppressed_until` column on `dr_subs_sub_health` so acknowledged-broken subs don't re-nag.
+
+## 6. Bulk fix UI
+"Fix all N ghost subs" button on dashboard. Invokes rule's batch apply variant, all fixes share a `batch_id`, revert entire batch atomically.
+
+## 7. Settings page
+Three sections: Alerts (toggle + email field), Fix history retention (30/90/180/365/forever), Help us improve (anonymous telemetry toggle, off by default). AJAX-saved with Saving.../Saved. flash. Unsaved-changes guard via JS.
+
+## 8. Translations
+Ship in 20 major languages via Potomatic (AI-translated .po/.mo files). Workflow: `wp i18n make-pot` generates the canonical .pot, Potomatic translates to target locales using an LLM, `wp i18n make-json` compiles .po to .mo.
+
+# User Experience
+
+All 5 admin surfaces are already designed and exist as production-ready PHP templates under `design-brief/v2-assets/admin/views/`:
+
+1. **First-run landing** (`first-run.php`) - states: default, scanning, zero-subs
+2. **Dashboard** (`dashboard.php`) - states: mixed (default), all-healthy, scan-failed, refreshing
+3. **Fix preview modal** (`modal-fix-preview.php`) - states: default, already-executed warning (resolves revert-silent-no-op concern)
+4. **Fix history** (`fix-history.php`) - states: default, empty, includes batch entries + reverted + past-retention
+5. **Settings** (`settings.php`) - three grouped sections with helper tooltips
+
+Shared partials (`plugin-header.php`, `stethoscope.php`), admin.js (vanilla, ~450 lines) with counter filter + modal open/close/focus-trap + AJAX apply/revert + settings AJAX save + R keyboard shortcut, and tokens.css + admin.css + responsive.css are all complete and design-reviewed.
+
+The v2 rebuild moves these assets into the plugin's `admin/` directory and wires them to real data.
+
+# UI/UX constraints (already locked)
+
+- Fonts: Switzer, Instrument Serif, JetBrains Mono - self-hosted as woff2 under admin/fonts/ (9 files, 156 KB, WP.org-compliant).
+- Accent: desaturated teal oklch(48% 0.06 195). State colors: muted green (healthy), warm amber (risk), terracotta (broken - NOT alert red).
+- OKLCH throughout, tinted neutrals, no pure white/black.
+- All styles scoped to `.ds-root` so they don't leak into WP admin.
+- Responsive (tablet 768-1023px + mobile <768px + print stylesheet).
+- WCAG 2.1 AA focus/contrast. Reduced-motion respected.
+</context>
+
+<PRD>
+
+# Technical Architecture
+
+## Class rename (breaking)
+v2 renames all PHP classes from `WCST_*` to `DR_Subs_*`. Public filter/hook prefix renames `wcst_*` to `dr_subs_*`. Constant rename `WCST_PLUGIN_*` to `DR_SUBS_PLUGIN_*`. Single breaking moment in v2.0 instead of carrying old prefix forever.
+
+## Core classes (new in v2)
+
+- `DR_Subs_Plugin` - main bootstrap (replaces WCST_Plugin)
+- `DR_Subs_Admin` - admin interface router + enqueue (replaces WCST_Admin, with tab-based routing to the 5 surfaces)
+- `DR_Subs_AJAX_Handler` - handles `dr_subs_get_fix_preview`, `dr_subs_apply_fix`, `dr_subs_revert_fix`, `dr_subs_run_scan`, `dr_subs_cancel_scan`, `dr_subs_save_settings` (all with nonce + capability check)
+- `DR_Subs_Security` - keeps existing nonce/capability helpers (renamed from WCST_Security)
+- `DR_Subs_Migration` - activation-hook migration: creates `dr_subs_sub_health` + `dr_subs_fix_journal` custom tables via dbDelta, preserves existing `wcst_settings` option data by reading and rewriting as `dr_subs_settings`
+
+## Rules engine
+
+- `DR_Subs_Rule_Interface` - contract: detect_batch, preview_fix, apply_fix, revert_fix, tracked_fields (allow-list for state guard), narrate
+- `DR_Subs_Rules_Registry` - registers/enumerates rules; exposes `dr_subs_detection_rules` filter for third-party rule plugins
+- `DR_Subs_Rule_Ghost_Sub` - ghost-sub rule impl
+- `DR_Subs_Rule_On_Hold_Paid` - Stripe on-hold-with-paid rule impl
+- `DR_Subs_Rule_Repeated_Failures` - repeated AS failures rule impl
+- `DR_Subs_Rule_Match` - lightweight DTO (rule_id, sub_id, severity, context data, cached narration text)
+- `DR_Subs_Scan_Context` - pre-scan index container (pending_as_by_sub, failed_as_by_sub last 30d, related_orders_by_sub)
+
+## Scanner + journal
+
+- `DR_Subs_Health_Scanner` - run(): build ScanContext, iterate subs in batches, apply rules, upsert `dr_subs_sub_health`, narrate each match, fire `dr_subs_after_scan` action
+- `DR_Subs_Fix_Journal` - record(FixJournalEntry), revert(entry_id), purge_older_than(days)
+- `DR_Subs_Narrator` - selects a template variant per rule + substitutes vars (sub_id, customer_name, dates)
+- `DR_Subs_Alert_Dispatcher` - listens on `dr_subs_after_scan`, composes digest, sends via wp_mail to `dr_subs_settings.alert_email || admin_email`
+
+## Data model
+
+### Table `dr_subs_sub_health`
+- sub_id BIGINT UNSIGNED PK
+- bucket VARCHAR(20) NOT NULL ('healthy'|'at_risk'|'broken')
+- matched_rules JSON (array of {rule_id, severity})
+- narration TEXT NULL (populated by scanner at scan time)
+- last_scanned_at DATETIME NOT NULL
+- suppressed_until DATETIME NULL
+- Index: (bucket, last_scanned_at DESC) composite; (bucket) alone for COUNT aggregation
+
+### Table `dr_subs_fix_journal`
+- entry_id BIGINT UNSIGNED AUTO_INCREMENT PK
+- batch_id VARCHAR(40) NULL
+- sub_id BIGINT UNSIGNED NOT NULL
+- rule_id VARCHAR(60) NOT NULL
+- before_state JSON NOT NULL
+- before_state_hash CHAR(64) NOT NULL
+- after_state JSON NOT NULL
+- side_effects JSON NOT NULL (e.g. [{type:'as_action', hook, args, id}, {type:'order_status_change', order_id, from, to}])
+- user_id BIGINT UNSIGNED NOT NULL
+- status ENUM('applied','reverted') NOT NULL DEFAULT 'applied'
+- created_at DATETIME NOT NULL
+- reverted_at DATETIME NULL
+- Indexes: (sub_id, created_at DESC); (batch_id)
+
+### Option `dr_subs_settings`
+- alerts_enabled (bool, default true)
+- alert_email (string, default admin_email)
+- journal_retention_days (int, default 180; -1 = forever)
+- telemetry_enabled (bool, default false)
+
+## Integration points (public API)
+
+- Filter: `dr_subs_detection_rules` - register custom rule classes
+- Action: `dr_subs_before_scan` - fires at scanner start
+- Action: `dr_subs_after_scan` - fires at scanner completion with ScanSummary
+- Action: `dr_subs_before_fix_apply` - fires pre-apply with sub + rule_id
+- Action: `dr_subs_after_fix_apply` - fires post-apply with FixJournalEntry
+- Filter: `dr_subs_narration` - decorate narrator output
+- AS hook: `dr_subs_daily_health_scan` - the recurring scanner
+- WP-Cron hook: `dr_subs_cron_watchdog` - AS watchdog
+
+## Compatibility
+
+- PHP 7.4+ (current baseline)
+- WordPress 5.0+
+- WooCommerce 9.0+ (HPOS baseline - drop CPT fallback per eng-review decision)
+- WooCommerce Subscriptions latest
+- HPOS declared via FeaturesUtil::declare_compatibility (already in v1.2.4)
+
+## Translations
+
+### POT generation
+Run via WP-CLI: `wp i18n make-pot . languages/doctor-subs.pot --slug=doctor-subs --domain=doctor-subs --include=doctor-subs.php,includes,admin`
+
+### Translation via Potomatic
+- Install: globally via `npm i -g potomatic` OR local via clone + npm install
+- Requires OpenAI or Gemini API key (env var POTOMATIC_OPENAI_API_KEY or POTOMATIC_GEMINI_API_KEY)
+- Invocation: `potomatic -l fr_FR,es_ES,de_DE,... -p languages/doctor-subs.pot -o languages/ --po-file-prefix doctor-subs-`
+- Use `--dry-run` first to estimate cost
+- Configure `config/dictionaries/dictionary.json` with brand terms that must NOT be translated: "Doctor Subs", "WooCommerce", "WordPress", "Stripe", "Action Scheduler", "PayPal", "Subscription"
+
+### Target languages (20 major WP locales)
+fr_FR French
+es_ES Spanish
+de_DE German
+it_IT Italian
+pt_BR Portuguese (Brazil)
+pt_PT Portuguese (Portugal)
+nl_NL Dutch
+pl_PL Polish
+ru_RU Russian
+ja Japanese
+zh_CN Chinese Simplified
+zh_TW Chinese Traditional
+ko_KR Korean
+ar Arabic
+tr_TR Turkish
+sv_SE Swedish
+nb_NO Norwegian
+da_DK Danish
+fi Finnish
+cs_CZ Czech
+
+### MO compilation
+`wp i18n make-mo languages/`
+
+### JSON translations for JS
+`wp i18n make-json languages/ --no-purge` to create per-script JSON translations for admin.js strings
+
+# Development Roadmap
+
+## Phase 1: Foundation (class rename, bootstrap, migrations, asset wiring)
+- Rename all `WCST_` classes to `DR_Subs_`, prefix all hooks/filters/constants accordingly
+- Update doctor-subs.php (main plugin file) with new constants + renamed autoloader
+- Fix the double spl_autoload_register bug from v1.2.4
+- Rewrite class-plugin.php as DR_Subs_Plugin
+- Rewrite class-admin.php as DR_Subs_Admin with tab router
+- Create DR_Subs_Migration with activation hook: creates `dr_subs_sub_health` + `dr_subs_fix_journal` tables via dbDelta, migrates `wcst_settings` option to `dr_subs_settings` shape
+- Move design-brief/v2-assets/admin/ assets into plugin's admin/ directory (replacing v1 files)
+- Wire enqueue_admin_scripts to load tokens.css, admin.css, responsive.css, admin.js
+- wp_localize_script with all expected strings and ajaxUrl + nonce
+- Delete WCST_Logger stubs; build DR_Subs_Logger as thin wrapper on wc_get_logger
+
+## Phase 2: Rules engine (interface + context + 3 rules)
+- Create DR_Subs_Rule_Interface + DR_Subs_Rules_Registry
+- Create DR_Subs_Scan_Context with pending_as_by_sub, failed_as_by_sub, related_orders_by_sub pre-scan indexes
+- Implement DR_Subs_Rule_Ghost_Sub (detect_batch, preview_fix, apply_fix, revert_fix, tracked_fields)
+- Implement DR_Subs_Rule_On_Hold_Paid (Stripe only, checks _stripe_charge_captured order meta)
+- Implement DR_Subs_Rule_Repeated_Failures (>=2 failed AS actions in 30d, retries latest once)
+- Each rule has unit test file under tests/rules/
+- Regression guard tests: sub ID substring (sub 1 vs sub 11); month != 30 days on Feb-crossing monthly renewals
+
+## Phase 3: Scanner + fix journal + narrator
+- DR_Subs_Health_Scanner::run() - scheduled via Action Scheduler recurring action
+- WP-Cron watchdog hook that fires if AS missed >36h
+- DR_Subs_Fix_Journal::record, revert, purge_older_than
+- DR_Subs_Narrator with 3-5 template variants per rule, variable substitution for sub_id/customer/dates
+- DR_Subs_Alert_Dispatcher listening on dr_subs_after_scan, sends digest email respecting suppressed_until
+- Scanner writes narration to dr_subs_sub_health row at scan time (no AJAX/lazy load)
+- Integration test: seeded 5000-sub store scans under 5 minutes, dashboard loads under 500ms
+
+## Phase 4: AJAX endpoints + real data wiring
+- DR_Subs_AJAX_Handler with all 6 endpoints, nonce + manage_woocommerce capability check
+- `dr_subs_get_fix_preview` returns modal HTML fragment including $already_executed branch when AS action is executed
+- `dr_subs_apply_fix` state-guarded apply, returns journal entry
+- `dr_subs_revert_fix` with drift check, soft-revert for already-executed AS (silent no-op was explicitly overridden to explicit warning in the design phase)
+- `dr_subs_run_scan` kicks off scanner (idempotent transient lock so double-click doesn't double-run)
+- `dr_subs_cancel_scan` sets cancellation flag the scanner checks between batches
+- `dr_subs_save_settings` validates + saves to `dr_subs_settings` option
+- Dashboard.php reads from `dr_subs_sub_health`, passes rows into template
+- First-run.php shown when last_scanned_at is NULL across all rows
+- Settings.php reads `dr_subs_settings`, writes back via form or AJAX
+- Fix history.php reads from `dr_subs_fix_journal` with pagination
+
+## Phase 5: Bulk fix + journal cleanup + telemetry ping
+- Bulk fix UI: "Fix all N ghost subs" button calls DR_Subs_Rule_Ghost_Sub::apply_fix_batch with a batch_id, all entries in journal share it
+- Revert batch: if entry has batch_id, revert all siblings atomically
+- Journal cleanup recurring AS action `dr_subs_journal_cleanup` that deletes entries older than `dr_subs_settings.journal_retention_days`
+- Telemetry ping endpoint: on successful apply, if telemetry_enabled, POST { install_hash, rule_id, applied_timestamp } to a simple ping endpoint (user's choice, start with file log as placeholder, can later point at a domain)
+- install_hash generated once on activation, stored in option
+
+## Phase 6: Translations
+- Write build script `scripts/translate.sh` that runs wp i18n make-pot, Potomatic, wp i18n make-mo, wp i18n make-json
+- Add Potomatic config `config/dictionaries/dictionary.json` with brand terms
+- Generate .po for all 20 target locales
+- Compile .mo + .json for each
+- Commit the generated .po files to git (source of truth for review/editing); .mo generated on build
+
+## Phase 7: QA + ship
+- Seed a test store with Subs Test Data Generator (David's own plugin) for fixtures
+- Run test matrix: PHP 7.4/8.2/8.3 x WP 5.0/6.9 x WCS 9.8.5/latest
+- Manual smoke test of all 5 surfaces + all 3 rules + revert + bulk fix + settings save + email digest
+- Run the 3 regression guard tests explicitly (sub ID substring, month != 30 days, single autoload registration)
+- Scanner perf test on seeded 5000-sub store
+- Bump version to 2.0.0 in doctor-subs.php + readme.txt
+- Update readme.txt with v2 description + changelog + upgrade notice
+- Create .github/workflows/release.yml that on git tag push builds the zip, creates GitHub Release, pushes to WP.org SVN via 10up/action-wordpress-plugin-deploy
+- Blog post on woohappylearning.wordpress.com
+
+# Logical Dependency Chain
+
+1. Phase 1 Foundation MUST complete first - everything else depends on the renamed classes, tables, and wired assets.
+2. Phase 2 Rules Engine can start after Phase 1. Each rule is independent of the others once the interface and ScanContext exist, so three rules can be written in parallel within Phase 2.
+3. Phase 3 Scanner + Journal + Narrator depends on Phase 2 rules existing. Journal is technically independent but revert() needs to call rules' revert_fix().
+4. Phase 4 AJAX + wiring depends on Phase 3 data existing (otherwise the dashboard renders empty forever).
+5. Phase 5 Bulk fix + cleanup + telemetry depends on Phase 3 + Phase 4 being complete.
+6. Phase 6 Translations can run in parallel with Phase 5 (different files touched). POT generation needs Phase 1-4 strings to be final.
+7. Phase 7 QA + ship is last, depends on everything.
+
+Critical "first visible thing that works" path for motivation: Phase 1 foundation + Phase 2 Ghost Sub rule + enough of Phase 3 to have a scanner run manually + enough of Phase 4 to render the dashboard. That's the vertical slice that proves the whole architecture.
+
+# Risks and Mitigations
+
+## Scanner performance on large stores (5k+ subs)
+v1.2.4 uses N+1 `args LIKE '%sub_id%'` queries per sub which is fatal at scale. v2 ScanContext builds one indexed query per hook and buckets in PHP. Mitigation: seeded 5000-sub stress test before v2.0.0 ships (Phase 7).
+
+## Font licensing + WP.org plugin directory compliance
+WP.org forbids runtime fetches of external assets. Fonts already self-hosted in design-brief/v2-assets/admin/fonts/ under OFL (JetBrains Mono, Instrument Serif) and Fontshare free tier (Switzer) - all permit self-hosting. Mitigation: documented in v2-assets/README.md; add attribution to plugin readme.txt license section.
+
+## HPOS-only baseline drops some CPT stores
+Eng review decision accepted this tradeoff. WCS 9.x stores are nearly all HPOS by 2026. Mitigation: bump WC requirement to 9.0+ in plugin header, show admin notice on activation if WC < 9.0.
+
+## Revert-of-already-executed AS action UX
+Originally overridden to silent no-op; design phase reversed back to explicit warning. Modal template renders an $already_executed warning block when the AS action has already run. Mitigation: scanner's ScanContext tracks executed AS status; ajax_handler passes flag through to modal template.
+
+## Sub ID substring match bug (CRITICAL REGRESSION)
+v1.2.4 uses `args LIKE '%11%'` which matches sub IDs 1, 11, 111, etc. v2 must use proper unserialize + exact compare. Mitigation: regression test seeded with subs 1, 11, 111, 110 asserts exact-one-match. Written in Phase 2.
+
+## Monthly renewals crossing February (CRITICAL REGRESSION)
+v1.2.4 `get_billing_period_days` treats month as 30 days. Feb renewals flag as "skipped". v2 must use DateTime::modify('+1 month'). Mitigation: regression test seeded Jan-31 monthly renewal asserts no false skipped-cycle on Feb 28 -> Mar 31 interval. Written in Phase 2.
+
+## Translation accuracy via AI
+Potomatic uses LLM; output varies. Brand terms must not be translated. Mitigation: user dictionary in `config/dictionaries/dictionary.json` lists "Doctor Subs", "WooCommerce", "WordPress", "Stripe", "Action Scheduler", "PayPal", "Subscription" as no-translate terms. After first generation, review at least the 5 most-used languages (fr/es/de/it/pt) manually before shipping.
+
+## Admin notice on activation if WCS missing
+Existing v1.2.4 logic handles this. Port to v2 in Phase 1.
+
+## Class rename breaks third-party plugins extending Doctor Subs
+Unlikely for a plugin this size but possible. Mitigation: publish migration note in WP.org support forum + add class_alias shims for the 3 most-likely-extended classes (WCST_Plugin, WCST_Admin, WCST_AJAX_Handler) that log deprecation warnings for one release cycle.
+
+# Appendix
+
+## Referenced existing artifacts
+
+- Design doc (APPROVED): `~/.gstack/projects/davidrukahu-doctor-subs/david-main-design-20260422-222612.md`
+- Test plan: `~/.gstack/projects/davidrukahu-doctor-subs/david-main-eng-review-test-plan-20260422-223000.md`
+- Production design assets: `design-brief/v2-assets/` (3 CSS, 9 fonts, 7 PHP views, 1 JS)
+- Preview: `design-brief/all-surfaces-preview.html` (all 11 states rendered from real templates)
+- Impeccable design context: `.impeccable.md`
+- Brief: `design-brief/01-product.md` through `06-constraints.md`
+- TODOs: `TODOS.md`
+
+## Key review outputs
+
+- Plan eng review: 17/20 technical; 2 P1 issues (screen-reader-text, anchor-vs-button) - resolved
+- Plan design review: started 3/10, ended 39/40 after fixes
+- Impeccable /audit: 17/20 -> ~19/20 after harden/colorize/polish
+- Impeccable /critique: 36/40 -> ~39/40 after critique-driven fixes
+- Outside voice (Claude subagent): 3 blockers found, all resolved (AI narrator dropped for v1, state-guard reworked to allow-listed fields, revert-already-executed warning shipping in v1)
+
+## Key design decisions (locked)
+
+- AI narrator dropped from v1 - templates only
+- Terracotta for "broken" - not alert red
+- Class rename `WCST_` -> `DR_Subs_`
+- HPOS-only baseline (drop CPT fallback)
+- Action Scheduler primary + WP-Cron watchdog
+- State-guard via allow-listed fields per rule (not JSON hash)
+- Revert-of-executed-AS shows explicit warning (not silent no-op)
+- Counter selection uses border-left (precedent in Linear/Notion); banner does NOT use border-left stripe
+- Scanner generates narration at scan-time, persisted on health row
+- Tab navigation (Dashboard / Fix history / Settings) in plugin header, not submenu pages
+- First-install flow is a "Scan my subscriptions" CTA, not an empty dashboard
+
+</PRD>
