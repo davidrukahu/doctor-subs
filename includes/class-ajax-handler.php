@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Ajax_Handler {
+class DR_Subs_Ajax_Handler {
 
 	/**
 	 * Constructor.
@@ -26,8 +26,8 @@ class WCST_Ajax_Handler {
 	 */
 	public function __construct() {
 		// Analysis actions.
-		add_action( 'wp_ajax_wcst_analyze_subscription', array( $this, 'analyze_subscription' ) );
-		add_action( 'wp_ajax_wcst_search_subscriptions', array( $this, 'search_subscriptions' ) );
+		add_action( 'wp_ajax_dr_subs_analyze_subscription', array( $this, 'analyze_subscription' ) );
+		add_action( 'wp_ajax_dr_subs_search_subscriptions', array( $this, 'search_subscriptions' ) );
 	}
 
 	/**
@@ -39,17 +39,17 @@ class WCST_Ajax_Handler {
 	public function analyze_subscription() {
 		try {
 			// Check if required classes exist.
-			if ( ! class_exists( 'WCST_Security' ) ) {
-				throw new Exception( 'WCST_Security class not found' );
+			if ( ! class_exists( 'DR_Subs_Security' ) ) {
+				throw new Exception( 'DR_Subs_Security class not found' );
 			}
-			if ( ! class_exists( 'WCST_Logger' ) ) {
-				throw new Exception( 'WCST_Logger class not found' );
+			if ( ! class_exists( 'DR_Subs_Logger' ) ) {
+				throw new Exception( 'DR_Subs_Logger class not found' );
 			}
 
 			// Security checks.
 			// phpcs:disable WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- wp_unslash() and sanitize_text_field() are applied below.
-			WCST_Security::verify_nonce( isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '', 'wcst_nonce' );
-			WCST_Security::check_permissions( 'manage_woocommerce' );
+			DR_Subs_Security::verify_nonce( isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '', 'dr_subs_nonce' );
+			DR_Subs_Security::check_permissions( 'manage_woocommerce' );
 
 			// Validate and sanitize input.
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_unslash() and sanitize_text_field() are applied below.
@@ -59,11 +59,11 @@ class WCST_Ajax_Handler {
 			// Log raw input for debugging (only in debug mode).
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Only used when WP_DEBUG and WP_DEBUG_LOG are enabled.
-				WCST_Logger::log( 'debug', 'Raw subscription ID received: ' . print_r( $raw_subscription_id, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				DR_Subs_Logger::log( 'debug', 'Raw subscription ID received: ' . print_r( $raw_subscription_id, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 			}
 
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_text_field() and absint() handle sanitization.
-			$subscription_id = WCST_Security::validate_subscription_id( sanitize_text_field( $raw_subscription_id ) );
+			$subscription_id = DR_Subs_Security::validate_subscription_id( sanitize_text_field( $raw_subscription_id ) );
 
 			// Verify subscription exists.
 			if ( ! function_exists( 'wcs_get_subscription' ) ) {
@@ -78,30 +78,30 @@ class WCST_Ajax_Handler {
 			// Keep logs minimal: only errors elsewhere.
 
 			// Initialize analyzers with error checking.
-			if ( ! class_exists( 'WCST_Subscription_Anatomy' ) ) {
-				throw new Exception( 'WCST_Subscription_Anatomy class not found' );
+			if ( ! class_exists( 'DR_Subs_Subscription_Anatomy' ) ) {
+				throw new Exception( 'DR_Subs_Subscription_Anatomy class not found' );
 			}
-			$anatomy_analyzer = new WCST_Subscription_Anatomy();
+			$anatomy_analyzer = new DR_Subs_Subscription_Anatomy();
 
-			if ( ! class_exists( 'WCST_Expected_Behavior' ) ) {
-				throw new Exception( 'WCST_Expected_Behavior class not found' );
+			if ( ! class_exists( 'DR_Subs_Expected_Behavior' ) ) {
+				throw new Exception( 'DR_Subs_Expected_Behavior class not found' );
 			}
-			$expected_analyzer = new WCST_Expected_Behavior();
+			$expected_analyzer = new DR_Subs_Expected_Behavior();
 
-			if ( ! class_exists( 'WCST_Timeline_Builder' ) ) {
-				throw new Exception( 'WCST_Timeline_Builder class not found' );
+			if ( ! class_exists( 'DR_Subs_Timeline_Builder' ) ) {
+				throw new Exception( 'DR_Subs_Timeline_Builder class not found' );
 			}
-			$timeline_builder = new WCST_Timeline_Builder();
+			$timeline_builder = new DR_Subs_Timeline_Builder();
 
-			if ( ! class_exists( 'WCST_Skipped_Cycle_Detector' ) ) {
-				throw new Exception( 'WCST_Skipped_Cycle_Detector class not found' );
+			if ( ! class_exists( 'DR_Subs_Skipped_Cycle_Detector' ) ) {
+				throw new Exception( 'DR_Subs_Skipped_Cycle_Detector class not found' );
 			}
-			$skipped_cycle_detector = new WCST_Skipped_Cycle_Detector();
+			$skipped_cycle_detector = new DR_Subs_Skipped_Cycle_Detector();
 
-			if ( ! class_exists( 'WCST_Discrepancy_Detector' ) ) {
-				throw new Exception( 'WCST_Discrepancy_Detector class not found' );
+			if ( ! class_exists( 'DR_Subs_Discrepancy_Detector' ) ) {
+				throw new Exception( 'DR_Subs_Discrepancy_Detector class not found' );
 			}
-			$discrepancy_detector = new WCST_Discrepancy_Detector();
+			$discrepancy_detector = new DR_Subs_Discrepancy_Detector();
 
 			// Step 1: Analyze anatomy.
 			// Anatomy analysis.
@@ -132,7 +132,7 @@ class WCST_Ajax_Handler {
 			try {
 				$discrepancy_data = $discrepancy_detector->analyze_discrepancies( $subscription_id );
 			} catch ( \Throwable $t ) {
-				WCST_Logger::log( 'error', 'Discrepancy detection failed: ' . $t->getMessage() );
+				DR_Subs_Logger::log( 'error', 'Discrepancy detection failed: ' . $t->getMessage() );
 				// Keep empty discrepancy data on failure.
 			}
 
@@ -156,7 +156,7 @@ class WCST_Ajax_Handler {
 			try {
 				$enhanced_data = $skipped_cycle_detector->analyze( $subscription_id );
 			} catch ( \Throwable $t ) {
-				WCST_Logger::log( 'error', 'Enhanced detection failed: ' . $t->getMessage() );
+				DR_Subs_Logger::log( 'error', 'Enhanced detection failed: ' . $t->getMessage() );
 				// Keep default empty enhanced data on failure.
 			}
 
@@ -186,8 +186,8 @@ class WCST_Ajax_Handler {
 				'trace'   => $e->getTraceAsString(),
 			);
 
-			WCST_Logger::log( 'error', 'Subscription analysis failed: ' . $error_message, $error_details );
-			WCST_Logger::log( 'error', 'Stack trace: ' . $e->getTraceAsString() );
+			DR_Subs_Logger::log( 'error', 'Subscription analysis failed: ' . $error_message, $error_details );
+			DR_Subs_Logger::log( 'error', 'Stack trace: ' . $e->getTraceAsString() );
 
 			// Provide more helpful error message to user (sanitized).
 			$user_message = 'Analysis failed. ';
@@ -224,8 +224,8 @@ class WCST_Ajax_Handler {
 		try {
 			// Security checks.
 			// phpcs:disable WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- wp_unslash() and sanitize_text_field() are applied below.
-			WCST_Security::verify_nonce( isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '', 'wcst_nonce' );
-			WCST_Security::check_permissions( 'manage_woocommerce' );
+			DR_Subs_Security::verify_nonce( isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '', 'dr_subs_nonce' );
+			DR_Subs_Security::check_permissions( 'manage_woocommerce' );
 
 			// Validate and sanitize input.
 			$search_term = isset( $_POST['search_term'] ) ? sanitize_text_field( wp_unslash( $_POST['search_term'] ) ) : '';
@@ -236,7 +236,7 @@ class WCST_Ajax_Handler {
 			}
 
 			// Initialize data collector.
-			$data_collector = new WCST_Subscription_Data();
+			$data_collector = new DR_Subs_Subscription_Data();
 
 			// Search for subscriptions.
 			$results = $data_collector->search_subscriptions( $search_term );
@@ -244,7 +244,7 @@ class WCST_Ajax_Handler {
 			wp_send_json_success( $results );
 
 		} catch ( Exception $e ) {
-			WCST_Logger::log( 'error', 'Subscription search failed: ' . $e->getMessage() );
+			DR_Subs_Logger::log( 'error', 'Subscription search failed: ' . $e->getMessage() );
 			wp_send_json_error( $e->getMessage() );
 		}
 	}
@@ -423,3 +423,10 @@ class WCST_Ajax_Handler {
 		return false;
 	}
 }
+
+/**
+ * Legacy v1 alias. Do not use in new code; DR_Subs_Ajax_Handler is canonical.
+ *
+ * @deprecated 2.0.0 Use DR_Subs_Ajax_Handler instead.
+ */
+class_alias( 'DR_Subs_Ajax_Handler', 'WCST_Ajax_Handler' );

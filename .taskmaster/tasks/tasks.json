@@ -2,14 +2,14 @@
   "master": {
     "tasks": [
       {
-        "id": 1,
+        "id": "1",
         "title": "Foundation: Rename classes WCST_ to DR_Subs_ and update constants",
         "description": "Rename all PHP classes from WCST_* to DR_Subs_*, update hook/filter prefixes, constants, and fix double autoloader registration bug",
         "details": "1. Update doctor-subs.php constants: WCST_PLUGIN_* → DR_SUBS_PLUGIN_*\n2. Rename classes: WCST_Plugin → DR_Subs_Plugin, WCST_Admin → DR_Subs_Admin, WCST_AJAX_Handler → DR_Subs_AJAX_Handler, WCST_Security → DR_Subs_Security, WCST_Logger → DR_Subs_Logger\n3. Fix double spl_autoload_register bug (lines 136 + 178 in main file - remove one)\n4. Update autoloader function to handle DR_Subs_ prefix instead of WCST_\n5. Update all internal class references in includes/\n6. Add class_alias shims for backward compat (WCST_Plugin, WCST_Admin, WCST_AJAX_Handler) with deprecation warnings\n7. Update hook/filter names: wcst_* → dr_subs_*\n8. Test activation on clean install",
         "testStrategy": "Unit test: autoloader resolves DR_Subs_Plugin, DR_Subs_Admin, DR_Subs_Security correctly. Integration test: activate plugin, verify admin menu appears, no PHP errors. Verify class_alias shims log deprecation warnings when accessed.",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -18,7 +18,8 @@
             "dependencies": [],
             "details": "In doctor-subs.php: Change lines 35-39 constants WCST_PLUGIN_FILE, WCST_PLUGIN_DIR, WCST_PLUGIN_URL, WCST_PLUGIN_VERSION, WCST_PLUGIN_BASENAME to DR_SUBS_PLUGIN_*. Remove duplicate spl_autoload_register on line 178 (keep only line 136). Update all constant references throughout file including file_path construction on line 170.",
             "status": "pending",
-            "testStrategy": "After changes, run `php -l doctor-subs.php` to verify syntax. Activate plugin on test site, verify no PHP errors in debug.log. Check plugin initializes with new constants visible in DR_Subs_Plugin class."
+            "testStrategy": "After changes, run `php -l doctor-subs.php` to verify syntax. Activate plugin on test site, verify no PHP errors in debug.log. Check plugin initializes with new constants visible in DR_Subs_Plugin class.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -29,7 +30,8 @@
             ],
             "details": "Update class declarations in includes/class-plugin.php (WCST_Plugin → DR_Subs_Plugin), includes/class-admin.php (WCST_Admin → DR_Subs_Admin), includes/class-ajax-handler.php (WCST_Ajax_Handler → DR_Subs_AJAX_Handler), includes/utilities/class-security.php (WCST_Security → DR_Subs_Security), includes/utilities/class-logger.php (WCST_Logger → DR_Subs_Logger). Update autoloader on lines 144-175 to detect DR_Subs_ prefix and convert correctly. Add class_alias() calls after each class definition for backward compatibility: class_alias('DR_Subs_Plugin', 'WCST_Plugin') with _deprecated_function() warning. Update all internal references ($this instantiation, type hints, docblocks).",
             "status": "pending",
-            "testStrategy": "Run `grep -r 'WCST_' includes/` to find missed references. Test autoloader loads DR_Subs_Plugin correctly. Test backward compat by calling WCST_Plugin in test script - should trigger deprecation notice but work. Verify all 5 core classes load without errors."
+            "testStrategy": "Run `grep -r 'WCST_' includes/` to find missed references. Test autoloader loads DR_Subs_Plugin correctly. Test backward compat by calling WCST_Plugin in test script - should trigger deprecation notice but work. Verify all 5 core classes load without errors.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -40,7 +42,8 @@
             ],
             "details": "Search and replace in includes/: wcst_check_dependencies → dr_subs_check_dependencies, wcst_admin_notices → dr_subs_admin_notices, wcst_autoloader → dr_subs_autoloader, wcst_init_plugin → dr_subs_init_plugin, wcst_activate_plugin → dr_subs_activate_plugin, wcst_deactivate_plugin → dr_subs_deactivate_plugin. Update add_action, add_filter, apply_filters calls. Update any custom hooks fired in analyzers/collectors classes. Maintain backward compatibility by re-registering old hook names that call new ones with deprecation warnings.",
             "status": "pending",
-            "testStrategy": "Run `grep -r \"wcst_\" doctor-subs.php includes/` to verify all replaced. Test plugin activation hook fires correctly. Test admin_notices hook displays. Use Query Monitor plugin to verify new hook names appear in Hooks panel."
+            "testStrategy": "Run `grep -r \"wcst_\" doctor-subs.php includes/` to verify all replaced. Test plugin activation hook fires correctly. Test admin_notices hook displays. Use Query Monitor plugin to verify new hook names appear in Hooks panel.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -51,7 +54,8 @@
             ],
             "details": "Create includes/class-migration.php with DR_Subs_Migration class. Add static activate() method called from plugin activation. Define dr_subs_sub_health schema with columns: sub_id BIGINT UNSIGNED PRIMARY KEY, bucket VARCHAR(20) NOT NULL, matched_rules JSON, narration TEXT NULL, last_scanned_at DATETIME NOT NULL, suppressed_until DATETIME NULL, INDEX idx_bucket_scan (bucket, last_scanned_at DESC), INDEX idx_bucket (bucket). Define dr_subs_fix_journal with: entry_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, batch_id VARCHAR(40) NULL, sub_id BIGINT UNSIGNED NOT NULL, rule_id VARCHAR(50) NOT NULL, applied_at DATETIME NOT NULL, applied_by BIGINT UNSIGNED NOT NULL, original_data JSON NOT NULL, new_data JSON NOT NULL, reverted_at DATETIME NULL, reverted_by BIGINT UNSIGNED NULL. Use dbDelta() for table creation. Add option migration: get_option('wcst_settings'), save as dr_subs_settings, delete wcst_settings. Update all get_option/update_option calls in codebase to use dr_subs_settings.",
             "status": "pending",
-            "testStrategy": "Test fresh activation: inspect wp_options for dr_subs_settings, check both tables exist with `SHOW TABLES LIKE 'dr_subs_%'`. Test upgrade: seed wcst_settings option with test data, activate plugin, verify data copied to dr_subs_settings and wcst_settings deleted. Use `DESCRIBE dr_subs_sub_health` to verify schema matches spec including indexes."
+            "testStrategy": "Test fresh activation: inspect wp_options for dr_subs_settings, check both tables exist with `SHOW TABLES LIKE 'dr_subs_%'`. Test upgrade: seed wcst_settings option with test data, activate plugin, verify data copied to dr_subs_settings and wcst_settings deleted. Use `DESCRIBE dr_subs_sub_health` to verify schema matches spec including indexes.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -62,19 +66,21 @@
             ],
             "details": "Copy operations: design-brief/v2-assets/admin/fonts/* (9 woff2 files) → admin/fonts/, design-brief/v2-assets/admin/css/tokens.css → admin/css/tokens.css, design-brief/v2-assets/admin/css/admin.css → admin/css/admin.css (replaces admin-styles.css), design-brief/v2-assets/admin/css/responsive.css → admin/css/responsive.css, design-brief/v2-assets/admin/js/admin.js → admin/js/admin.js (replaces admin-scripts.js), design-brief/v2-assets/admin/views/*.php (dashboard.php, first-run.php, modal-fix-preview.php, fix-history.php, settings.php) → admin/views/, design-brief/v2-assets/admin/views/partials/*.php → admin/views/partials/. Update DR_Subs_Admin::enqueue_admin_scripts() in includes/class-admin.php: wp_enqueue_style('dr-subs-tokens', DR_SUBS_PLUGIN_URL . 'admin/css/tokens.css'), wp_enqueue_style('dr-subs-admin', dependencies: ['dr-subs-tokens']), wp_enqueue_style('dr-subs-responsive', dependencies: ['dr-subs-admin'], media: 'all'). Update wp_enqueue_script to load admin/js/admin.js. Add wp_localize_script with ajaxurl, nonce, i18n strings. Delete old admin-styles.css and admin-scripts.js after confirming new assets load.",
             "status": "pending",
-            "testStrategy": "Manual test in wp-admin Doctor Subs page: open browser DevTools Network tab, verify tokens.css loads first, then admin.css (with tokens dependency), then responsive.css. Verify all 9 font files load without 404s. Check admin.js loads with localized dr_subs_admin_data object containing nonce and ajaxurl. Inspect page with .ds-root class applied. Test responsive breakpoints by resizing browser window."
+            "testStrategy": "Manual test in wp-admin Doctor Subs page: open browser DevTools Network tab, verify tokens.css loads first, then admin.css (with tokens dependency), then responsive.css. Verify all 9 font files load without 404s. Check admin.js loads with localized dr_subs_admin_data object containing nonce and ajaxurl. Inspect page with .ds-root class applied. Test responsive breakpoints by resizing browser window.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:18:44.187Z"
       },
       {
-        "id": 2,
+        "id": "2",
         "title": "Database migration: Create custom tables and migrate settings",
         "description": "Create DR_Subs_Migration class with activation hook to create dr_subs_sub_health and dr_subs_fix_journal tables via dbDelta, migrate wcst_settings to dr_subs_settings",
         "details": "1. Create includes/class-migration.php with DR_Subs_Migration class\n2. Define dr_subs_sub_health schema: sub_id (BIGINT UNSIGNED PK), bucket (VARCHAR(20) NOT NULL), matched_rules (JSON), narration (TEXT NULL), last_scanned_at (DATETIME NOT NULL), suppressed_until (DATETIME NULL), composite index (bucket, last_scanned_at DESC), single index (bucket)\n3. Define dr_subs_fix_journal schema: entry_id (BIGINT UNSIGNED AUTO_INCREMENT PK), batch_id (VARCHAR(40) NULL), sub_id (BIGINT UNSIGNED NOT NULL), rule_id (VARCHAR(60) NOT NULL), before_state (JSON NOT NULL), before_state_hash (CHAR(64) NOT NULL), after_state (JSON NOT NULL), side_effects (JSON NOT NULL), user_id (BIGINT UNSIGNED NOT NULL), status (ENUM('applied','reverted') DEFAULT 'applied'), created_at (DATETIME NOT NULL), reverted_at (DATETIME NULL), indexes: (sub_id, created_at DESC), (batch_id)\n4. Use dbDelta for table creation (WordPress standard)\n5. Read wcst_settings option, transform to dr_subs_settings shape (alerts_enabled, alert_email, journal_retention_days=180, telemetry_enabled=false)\n6. Hook to register_activation_hook in main file\n7. Add version tracking option dr_subs_db_version for future migrations",
         "testStrategy": "Test activation on fresh install: verify both tables exist with correct schema. Test upgrade from v1.2.4: verify wcst_settings migrated to dr_subs_settings preserving values. Use wp db query to inspect table structure and indexes.",
         "priority": "high",
         "dependencies": [
-          1
+          "1"
         ],
         "status": "pending",
         "subtasks": [
@@ -85,7 +91,8 @@
             "dependencies": [],
             "details": "1. Create new file includes/class-migration.php with proper WordPress header and security check\n2. Define DR_Subs_Migration class with static methods for activation workflow\n3. Add 'migration' => 'includes/' mapping to $class_directories array in wcst_autoloader() function (doctor-subs.php:155-167)\n4. Replace wcst_activate_plugin() body to call DR_Subs_Migration::activate() instead of WCST_Plugin::activate() (doctor-subs.php:212-214)\n5. Keep existing WCST_Plugin::activate() for backwards compatibility but make it no-op",
             "status": "pending",
-            "testStrategy": "Verify file created with correct class name. Check autoloader resolves class. Confirm activation hook registered correctly by checking doctor-subs.php:215 points to function that calls DR_Subs_Migration::activate()."
+            "testStrategy": "Verify file created with correct class name. Check autoloader resolves class. Confirm activation hook registered correctly by checking doctor-subs.php:215 points to function that calls DR_Subs_Migration::activate().",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -96,7 +103,8 @@
             ],
             "details": "1. Add private static method create_sub_health_table() in DR_Subs_Migration\n2. Define SQL schema: sub_id (BIGINT UNSIGNED PRIMARY KEY), bucket (VARCHAR(20) NOT NULL), matched_rules (JSON), narration (TEXT NULL), last_scanned_at (DATETIME NOT NULL), suppressed_until (DATETIME NULL)\n3. Add composite index: KEY bucket_scan_idx (bucket, last_scanned_at DESC)\n4. Add single index: KEY bucket_idx (bucket)\n5. Use global $wpdb for table prefix, call dbDelta() with SQL\n6. Require wp-admin/includes/upgrade.php for dbDelta function\n7. Set charset/collate from $wpdb->get_charset_collate()",
             "status": "pending",
-            "testStrategy": "Unit test: call create_sub_health_table(), run DESCRIBE wp_dr_subs_sub_health to verify columns match spec. Check SHOW INDEXES to confirm bucket_scan_idx (bucket, last_scanned_at DESC) and bucket_idx exist."
+            "testStrategy": "Unit test: call create_sub_health_table(), run DESCRIBE wp_dr_subs_sub_health to verify columns match spec. Check SHOW INDEXES to confirm bucket_scan_idx (bucket, last_scanned_at DESC) and bucket_idx exist.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -107,7 +115,8 @@
             ],
             "details": "1. Add private static method create_fix_journal_table() in DR_Subs_Migration\n2. Define SQL schema: entry_id (BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY), batch_id (VARCHAR(40) NULL), sub_id (BIGINT UNSIGNED NOT NULL), rule_id (VARCHAR(60) NOT NULL), before_state (JSON NOT NULL), before_state_hash (CHAR(64) NOT NULL), after_state (JSON NOT NULL), side_effects (JSON NOT NULL), user_id (BIGINT UNSIGNED NOT NULL), status (ENUM('applied','reverted') DEFAULT 'applied'), created_at (DATETIME NOT NULL), reverted_at (DATETIME NULL)\n3. Add composite index: KEY sub_history_idx (sub_id, created_at DESC)\n4. Add single index: KEY batch_idx (batch_id)\n5. Use global $wpdb for table prefix, call dbDelta() with SQL\n6. Set charset/collate from $wpdb->get_charset_collate()",
             "status": "pending",
-            "testStrategy": "Unit test: call create_fix_journal_table(), run DESCRIBE wp_dr_subs_fix_journal to verify all 12 columns exist with correct types. Check SHOW INDEXES confirms sub_history_idx (sub_id, created_at DESC) and batch_idx."
+            "testStrategy": "Unit test: call create_fix_journal_table(), run DESCRIBE wp_dr_subs_fix_journal to verify all 12 columns exist with correct types. Check SHOW INDEXES confirms sub_history_idx (sub_id, created_at DESC) and batch_idx.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -118,7 +127,8 @@
             ],
             "details": "1. Add private static method migrate_settings() in DR_Subs_Migration\n2. Read wcst_settings option with get_option('wcst_settings', array())\n3. Transform to dr_subs_settings shape: alerts_enabled (map from old enable_logging or default true), alert_email (use get_option('admin_email')), journal_retention_days (default 180), telemetry_enabled (default false)\n4. Preserve any existing values that match new schema\n5. Write to dr_subs_settings option with add_option() or update_option()\n6. Do NOT delete wcst_settings (preserve for rollback safety)\n7. Return true on success, false on failure",
             "status": "pending",
-            "testStrategy": "Integration test: seed wcst_settings with {enable_logging: false, log_retention_days: 60}, run migrate_settings(), verify dr_subs_settings contains {alerts_enabled: false, alert_email: admin@test.com, journal_retention_days: 180, telemetry_enabled: false}. Verify wcst_settings still exists."
+            "testStrategy": "Integration test: seed wcst_settings with {enable_logging: false, log_retention_days: 60}, run migrate_settings(), verify dr_subs_settings contains {alerts_enabled: false, alert_email: admin@test.com, journal_retention_days: 180, telemetry_enabled: false}. Verify wcst_settings still exists.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -131,19 +141,20 @@
             ],
             "details": "1. Add public static method activate() in DR_Subs_Migration\n2. Check current dr_subs_db_version option value\n3. Call create_sub_health_table() method\n4. Call create_fix_journal_table() method\n5. Call migrate_settings() method\n6. Update dr_subs_db_version option to match WCST_PLUGIN_VERSION constant\n7. Add error logging for any failures using error_log()\n8. Call WCST_Plugin::activate() to preserve existing activation logic (set default options, flush rewrite rules)\n9. Return true on success",
             "status": "pending",
-            "testStrategy": "Integration test on fresh install: activate plugin, verify dr_subs_sub_health and dr_subs_fix_journal tables exist, dr_subs_settings option set with defaults, dr_subs_db_version matches plugin version. Test upgrade: deactivate, modify wcst_settings, reactivate, verify migration preserves data."
+            "testStrategy": "Integration test on fresh install: activate plugin, verify dr_subs_sub_health and dr_subs_fix_journal tables exist, dr_subs_settings option set with defaults, dr_subs_db_version matches plugin version. Test upgrade: deactivate, modify wcst_settings, reactivate, verify migration preserves data.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 3,
+        "id": "3",
         "title": "Asset migration: Move v2 design assets into plugin structure",
         "description": "Move design-brief/v2-assets/admin/* into plugin admin/ directory, replacing v1 files, update enqueue logic in DR_Subs_Admin",
         "details": "1. Copy design-brief/v2-assets/admin/fonts/* (9 woff2 files) → admin/fonts/\n2. Copy design-brief/v2-assets/admin/css/* (tokens.css, admin.css, responsive.css) → admin/css/\n3. Copy design-brief/v2-assets/admin/js/admin.js → admin/js/\n4. Copy design-brief/v2-assets/admin/views/* (7 PHP templates + 2 partials) → admin/views/\n5. Update DR_Subs_Admin::enqueue_admin_scripts() to load tokens.css, admin.css, responsive.css, admin.js with .ds-root scoping\n6. Add wp_localize_script for admin.js with ajaxUrl, nonce, i18n strings array\n7. Enqueue fonts via @font-face in tokens.css (already done in design assets)\n8. Delete old v1 admin CSS/JS files\n9. Add admin/fonts/LICENSE.txt with OFL/Fontshare attribution per WP.org compliance",
         "testStrategy": "Manual test: load /wp-admin/ Doctor Subs page, verify fonts load (no 404s), CSS applies with .ds-root scoping, admin.js loads with localized data. Check browser console for errors. Verify print stylesheet loads.",
         "priority": "high",
         "dependencies": [
-          1
+          "1"
         ],
         "status": "pending",
         "subtasks": [
@@ -154,7 +165,8 @@
             "dependencies": [],
             "details": "Copy fonts to admin/fonts/: switzer-400.woff2, switzer-500.woff2, switzer-600.woff2, instrument-serif-400-latin.woff2, instrument-serif-400-latin-ext.woff2, instrument-serif-400-italic-latin.woff2, instrument-serif-400-italic-latin-ext.woff2, jetbrains-mono-latin.woff2, jetbrains-mono-latin-ext.woff2. Create LICENSE.txt with OFL/Fontshare attribution: Switzer by Jérémie Hornus (Fontshare/OFL), Instrument Serif (Google Fonts/OFL), JetBrains Mono (JetBrains/OFL). Reference: https://scripts.sil.org/OFL for license text.",
             "status": "pending",
-            "testStrategy": "Verify fonts exist at admin/fonts/ with correct filenames. Read LICENSE.txt to confirm OFL attribution is present. Check file sizes match source files."
+            "testStrategy": "Verify fonts exist at admin/fonts/ with correct filenames. Read LICENSE.txt to confirm OFL attribution is present. Check file sizes match source files.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -165,7 +177,8 @@
             ],
             "details": "Copy design-brief/v2-assets/admin/css/tokens.css → admin/css/tokens.css (includes @font-face declarations with relative paths ../fonts/*.woff2). Copy admin.css → admin/css/admin.css (main styles with .ds-root scoping). Copy responsive.css → admin/css/responsive.css (breakpoint styles). Delete old admin/css/admin-styles.css (v1 file no longer needed). Verify tokens.css font URLs reference admin/fonts/ correctly (already use '../fonts/' relative paths).",
             "status": "pending",
-            "testStrategy": "Check tokens.css contains @font-face rules with url('../fonts/switzer-400.woff2'). Verify admin.css has .ds-root selectors. Confirm old admin-styles.css is deleted."
+            "testStrategy": "Check tokens.css contains @font-face rules with url('../fonts/switzer-400.woff2'). Verify admin.css has .ds-root selectors. Confirm old admin-styles.css is deleted.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -176,7 +189,8 @@
             ],
             "details": "Copy design-brief/v2-assets/admin/js/admin.js → admin/js/admin.js (vanilla JS, no jQuery dependency, expects window.drSubsAjax localized object). Delete old admin/js/admin-scripts.js (v1 file). New admin.js handles: filter clicks, modal preview, scan refresh, revert buttons, settings form save, toggle sync. No longer depends on jQuery.",
             "status": "pending",
-            "testStrategy": "Verify admin/js/admin.js exists and contains 'window.drSubsAjax'. Confirm old admin-scripts.js is deleted. Check file has filter/modal/settings handlers."
+            "testStrategy": "Verify admin/js/admin.js exists and contains 'window.drSubsAjax'. Confirm old admin-scripts.js is deleted. Check file has filter/modal/settings handlers.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -187,7 +201,8 @@
             ],
             "details": "Create admin/views/ directory if not exists. Copy: dashboard.php, first-run.php, fix-history.php, settings.php, modal-fix-preview.php from design-brief/v2-assets/admin/views/ → admin/views/. Create admin/views/partials/ subdirectory. Copy: plugin-header.php, stethoscope.php from design-brief/v2-assets/admin/views/partials/ → admin/views/partials/. These templates expect: dashboard.php receives $state, $counts, $subs, $filter, $last_scanned, $stale vars; fix-history.php receives $entries array; settings.php receives $settings array.",
             "status": "pending",
-            "testStrategy": "Verify all 7 templates exist in admin/views/. Check partials/plugin-header.php and partials/stethoscope.php exist. Read dashboard.php header comment to confirm @var declarations for expected variables."
+            "testStrategy": "Verify all 7 templates exist in admin/views/. Check partials/plugin-header.php and partials/stethoscope.php exist. Read dashboard.php header comment to confirm @var declarations for expected variables.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -199,20 +214,21 @@
             ],
             "details": "Update DR_Subs_Admin::enqueue_admin_scripts() in includes/class-admin.php (line 56-114). Replace wp_enqueue_style('wcst-admin-styles') with three separate calls: wp_enqueue_style('dr-subs-tokens', DR_SUBS_PLUGIN_URL . 'admin/css/tokens.css', [], DR_SUBS_PLUGIN_VERSION), wp_enqueue_style('dr-subs-admin', DR_SUBS_PLUGIN_URL . 'admin/css/admin.css', ['dr-subs-tokens'], DR_SUBS_PLUGIN_VERSION), wp_enqueue_style('dr-subs-responsive', DR_SUBS_PLUGIN_URL . 'admin/css/responsive.css', ['dr-subs-admin'], DR_SUBS_PLUGIN_VERSION, 'screen'). Replace wp_enqueue_script('wcst-admin-scripts') with wp_enqueue_script('dr-subs-admin', DR_SUBS_PLUGIN_URL . 'admin/js/admin.js', [], DR_SUBS_PLUGIN_VERSION, true). Update wp_localize_script() to use 'dr-subs-admin' handle and object name 'drSubsAjax' (not wcst_ajax). Keep ajax_url, nonce, strings structure. Remove auto_analyze_id logic (v1 feature). Note: Will need constants renamed from WCST_PLUGIN_* to DR_SUBS_PLUGIN_* per Task 1 completion.",
             "status": "pending",
-            "testStrategy": "Load /wp-admin/ Doctor Subs page. Open DevTools Network tab: verify tokens.css loads first (no 404s on font URLs), then admin.css, then responsive.css, then admin.js. Check Console: verify window.drSubsAjax exists with ajaxUrl, nonce, strings properties. Inspect Elements: verify .ds-root class present and Switzer font renders correctly. No jQuery errors should appear."
+            "testStrategy": "Load /wp-admin/ Doctor Subs page. Open DevTools Network tab: verify tokens.css loads first (no 404s on font URLs), then admin.css, then responsive.css, then admin.js. Check Console: verify window.drSubsAjax exists with ajaxUrl, nonce, strings properties. Inspect Elements: verify .ds-root class present and Switzer font renders correctly. No jQuery errors should appear.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 4,
+        "id": "4",
         "title": "Admin router: Rebuild DR_Subs_Admin with tab-based routing",
         "description": "Rewrite class-admin.php as DR_Subs_Admin with tab router for dashboard/fix-history/settings surfaces",
         "details": "1. Rewrite includes/class-admin.php for DR_Subs_Admin\n2. Implement tab routing: check $_GET['tab'] param (dashboard|fix-history|settings, default=dashboard)\n3. Route to appropriate view: dashboard.php, fix-history.php, settings.php from admin/views/\n4. Pass data to views: dashboard gets dr_subs_sub_health rows grouped by bucket, fix-history gets dr_subs_fix_journal rows paginated, settings gets dr_subs_settings option\n5. First-run detection: if no rows in dr_subs_sub_health with last_scanned_at, show first-run.php instead of dashboard\n6. Render plugin-header.php partial at top of all tabs\n7. Check manage_woocommerce capability before render\n8. Add menu item under WooCommerce menu (not top-level)\n9. Use wp_enqueue_scripts only on our admin pages",
         "testStrategy": "Manual test: navigate to WooCommerce > Doctor Subs, verify tab switching works, first-run.php shows on fresh install, dashboard.php shows after first scan. Check capability enforcement (non-admin sees nothing). Verify assets only load on our pages.",
         "priority": "high",
         "dependencies": [
-          2,
-          3
+          "2",
+          "3"
         ],
         "status": "pending",
         "subtasks": [
@@ -223,7 +239,8 @@
             "dependencies": [],
             "details": "Rewrite includes/class-admin.php::render_admin_page() method. Sanitize $_GET['tab'] using sanitize_key(wp_unslash()). Support values: 'history', 'settings', default to 'dashboard'. Check for first-run state: query dr_subs_sub_health table for any rows with last_scanned_at IS NOT NULL - if zero rows found, route to first-run.php. Otherwise route based on tab: 'history' → fix-history.php, 'settings' → settings.php, default → dashboard.php. All view files loaded from admin/views/ directory using require with WCST_PLUGIN_DIR constant (will be renamed to DR_SUBS_PLUGIN_DIR in Task 1).",
             "status": "pending",
-            "testStrategy": "Manual test: fresh install → verify first-run.php loads. Add ?tab=history → verify fix-history.php loads. Add ?tab=settings → verify settings.php loads. No tab param or ?tab=dashboard → verify dashboard.php loads (after first scan). Inspect $_GET handling with invalid values like ?tab=<script> to ensure sanitize_key prevents XSS."
+            "testStrategy": "Manual test: fresh install → verify first-run.php loads. Add ?tab=history → verify fix-history.php loads. Add ?tab=settings → verify settings.php loads. No tab param or ?tab=dashboard → verify dashboard.php loads (after first scan). Inspect $_GET handling with invalid values like ?tab=<script> to ensure sanitize_key prevents XSS.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -234,7 +251,8 @@
             ],
             "details": "Add protected methods to DR_Subs_Admin class: get_dashboard_data() queries dr_subs_sub_health rows grouped by bucket (broken, at_risk, healthy), returns array with 'counts', 'subs', 'filter', 'last_scanned', 'stale'. get_fix_history_data() queries dr_subs_fix_journal with pagination ($_GET['paged'], 20 per page), returns array with 'entries', 'total', 'pages'. get_settings_data() loads dr_subs_settings option with get_option(), returns array with alert settings (email, threshold), retention (days), telemetry (enabled bool). Pass these arrays to view files by extracting as variables before require statement. Use global $wpdb for queries with proper table prefix: {$wpdb->prefix}dr_subs_sub_health.",
             "status": "pending",
-            "testStrategy": "Unit test: mock $wpdb results, verify get_dashboard_data() returns correct structure with counts[broken|at_risk|healthy]. Verify get_fix_history_data() respects pagination (page 2 skips first 20 rows). Verify get_settings_data() returns defaults if option doesn't exist. Integration test: seed 100 subs in health table, verify counts match buckets."
+            "testStrategy": "Unit test: mock $wpdb results, verify get_dashboard_data() returns correct structure with counts[broken|at_risk|healthy]. Verify get_fix_history_data() respects pagination (page 2 skips first 20 rows). Verify get_settings_data() returns defaults if option doesn't exist. Integration test: seed 100 subs in health table, verify counts match buckets.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -245,7 +263,8 @@
             ],
             "details": "In render_admin_page(), add capability check at top: if (!current_user_can('manage_woocommerce')) { wp_die(__('You do not have permission to access this page.', 'doctor-subs'), 403); }. After routing logic determines which view to load, call appropriate get_*_data() method. Extract returned array to variables using extract($data, EXTR_SKIP) before require statement. For plugin-header.php partial, prepare $active_tab, $show_meta, $last_scanned, $stale variables and extract before require. Wrap entire page output in <div class=\"wrap ds-root\"> to match design system scope from tokens.css.",
             "status": "pending",
-            "testStrategy": "Manual test: log out admin, access /wp-admin/admin.php?page=doctor-subs as subscriber → verify 403 wp_die screen. Log in as shop_manager → verify access granted. Test with user without manage_woocommerce capability → verify rejection. Check page source for <div class=\"ds-root\"> wrapper. Verify variables like $counts, $subs available in view files by adding temporary var_dump() in dashboard.php."
+            "testStrategy": "Manual test: log out admin, access /wp-admin/admin.php?page=doctor-subs as subscriber → verify 403 wp_die screen. Log in as shop_manager → verify access granted. Test with user without manage_woocommerce capability → verify rejection. Check page source for <div class=\"ds-root\"> wrapper. Verify variables like $counts, $subs available in view files by adding temporary var_dump() in dashboard.php.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -254,7 +273,8 @@
             "dependencies": [],
             "details": "In add_admin_menu() method, verify add_submenu_page() uses 'woocommerce' as parent slug (already correct at class-admin.php:40-47). In enqueue_admin_scripts($hook), keep existing check: if ('woocommerce_page_doctor-subs' !== $hook) { return; }. Update wp_enqueue_style calls to load tokens.css, admin.css, responsive.css in order with dependencies. Update wp_enqueue_script to load admin.js. Update wp_localize_script variable name from 'wcst_ajax' to 'drSubsAjax', keys: ajaxUrl, nonce (using dr_subs_admin nonce action), strings array per design-brief/v2-assets/README.md:83-97. Remove old auto_analyze_id logic (lines 77-91) - that's v1 single-sub analysis, not needed in v2.",
             "status": "pending",
-            "testStrategy": "Manual test: activate plugin, navigate WP admin → verify \"Doctor Subs\" appears under WooCommerce menu, not as top-level. Open browser DevTools Network tab, navigate to Doctor Subs page → verify tokens.css, admin.css, responsive.css, admin.js load. Navigate to WooCommerce → Orders → verify NO Doctor Subs assets in Network tab. Check page source for window.drSubsAjax object with ajaxUrl, nonce, strings keys."
+            "testStrategy": "Manual test: activate plugin, navigate WP admin → verify \"Doctor Subs\" appears under WooCommerce menu, not as top-level. Open browser DevTools Network tab, navigate to Doctor Subs page → verify tokens.css, admin.css, responsive.css, admin.js load. Navigate to WooCommerce → Orders → verify NO Doctor Subs assets in Network tab. Check page source for window.drSubsAjax object with ajaxUrl, nonce, strings keys.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -266,19 +286,20 @@
             ],
             "details": "In render_admin_page(), after tab sanitization but before switch statement, add first-run check for 'dashboard' tab only. Query: global $wpdb; $scanned = $wpdb->get_var(\"SELECT COUNT(*) FROM {$wpdb->prefix}dr_subs_sub_health WHERE last_scanned_at IS NOT NULL\"); If $scanned === 0 or $scanned === '0', set $view_file to 'first-run.php'. Otherwise proceed with tab routing. Build full view paths using WCST_PLUGIN_DIR . 'admin/views/' . $view_file. For plugin-header.php partial, use __DIR__ relative path from view files (per first-run.php:36). Verify all view files exist with file_exists() before require, fallback to dashboard.php if missing.",
             "status": "pending",
-            "testStrategy": "Integration test: fresh WP install with plugin activated, zero rows in dr_subs_sub_health → navigate to Doctor Subs → verify first-run.php content (\"First visit\" kicker, \"Let's check your subscriptions\" hero). Insert 1 row into dr_subs_sub_health with last_scanned_at = NOW() → reload page → verify dashboard.php loads instead. Test with missing view file (rename fix-history.php) → navigate to ?tab=history → verify fallback to dashboard.php, check error_log for file_exists() failure."
+            "testStrategy": "Integration test: fresh WP install with plugin activated, zero rows in dr_subs_sub_health → navigate to Doctor Subs → verify first-run.php content (\"First visit\" kicker, \"Let's check your subscriptions\" hero). Insert 1 row into dr_subs_sub_health with last_scanned_at = NOW() → reload page → verify dashboard.php loads instead. Test with missing view file (rename fix-history.php) → navigate to ?tab=history → verify fallback to dashboard.php, check error_log for file_exists() failure.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 5,
+        "id": "5",
         "title": "Rules engine: Create interface, registry, and ScanContext",
         "description": "Build DR_Subs_Rule_Interface, DR_Subs_Rules_Registry, and DR_Subs_Scan_Context with pre-scan indexing",
         "details": "1. Create includes/rules/interface-rule.php with DR_Subs_Rule_Interface: detect_batch(array $sub_ids, ScanContext $ctx): array, preview_fix(WC_Subscription $sub): array, apply_fix(WC_Subscription $sub): array, revert_fix(FixJournalEntry $entry): array, tracked_fields(): array, get_id(): string, get_name(): string\n2. Create includes/rules/class-rules-registry.php with register(Rule), get_all(): array, get_by_id(string): Rule|null, apply_filters('dr_subs_detection_rules', $rules) for third-party extension\n3. Create includes/rules/class-scan-context.php:\n   - pending_as_by_sub: indexed query for pending woocommerce_scheduled_subscription_payment actions grouped by subscription_id extracted from args (unserialize + exact match, NOT LIKE '%sub_id%' substring)\n   - failed_as_by_sub: failed actions in last 30 days grouped by subscription_id\n   - related_orders_by_sub: recent renewal orders per sub\n4. ScanContext builds all indexes in constructor via single queries, stores in arrays for O(1) lookup\n5. Use global $wpdb for Action Scheduler queries (actionscheduler_actions + actionscheduler_groups tables)",
         "testStrategy": "Unit test: ScanContext constructor with seeded AS actions (sub IDs 1, 11, 111, 110) verifies exact ID extraction, no substring matches. Test pending_as_by_sub[11] returns only sub 11 actions. Test failed_as_by_sub respects 30-day window.",
         "priority": "high",
         "dependencies": [
-          1
+          "1"
         ],
         "status": "pending",
         "subtasks": [
@@ -289,7 +310,8 @@
             "dependencies": [],
             "details": "Create includes/rules/interface-rule.php. Define DR_Subs_Rule_Interface with: detect_batch(array $sub_ids, DR_Subs_Scan_Context $ctx): array returns sub_id => issue_data map, preview_fix(WC_Subscription $sub): array returns before/after/description, apply_fix(WC_Subscription $sub): array applies fix and returns result, revert_fix(array $entry): array reverts from journal entry, tracked_fields(): array returns field names for state guard, get_id(): string returns rule ID, get_name(): string returns display name. Use strict_types declaration at top. Follow existing WCST_* class patterns (will be renamed to DR_Subs_* in task 1).",
             "status": "pending",
-            "testStrategy": "Unit test: create mock rule implementing interface, verify all methods exist with correct signatures. PHPStan: verify interface contract valid. Test tracked_fields returns array of strings."
+            "testStrategy": "Unit test: create mock rule implementing interface, verify all methods exist with correct signatures. PHPStan: verify interface contract valid. Test tracked_fields returns array of strings.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -300,7 +322,8 @@
             ],
             "details": "Create includes/rules/class-rules-registry.php. Implement DR_Subs_Rules_Registry with: private static $rules = [], register(DR_Subs_Rule_Interface $rule): void stores rule by ID, get_all(): array returns all registered rules, get_by_id(string $id): ?DR_Subs_Rule_Interface finds rule by ID or null. Add apply_filters('dr_subs_detection_rules', $rules) in get_all() for third-party extension. Singleton pattern like WCST_Plugin. Follow autoloader mapping pattern from doctor-subs.php (class-rules-registry.php maps to includes/rules/).",
             "status": "pending",
-            "testStrategy": "Unit test: register 2 mock rules, verify get_all returns both, get_by_id finds correct rule, get_by_id('nonexistent') returns null. Test filter hook modifies returned rules array."
+            "testStrategy": "Unit test: register 2 mock rules, verify get_all returns both, get_by_id finds correct rule, get_by_id('nonexistent') returns null. Test filter hook modifies returned rules array.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -311,7 +334,8 @@
             ],
             "details": "Create includes/rules/class-scan-context.php. Constructor accepts array of sub IDs, builds indexes via single queries: pending_as_by_sub array (grouped by subscription_id from actionscheduler_actions WHERE status='pending' AND hook='woocommerce_scheduled_subscription_payment'), failed_as_by_sub array (status='failed' AND modified > NOW() - INTERVAL 30 DAY), related_orders_by_sub array (query wc_orders for renewal orders via _subscription_renewal meta). Extract subscription_id from AS args column (unserialize, exact match 'subscription_id' key, NOT LIKE '%sub_id%'). Use global $wpdb for direct queries (actionscheduler_actions + actionscheduler_groups tables). Store in private arrays with public getters get_pending_actions(int $sub_id): array, get_failed_actions(int $sub_id): array, get_related_orders(int $sub_id): array.",
             "status": "pending",
-            "testStrategy": "Unit test: seed actionscheduler_actions with sub IDs 1, 11, 111, 110 in args (test exact extraction vs substring). Construct ScanContext, verify pending_as_by_sub[11] returns only sub 11 actions (not 110, 111). Test failed_as_by_sub respects 30-day window. Mock wpdb for queries."
+            "testStrategy": "Unit test: seed actionscheduler_actions with sub IDs 1, 11, 111, 110 in args (test exact extraction vs substring). Construct ScanContext, verify pending_as_by_sub[11] returns only sub 11 actions (not 110, 111). Test failed_as_by_sub respects 30-day window. Mock wpdb for queries.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -324,7 +348,8 @@
             ],
             "details": "Edit doctor-subs.php wcst_autoloader function (lines 144-175). Add to $class_directories array: 'rule-interface' => 'includes/rules/', 'rules-registry' => 'includes/rules/', 'scan-context' => 'includes/rules/'. Adjust autoloader logic to handle 'interface-rule.php' file naming pattern (interface files use 'interface-' prefix instead of 'class-'). Test autoloader resolves DR_Subs_Rule_Interface from interface-rule.php, DR_Subs_Rules_Registry from class-rules-registry.php, DR_Subs_Scan_Context from class-scan-context.php.",
             "status": "pending",
-            "testStrategy": "Unit test: call wcst_autoloader('DR_Subs_Rule_Interface'), verify includes/rules/interface-rule.php loaded. Call wcst_autoloader('DR_Subs_Rules_Registry'), verify class-rules-registry.php loaded. Integration test: instantiate DR_Subs_Scan_Context, verify no autoload errors."
+            "testStrategy": "Unit test: call wcst_autoloader('DR_Subs_Rule_Interface'), verify includes/rules/interface-rule.php loaded. Call wcst_autoloader('DR_Subs_Rules_Registry'), verify class-rules-registry.php loaded. Integration test: instantiate DR_Subs_Scan_Context, verify no autoload errors.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -336,19 +361,20 @@
             ],
             "details": "Edit includes/class-plugin.php. In init() method (line 113), instantiate DR_Subs_Rules_Registry::get_instance() before do_action('wcst_init'). Add property public $rules_registry to WCST_Plugin class. Store registry instance in $this->rules_registry. Fire new action do_action('dr_subs_register_rules', $registry) after instantiation for core and third-party rules to register. Update PHPDoc for init() method. Follow pattern used for $admin, $ajax_handler, $logger properties.",
             "status": "pending",
-            "testStrategy": "Integration test: activate plugin, verify DR_Subs_Rules_Registry instantiated. Add test rule registration on 'dr_subs_register_rules' hook, verify rule appears in get_all(). Check $this->rules_registry accessible from WCST_Plugin::get_instance(). No PHP errors on plugin load."
+            "testStrategy": "Integration test: activate plugin, verify DR_Subs_Rules_Registry instantiated. Add test rule registration on 'dr_subs_register_rules' hook, verify rule appears in get_all(). Check $this->rules_registry accessible from WCST_Plugin::get_instance(). No PHP errors on plugin load.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 6,
+        "id": "6",
         "title": "Detection rule: Implement Ghost Sub rule",
         "description": "Create DR_Subs_Rule_Ghost_Sub implementing full detect/preview/apply/revert cycle",
         "details": "1. Create includes/rules/class-rule-ghost-sub.php implementing DR_Subs_Rule_Interface\n2. detect_batch: find subs with status='active' AND next_payment < now() AND no pending AS action in ScanContext\n3. tracked_fields: ['status', 'next_payment'] for state guard\n4. preview_fix: return {before: {status, next_payment}, after: {status, next_payment}, description: 'Re-enqueue missed payment event'}\n5. apply_fix: state-guard check (current state matches before_state on tracked fields), if pass: re-enqueue woocommerce_scheduled_subscription_payment via as_schedule_single_action(), record journal entry with side_effects JSON\n6. revert_fix: check if AS action already executed (query AS logs), if not: unschedule action, restore state, if yes: show warning, soft-revert (journal entry marked reverted but no state change)\n7. get_id: 'ghost_sub', get_name: 'Ghost Subscription'\n8. Unit test file: tests/rules/test-ghost-sub.php",
         "testStrategy": "Unit test: seed sub with past next_payment + no AS action, detect_batch finds it. apply_fix creates AS action. revert_fix unschedules if not executed. State-guard test: modify sub between preview and apply, verify apply aborts. Regression test: sub IDs 1, 11, 111 - verify exact match.",
         "priority": "high",
         "dependencies": [
-          5
+          "5"
         ],
         "status": "pending",
         "subtasks": [
@@ -359,7 +385,8 @@
             "dependencies": [],
             "details": "Create includes/rules/class-rule-ghost-sub.php with WordPress security header (if !defined ABSPATH exit). Define class DR_Subs_Rule_Ghost_Sub implementing DR_Subs_Rule_Interface. Add method stubs: detect_batch(array $sub_ids, ScanContext $ctx): array, preview_fix(WC_Subscription $sub): array, apply_fix(WC_Subscription $sub, array $before_state): array, revert_fix(FixJournalEntry $entry): array, get_id(): string returning 'ghost_sub', get_name(): string returning 'Ghost Subscription', tracked_fields(): array returning ['status', 'next_payment']. Add class docblock describing rule purpose: detects active subscriptions with past next_payment date and no pending Action Scheduler payment event.",
             "status": "pending",
-            "testStrategy": "Unit test: instantiate class, verify get_id() returns 'ghost_sub', get_name() returns 'Ghost Subscription', tracked_fields() returns ['status', 'next_payment']. Verify class implements DR_Subs_Rule_Interface without fatal errors."
+            "testStrategy": "Unit test: instantiate class, verify get_id() returns 'ghost_sub', get_name() returns 'Ghost Subscription', tracked_fields() returns ['status', 'next_payment']. Verify class implements DR_Subs_Rule_Interface without fatal errors.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -370,7 +397,8 @@
             ],
             "details": "In detect_batch method: iterate $sub_ids, for each ID load WC_Subscription via wcs_get_subscription($id). Check sub->get_status() === 'active'. Get next_payment via $sub->get_date('next_payment') and convert to timestamp. Compare to current_time('timestamp'). If next_payment < now(), check ScanContext->pending_as_by_sub[$sub_id] for woocommerce_scheduled_subscription_payment hook. If no pending action found, create DR_Subs_Rule_Match object with rule_id='ghost_sub', sub_id=$id, severity='high', context_data={next_payment: date, status: 'active'}. Return array of RuleMatch objects. Handle edge cases: skip if next_payment is 0 or empty (manual renewals).",
             "status": "pending",
-            "testStrategy": "Unit test: seed ScanContext with empty pending_as_by_sub. Create mock WC_Subscription with status=active, next_payment=2 days ago. Call detect_batch([sub_id], context). Assert returns 1 RuleMatch. Test negative: seed context with pending AS action for sub, assert returns empty array. Test ID substring bug: seed subs 1, 11, 111 with only sub 11 matching criteria, assert exactly 1 match for sub 11."
+            "testStrategy": "Unit test: seed ScanContext with empty pending_as_by_sub. Create mock WC_Subscription with status=active, next_payment=2 days ago. Call detect_batch([sub_id], context). Assert returns 1 RuleMatch. Test negative: seed context with pending AS action for sub, assert returns empty array. Test ID substring bug: seed subs 1, 11, 111 with only sub 11 matching criteria, assert exactly 1 match for sub 11.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -381,7 +409,8 @@
             ],
             "details": "In preview_fix method: accept WC_Subscription $sub parameter. Build $before_state array with 'status' => $sub->get_status(), 'next_payment' => $sub->get_date('next_payment'). Build $after_state with same values (Ghost Sub fix doesn't change subscription fields, only re-enqueues AS action). Set description: 'Re-enqueue missed payment event for subscription {sub_id}'. Return array with keys: before_state, after_state, description, action_type='as_reschedule'. Add note in comments that actual state change is side_effect (AS action creation) not subscription field modification.",
             "status": "pending",
-            "testStrategy": "Unit test: create WC_Subscription with status=active, next_payment=yesterday. Call preview_fix($sub). Assert before_state has status='active' and next_payment matches sub date. Assert after_state matches before_state. Assert description contains 'Re-enqueue missed payment event'."
+            "testStrategy": "Unit test: create WC_Subscription with status=active, next_payment=yesterday. Call preview_fix($sub). Assert before_state has status='active' and next_payment matches sub date. Assert after_state matches before_state. Assert description contains 'Re-enqueue missed payment event'.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -393,7 +422,8 @@
             ],
             "details": "In apply_fix method: accept WC_Subscription $sub and array $before_state. Run state-guard check: foreach tracked_fields() get current value from $sub (get_status(), get_date('next_payment')), compare to $before_state values. If mismatch, return error result {success: false, error: 'State changed between preview and apply'}. If pass: get next_payment timestamp, call as_schedule_single_action($timestamp, 'woocommerce_scheduled_subscription_payment', [$sub->get_id()], 'woocommerce-subscriptions'). Capture returned AS action ID. Build side_effects array: [{type: 'as_action_created', hook: 'woocommerce_scheduled_subscription_payment', action_id: $id, args: [$sub_id]}]. Return {success: true, side_effects: $array, before_state: $before_state, after_state: $before_state (no change)}. Use WCS helper functions for compatibility.",
             "status": "pending",
-            "testStrategy": "Unit test: seed sub with status=active, next_payment=yesterday. Call apply_fix with matching before_state. Assert success=true. Query Action Scheduler tables to verify woocommerce_scheduled_subscription_payment action exists for sub_id. Test state-guard: modify sub status to on-hold between preview and apply, assert apply returns error. Test journal entry records side_effects JSON with action_id."
+            "testStrategy": "Unit test: seed sub with status=active, next_payment=yesterday. Call apply_fix with matching before_state. Assert success=true. Query Action Scheduler tables to verify woocommerce_scheduled_subscription_payment action exists for sub_id. Test state-guard: modify sub status to on-hold between preview and apply, assert apply returns error. Test journal entry records side_effects JSON with action_id.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -404,19 +434,20 @@
             ],
             "details": "In revert_fix method: accept FixJournalEntry $entry. Extract side_effects JSON, find entry with type='as_action_created', get action_id. Query Action Scheduler logs via as_get_scheduled_actions with 'status' => 'complete' and action_id filter (or query as_actionscheduler_logs table directly for action_id + status=complete). If action executed: return {success: false, warning: 'Payment action already executed. Cannot safely revert - payment may have been processed.', soft_revert: true}. If not executed: call as_unschedule_action($action_id). Return {success: true, message: 'Scheduled payment action removed', restored: true}. Handle edge case: action_id not found in side_effects (old journal format) - show warning.",
             "status": "pending",
-            "testStrategy": "Unit test: create AS action via as_schedule_single_action, record action_id in journal entry side_effects. Call revert_fix before execution - assert success=true and action unscheduled. Test already-executed: manually mark AS action complete, call revert_fix - assert success=false with warning message containing 'already executed'. Test journal entry status updated to 'reverted' only if not executed."
+            "testStrategy": "Unit test: create AS action via as_schedule_single_action, record action_id in journal entry side_effects. Call revert_fix before execution - assert success=true and action unscheduled. Test already-executed: manually mark AS action complete, call revert_fix - assert success=false with warning message containing 'already executed'. Test journal entry status updated to 'reverted' only if not executed.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 7,
+        "id": "7",
         "title": "Detection rule: Implement On-Hold Paid rule (Stripe)",
         "description": "Create DR_Subs_Rule_On_Hold_Paid for Stripe on-hold subscriptions with captured renewal payments",
         "details": "1. Create includes/rules/class-rule-on-hold-paid.php implementing DR_Subs_Rule_Interface\n2. detect_batch: find subs with status='on-hold' AND latest renewal order has _stripe_charge_captured meta (query orders via ScanContext.related_orders_by_sub, check order meta)\n3. tracked_fields: ['status'] for sub, ['status'] for order\n4. preview_fix: return {before: {sub_status: 'on-hold', order_status: current}, after: {sub_status: 'active', order_status: 'completed'}}\n5. apply_fix: state-guard check, update order status to 'completed' via $order->update_status(), update sub status to 'active' via $sub->update_status(), record journal with side_effects [{type: 'order_status_change', order_id, from, to}, {type: 'sub_status_change', sub_id, from, to}]\n6. revert_fix: restore order + sub status, journal entry\n7. get_id: 'on_hold_paid', get_name: 'On-Hold with Paid Renewal'\n8. Stripe-only in v1: skip non-Stripe payment methods",
         "testStrategy": "Unit test: seed on-hold sub with completed Stripe renewal order having _stripe_charge_captured=yes. detect_batch finds it. apply_fix flips both statuses. revert_fix restores. Test non-Stripe payment method: verify rule skips.",
         "priority": "medium",
         "dependencies": [
-          5
+          "5"
         ],
         "status": "pending",
         "subtasks": [
@@ -427,7 +458,8 @@
             "dependencies": [],
             "details": "Create class DR_Subs_Rule_On_Hold_Paid implementing DR_Subs_Rule_Interface. Add all required method signatures: detect_batch($sub_ids, $ctx), preview_fix($sub), apply_fix($sub), revert_fix($entry), tracked_fields(), get_id() returning 'on_hold_paid', get_name() returning 'On-Hold with Paid Renewal'. Add class docblock and file header matching existing plugin style (strict_types, ABSPATH check). Return empty/null stubs for now.",
             "status": "pending",
-            "testStrategy": "Manual: verify file parses without syntax errors via php -l includes/rules/class-rule-on-hold-paid.php"
+            "testStrategy": "Manual: verify file parses without syntax errors via php -l includes/rules/class-rule-on-hold-paid.php",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -438,7 +470,8 @@
             ],
             "details": "In detect_batch: iterate $sub_ids, load each WC_Subscription via wcs_get_subscription(). Filter out non-Stripe payment methods (check $sub->get_payment_method() !== 'stripe'). For Stripe subs with status='on-hold', fetch related orders from $ctx->related_orders_by_sub[$sub_id]. Find latest renewal order (check order meta _subscription_renewal='renewal'). Check order->get_meta('_stripe_charge_captured'). If captured and order status not 'completed', create DR_Subs_Rule_Match with rule_id='on_hold_paid', sub_id, severity='high', context={order_id, order_status, charge_captured}. Return array of matches.",
             "status": "pending",
-            "testStrategy": "Unit test: seed on-hold Stripe sub with renewal order having _stripe_charge_captured=yes but status=processing. Verify detect_batch returns 1 match. Seed PayPal on-hold sub, verify 0 matches (Stripe-only filter works)."
+            "testStrategy": "Unit test: seed on-hold Stripe sub with renewal order having _stripe_charge_captured=yes but status=processing. Verify detect_batch returns 1 match. Seed PayPal on-hold sub, verify 0 matches (Stripe-only filter works).",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -449,7 +482,8 @@
             ],
             "details": "tracked_fields() returns ['status'] for subscription state guard. In preview_fix($sub): load latest renewal order from related_orders. Build before_state = {sub_status: $sub->get_status(), order_id: $order->get_id(), order_status: $order->get_status()}. Build after_state = {sub_status: 'active', order_id: $order->get_id(), order_status: 'completed'}. Return FixPreview object with before_state, after_state, description text 'Activate subscription and mark payment completed'. Include charge_captured flag in context for audit trail.",
             "status": "pending",
-            "testStrategy": "Unit test: call preview_fix on seeded on-hold sub. Verify before_state has sub_status='on-hold' and order_status!=completed. Verify after_state has sub_status='active' and order_status='completed'."
+            "testStrategy": "Unit test: call preview_fix on seeded on-hold sub. Verify before_state has sub_status='on-hold' and order_status!=completed. Verify after_state has sub_status='active' and order_status='completed'.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -460,7 +494,8 @@
             ],
             "details": "In apply_fix($sub): load latest renewal order. State-guard check: compare current $sub->get_status() against before_state from preview_fix. If mismatch, abort with error. Call $order->update_status('completed', 'Doctor Subs: Stripe payment was captured but order stuck in processing'). Call $sub->update_status('active', 'Doctor Subs: Payment completed, reactivating subscription'). Build FixResult with status='applied', before_state, after_state, side_effects=[{type:'order_status_change',order_id,from,to},{type:'sub_status_change',sub_id,from,to}]. Return FixResult for journal recording.",
             "status": "pending",
-            "testStrategy": "Unit test: apply_fix on seeded sub. Verify order->get_status()='completed' and sub->get_status()='active'. Modify sub status between preview and apply, verify state-guard aborts. Check FixResult side_effects array has 2 entries."
+            "testStrategy": "Unit test: apply_fix on seeded sub. Verify order->get_status()='completed' and sub->get_status()='active'. Modify sub status between preview and apply, verify state-guard aborts. Check FixResult side_effects array has 2 entries.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -471,19 +506,20 @@
             ],
             "details": "In revert_fix($entry): extract before_state from FixJournalEntry. Load order and sub. Check current state vs after_state for drift (warn if changed since apply). Call $order->update_status(before_state['order_status'], 'Doctor Subs: Reverting fix'). Call $sub->update_status(before_state['sub_status'], 'Doctor Subs: Reverting fix'). Build RevertResult with status='reverted', restored_fields={sub_status,order_status}, drift_detected flag if state changed. Return RevertResult. Add docblock warning: reverting won't refund customer if payment already processed.",
             "status": "pending",
-            "testStrategy": "Unit test: apply_fix then revert_fix. Verify order and sub return to original on-hold/processing status. Modify sub between apply and revert, verify drift_detected=true in RevertResult. Check order notes contain 'Reverting fix' entry."
+            "testStrategy": "Unit test: apply_fix then revert_fix. Verify order and sub return to original on-hold/processing status. Modify sub between apply and revert, verify drift_detected=true in RevertResult. Check order notes contain 'Reverting fix' entry.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 8,
+        "id": "8",
         "title": "Detection rule: Implement Repeated AS Failures rule",
         "description": "Create DR_Subs_Rule_Repeated_Failures for subscriptions with >=2 failed payment actions in 30 days",
         "details": "1. Create includes/rules/class-rule-repeated-failures.php implementing DR_Subs_Rule_Interface\n2. detect_batch: find subs with >=2 failed woocommerce_scheduled_subscription_payment actions in last 30 days via ScanContext.failed_as_by_sub\n3. tracked_fields: [] (no sub state change, only AS retry)\n4. preview_fix: return {before: {failed_count: N}, after: {action: 'Retry latest failed payment once'}}\n5. apply_fix: get latest failed action ID, retry via as_schedule_single_action with same hook+args, record journal with side_effects [{type: 'as_action_retry', original_action_id, new_action_id}]\n6. revert_fix: unschedule the retried action if not executed, journal entry\n7. get_id: 'repeated_failures', get_name: 'Repeated Payment Failures'\n8. No loop: only retry once per apply",
         "testStrategy": "Unit test: seed sub with 3 failed AS actions in last 20 days. detect_batch finds it. apply_fix creates one retry action. Verify no infinite loop (apply twice, check only 2 retry actions total). revert_fix unschedules retry.",
         "priority": "medium",
         "dependencies": [
-          5
+          "5"
         ],
         "status": "pending",
         "subtasks": [
@@ -494,7 +530,8 @@
             "dependencies": [],
             "details": "Create new file includes/rules/class-rule-repeated-failures.php. Define class DR_Subs_Rule_Repeated_Failures implementing DR_Subs_Rule_Interface. Add skeleton methods: get_id() return 'repeated_failures', get_name() return 'Repeated Payment Failures', tracked_fields() return [], detect_batch(), preview_fix(), apply_fix(), revert_fix(). Add file header with package/since docs. Include ABSPATH check. Use DR_Subs_* naming convention matching v2 architecture.",
             "status": "pending",
-            "testStrategy": "Run php -l on file to verify syntax. Instantiate class and call get_id(), get_name(), tracked_fields() - verify returns match spec. Check class implements interface correctly via reflection."
+            "testStrategy": "Run php -l on file to verify syntax. Instantiate class and call get_id(), get_name(), tracked_fields() - verify returns match spec. Check class implements interface correctly via reflection.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -505,7 +542,8 @@
             ],
             "details": "In detect_batch(array $sub_ids, ScanContext $ctx): iterate $ctx->failed_as_by_sub. For each sub in $sub_ids, count failed actions with hook='woocommerce_scheduled_subscription_payment' within last 30 days timestamp range. If count >= 2, create RuleMatch with rule_id='repeated_failures', severity='medium', context={failed_count: N}. Return array of RuleMatch objects. No direct DB queries - use only pre-indexed ScanContext data for O(1) lookups per sub.",
             "status": "pending",
-            "testStrategy": "Unit test: create mock ScanContext with failed_as_by_sub containing sub_id=123 with 3 failed actions in last 20 days. Call detect_batch([123], $ctx). Assert returns 1 RuleMatch with failed_count=3. Test sub with 1 failure returns empty array. Test failures older than 30 days are ignored."
+            "testStrategy": "Unit test: create mock ScanContext with failed_as_by_sub containing sub_id=123 with 3 failed actions in last 20 days. Call detect_batch([123], $ctx). Assert returns 1 RuleMatch with failed_count=3. Test sub with 1 failure returns empty array. Test failures older than 30 days are ignored.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -516,7 +554,8 @@
             ],
             "details": "In preview_fix(WC_Subscription $sub): query ActionScheduler tables directly to get failed action count for this sub_id with hook='woocommerce_scheduled_subscription_payment' in last 30 days. Build FixPreview object with before: {failed_count: N}, after: {action: 'Retry latest failed payment once'}, description: 'Re-attempt the most recent failed payment. No retry loop - runs once only.' Return FixPreview. This method runs per-sub when user clicks Fix button, so direct query acceptable here (not batch operation).",
             "status": "pending",
-            "testStrategy": "Seed test sub with 3 failed AS actions. Call preview_fix($sub). Assert before.failed_count = 3. Assert after.action contains 'Retry latest failed payment once'. Verify description warns about one-time execution."
+            "testStrategy": "Seed test sub with 3 failed AS actions. Call preview_fix($sub). Assert before.failed_count = 3. Assert after.action contains 'Retry latest failed payment once'. Verify description warns about one-time execution.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -527,7 +566,8 @@
             ],
             "details": "In apply_fix(WC_Subscription $sub): 1) Query ActionScheduler to get latest (MAX timestamp) failed action with hook='woocommerce_scheduled_subscription_payment' for this sub_id. 2) Extract original hook, args, group from that action. 3) Call as_schedule_single_action(time(), $hook, $args, $group) to schedule immediate retry. Capture new_action_id. 4) Build FixJournalEntry with before_state: {failed_count: N}, after_state: {action: 'retried'}, side_effects: [{type: 'as_action_retry', original_action_id: X, new_action_id: Y}]. 5) No state guard needed (tracked_fields=[]) so skip that check. Return FixResult with journal entry. Critical: only retry once - no loop.",
             "status": "pending",
-            "testStrategy": "Unit test: seed sub with 3 failed AS actions. Call apply_fix($sub). Verify 1 new AS action created with same hook+args as latest failed action. Verify journal entry recorded with correct side_effects. Call apply_fix again - verify only 1 additional retry created (total 2 retries after 2 applies). Test no infinite loop."
+            "testStrategy": "Unit test: seed sub with 3 failed AS actions. Call apply_fix($sub). Verify 1 new AS action created with same hook+args as latest failed action. Verify journal entry recorded with correct side_effects. Call apply_fix again - verify only 1 additional retry created (total 2 retries after 2 applies). Test no infinite loop.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -538,21 +578,22 @@
             ],
             "details": "In revert_fix(FixJournalEntry $entry): 1) Extract new_action_id from entry.side_effects where type='as_action_retry'. 2) Query ActionScheduler to check action status. 3) If status is 'pending' or 'in-progress': call as_unschedule_action($new_action_id) to cancel. 4) If status is 'complete': return RevertResult with warning 'Cannot revert - payment retry already executed'. 5) Update journal entry status to 'reverted', set reverted_at timestamp. Return RevertResult. Handle case where action no longer exists in AS tables (treat as already-executed).",
             "status": "pending",
-            "testStrategy": "Test 1: apply_fix, immediately call revert_fix before action runs. Verify action unscheduled, journal entry marked reverted. Test 2: apply_fix, manually mark AS action complete, call revert_fix. Verify returns warning about already-executed. Test 3: apply_fix, delete AS action row, call revert_fix. Verify handles missing action gracefully."
+            "testStrategy": "Test 1: apply_fix, immediately call revert_fix before action runs. Verify action unscheduled, journal entry marked reverted. Test 2: apply_fix, manually mark AS action complete, call revert_fix. Verify returns warning about already-executed. Test 3: apply_fix, delete AS action row, call revert_fix. Verify handles missing action gracefully.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 9,
+        "id": "9",
         "title": "Scanner: Implement health scanner and journal",
         "description": "Build DR_Subs_Health_Scanner, DR_Subs_Fix_Journal, and Action Scheduler integration",
         "details": "1. Create includes/scanner/class-health-scanner.php:\n   - run(): build ScanContext once, get all active subs via wcs_get_subscriptions(['status' => ['active', 'on-hold'], 'limit' => -1]), iterate in batches of 100\n   - For each sub: apply all registered rules via DR_Subs_Rules_Registry, collect RuleMatch objects\n   - Determine bucket: 'broken' if any high-severity match, 'at_risk' if any medium-severity, else 'healthy'\n   - Generate narration via DR_Subs_Narrator (next task), upsert to dr_subs_sub_health\n   - Fire dr_subs_after_scan action with ScanSummary (total subs, healthy count, at_risk count, broken count, new_broken_since_last_run)\n   - Idempotent lock via transient (dr_subs_scan_lock) to prevent double-run\n2. Register Action Scheduler recurring action: dr_subs_daily_health_scan (daily at 2am site time)\n3. WP-Cron watchdog: dr_subs_cron_watchdog (hourly) checks if last scan >36h ago, triggers scanner if AS missed\n4. Create includes/scanner/class-fix-journal.php:\n   - record(entry): insert to dr_subs_fix_journal, return entry_id\n   - revert(entry_id): load entry, call rule's revert_fix(), update status='reverted', set reverted_at\n   - purge_older_than(days): DELETE WHERE created_at < DATE_SUB(NOW(), INTERVAL days DAY) AND status='applied'\n5. Batch size constant: DR_SUBS_SCAN_BATCH_SIZE = 100",
         "testStrategy": "Integration test: seed 500 subs (mix of healthy, ghost, on-hold-paid), run scanner, verify dr_subs_sub_health has 500 rows with correct buckets. Performance test: 5000 subs, scan completes <5min, memory <128MB. Test watchdog: disable AS, wait 37h, verify watchdog triggers scan.",
         "priority": "high",
         "dependencies": [
-          6,
-          7,
-          8
+          "6",
+          "7",
+          "8"
         ],
         "status": "pending",
         "subtasks": [
@@ -563,7 +604,8 @@
             "dependencies": [],
             "details": "Create includes/scanner/class-health-scanner.php with DR_Subs_Health_Scanner class. Implement run() method that: 1) Build ScanContext once via constructor, 2) Get all active+on-hold subs via wcs_get_subscriptions(['status' => ['active', 'on-hold'], 'limit' => -1]), 3) Iterate in batches of 100 (constant DR_SUBS_SCAN_BATCH_SIZE), 4) For each sub: apply all registered rules via DR_Subs_Rules_Registry::get_all(), collect RuleMatch objects, 5) Determine bucket: 'broken' if any high-severity match, 'at_risk' if medium, else 'healthy', 6) Generate narration via DR_Subs_Narrator::narrate(), 7) Upsert to dr_subs_sub_health table (sub_id, bucket, narration, matched_rules JSON, scanned_at), 8) Build ScanSummary object (total_subs, healthy_count, at_risk_count, broken_count, new_broken_since_last_run), 9) Fire dr_subs_after_scan action with ScanSummary, 10) Implement idempotent lock via transient dr_subs_scan_lock (5 min TTL) to prevent double-run, check+set at start, delete at end.",
             "status": "pending",
-            "testStrategy": "Integration test: seed 500 mixed subs (healthy, ghost, on-hold-paid), run scanner, verify dr_subs_sub_health has 500 rows with correct buckets. Performance test: 5000 subs, scan completes <5min, memory <128MB."
+            "testStrategy": "Integration test: seed 500 mixed subs (healthy, ghost, on-hold-paid), run scanner, verify dr_subs_sub_health has 500 rows with correct buckets. Performance test: 5000 subs, scan completes <5min, memory <128MB.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -574,7 +616,8 @@
             ],
             "details": "Hook into init or wcst_init action to register AS recurring action. Use as_schedule_recurring_action() with: 1) Start time: strtotime('tomorrow 2am'), 2) Interval: DAY_IN_SECONDS, 3) Hook: 'dr_subs_daily_health_scan', 4) Args: [], 5) Group: 'doctor-subs', 6) Unique: true to prevent duplicates. Add action hook handler for dr_subs_daily_health_scan that instantiates DR_Subs_Health_Scanner and calls run(). Handle edge cases: check if AS functions exist before scheduling (as_schedule_recurring_action available), graceful fallback if AS not available (log warning via WCST_Logger).",
             "status": "pending",
-            "testStrategy": "Test AS action registered: check actionscheduler_actions table for dr_subs_daily_health_scan with 'doctor-subs' group and pending status. Manual trigger via as_enqueue_async_action('dr_subs_daily_health_scan') and verify scanner runs."
+            "testStrategy": "Test AS action registered: check actionscheduler_actions table for dr_subs_daily_health_scan with 'doctor-subs' group and pending status. Manual trigger via as_enqueue_async_action('dr_subs_daily_health_scan') and verify scanner runs.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -585,7 +628,8 @@
             ],
             "details": "Register WP-Cron event dr_subs_cron_watchdog to run hourly via wp_schedule_event() with 'hourly' recurrence (hook into activation or init). Implement watchdog callback that: 1) Query dr_subs_sub_health table for MAX(scanned_at), 2) Compare with current time: if >36 hours ago (HOUR_IN_SECONDS * 36), 3) Log warning via WCST_Logger: 'Action Scheduler missed daily scan, watchdog triggering manual scan', 4) Instantiate DR_Subs_Health_Scanner and call run(), 5) Fire dr_subs_watchdog_triggered action for monitoring. Handle first-run case: if no rows in dr_subs_sub_health, skip trigger (no scan expected yet). Add deactivation hook to unregister cron event via wp_clear_scheduled_hook('dr_subs_cron_watchdog').",
             "status": "pending",
-            "testStrategy": "Test watchdog: disable AS recurring action, manually set dr_subs_sub_health MAX(scanned_at) to 37 hours ago via direct DB update, wait for hourly cron tick or trigger manually via wp_cron(), verify scanner runs and watchdog_triggered action fires."
+            "testStrategy": "Test watchdog: disable AS recurring action, manually set dr_subs_sub_health MAX(scanned_at) to 37 hours ago via direct DB update, wait for hourly cron tick or trigger manually via wp_cron(), verify scanner runs and watchdog_triggered action fires.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -594,7 +638,8 @@
             "dependencies": [],
             "details": "Create includes/scanner/class-fix-journal.php with DR_Subs_Fix_Journal class. Implement: 1) record(FixJournalEntry $entry): int - Insert to dr_subs_fix_journal table (columns: entry_id AUTO_INCREMENT, created_at, sub_id, rule_id, batch_id, before_state JSON, before_state_hash SHA256, after_state JSON, side_effects JSON, user_id, status VARCHAR 'applied'), return entry_id via wpdb->insert_id. 2) revert(int $entry_id): RevertResult - Load entry via wpdb->get_row(), call rule's revert_fix() method via DR_Subs_Rules_Registry::get_by_id($entry->rule_id)->revert_fix($entry), update status='reverted' and set reverted_at=NOW() via wpdb->update, return RevertResult (success bool, warnings array). 3) purge_older_than(int $days): int - DELETE FROM dr_subs_fix_journal WHERE created_at < DATE_SUB(NOW(), INTERVAL $days DAY) AND status='applied', return wpdb->affected_rows. Add get_by_id(int $entry_id): ?FixJournalEntry helper for revert. Use wpdb->prepare() for all queries.",
             "status": "pending",
-            "testStrategy": "Unit test: create mock FixJournalEntry, call record(), verify row inserted with correct JSON encoding and SHA256 hash. Test revert(): record entry, call revert(), verify status='reverted' and reverted_at set. Test purge_older_than(30): seed old entries (31 days ago), verify deleted."
+            "testStrategy": "Unit test: create mock FixJournalEntry, call record(), verify row inserted with correct JSON encoding and SHA256 hash. Test revert(): record entry, call revert(), verify status='reverted' and reverted_at set. Test purge_older_than(30): seed old entries (31 days ago), verify deleted.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -606,19 +651,20 @@
             ],
             "details": "In doctor-subs.php or includes/class-plugin.php, define constant DR_SUBS_SCAN_BATCH_SIZE = 100 (apply_filters('dr_subs_scan_batch_size', 100) for customization). Update WCST_Plugin::load_dependencies() to require_once scanner and journal classes: require_once WCST_PLUGIN_DIR . 'includes/scanner/class-health-scanner.php', require_once WCST_PLUGIN_DIR . 'includes/scanner/class-fix-journal.php'. Ensure includes/scanner/ directory exists. Add autoload registration if using spl_autoload_register instead of manual requires. Verify classes instantiate without errors on plugin activation.",
             "status": "pending",
-            "testStrategy": "Manual test: activate plugin, verify no PHP errors. Check DR_SUBS_SCAN_BATCH_SIZE constant defined via var_dump(DR_SUBS_SCAN_BATCH_SIZE). Instantiate DR_Subs_Health_Scanner and DR_Subs_Fix_Journal in test script, verify no class-not-found errors."
+            "testStrategy": "Manual test: activate plugin, verify no PHP errors. Check DR_SUBS_SCAN_BATCH_SIZE constant defined via var_dump(DR_SUBS_SCAN_BATCH_SIZE). Instantiate DR_Subs_Health_Scanner and DR_Subs_Fix_Journal in test script, verify no class-not-found errors.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 10,
+        "id": "10",
         "title": "Narrator: Implement template-based narration",
         "description": "Create DR_Subs_Narrator with 3-5 template variants per rule and variable substitution",
         "details": "1. Create includes/scanner/class-narrator.php\n2. Define template arrays per rule_id: ghost_sub has ['This subscription missed its payment on {date}. The automatic renewal did not trigger.', 'Expected payment on {date} was skipped. No pending event found.', ...]\n3. narrate(RuleMatch $match): string - select random template, substitute {sub_id}, {customer_name}, {date}, {amount} from match context\n4. Use wc_format_datetime for dates, wc_price for amounts\n5. No AI/LLM - pure template substitution (v1 scope per design decision)\n6. Apply dr_subs_narration filter for third-party decoration\n7. Scanner calls narrator at scan time, stores result in dr_subs_sub_health.narration column (no AJAX/lazy load)",
         "testStrategy": "Unit test: create RuleMatch for ghost_sub with context {sub_id: 123, next_payment: '2026-04-01', customer: 'John Doe'}, verify narration contains sub ID, formatted date, customer name. Test all 3 rules have at least 3 template variants each.",
         "priority": "medium",
         "dependencies": [
-          9
+          "9"
         ],
         "status": "pending",
         "subtasks": [
@@ -629,7 +675,8 @@
             "dependencies": [],
             "details": "Create includes/scanner/ directory if not exists. Create class-narrator.php with strict types declaration, ABSPATH check, class DR_Subs_Narrator definition. Add narrate(RuleMatch $match): string method stub. Include docblocks with @package Dr_Subs, @since 2.0.0 tags. Follow existing plugin class patterns from includes/class-plugin.php (line 1-20 structure).",
             "status": "pending",
-            "testStrategy": "Run php -l on class-narrator.php to verify syntax. Attempt to instantiate DR_Subs_Narrator in test context, verify class loads without errors via autoloader."
+            "testStrategy": "Run php -l on class-narrator.php to verify syntax. Attempt to instantiate DR_Subs_Narrator in test context, verify class loads without errors via autoloader.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -640,7 +687,8 @@
             ],
             "details": "In DR_Subs_Narrator class, add private array property $templates with nested arrays keyed by rule_id. ghost_sub gets 3 templates like 'This subscription missed its payment on {date}. The automatic renewal did not trigger.', 'Expected payment on {date} was skipped. No pending event found.', 'Subscription {sub_id} for {customer_name} has no scheduled payment action despite being active.'. on_hold_paid gets 3 templates. repeated_failures gets 3 templates. Use {sub_id}, {customer_name}, {date}, {amount} placeholder tokens matching RuleMatch context structure per PRD Phase 3 spec (line 232).",
             "status": "pending",
-            "testStrategy": "Unit test: instantiate narrator, use reflection to access $templates property, verify ghost_sub key exists with array of exactly 3-5 strings. Verify all templates contain at least one placeholder token."
+            "testStrategy": "Unit test: instantiate narrator, use reflection to access $templates property, verify ghost_sub key exists with array of exactly 3-5 strings. Verify all templates contain at least one placeholder token.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -651,7 +699,8 @@
             ],
             "details": "In narrate(RuleMatch $match): string method body, extract rule_id from $match object. Get $templates[$rule_id] array, select random template via array_rand(). Extract context data from $match (sub_id, customer_name, date, amount). Use str_replace or preg_replace to substitute {sub_id}, {customer_name}, {date}, {amount} tokens. Return final narration string. Handle missing rule_id gracefully with fallback generic message per defensive coding pattern from class-skipped-cycle-detector.php lines 55-64.",
             "status": "pending",
-            "testStrategy": "Unit test: create mock RuleMatch for ghost_sub with context {sub_id: 123, next_payment: '2026-04-01', customer: 'John Doe'}, call narrate(), verify returned string contains sub ID 123, customer name 'John Doe', and date. Run 10 times to verify random selection works (check for at least 2 different templates returned across 10 calls)."
+            "testStrategy": "Unit test: create mock RuleMatch for ghost_sub with context {sub_id: 123, next_payment: '2026-04-01', customer: 'John Doe'}, call narrate(), verify returned string contains sub ID 123, customer name 'John Doe', and date. Run 10 times to verify random selection works (check for at least 2 different templates returned across 10 calls).",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -662,7 +711,8 @@
             ],
             "details": "In token substitution logic, when processing {date} token, pass raw timestamp/date string through wc_format_datetime($date) before substitution to get localized format like 'April 1, 2026'. When processing {amount} token, pass numeric value through wc_price($amount) before substitution to get formatted price like '$19.99'. Check if WooCommerce functions exist via function_exists guard per plugin compatibility pattern from class-skipped-cycle-detector.php line 56. Fallback to gmdate() and number_format() if wc helpers unavailable.",
             "status": "pending",
-            "testStrategy": "Unit test: create RuleMatch with date '2026-04-01' and amount 19.99, verify narration output contains formatted date string matching WooCommerce date format setting, and formatted price with currency symbol. Test with WC not loaded scenario to verify fallback formatting."
+            "testStrategy": "Unit test: create RuleMatch with date '2026-04-01' and amount 19.99, verify narration output contains formatted date string matching WooCommerce date format setting, and formatted price with currency symbol. Test with WC not loaded scenario to verify fallback formatting.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -673,20 +723,21 @@
             ],
             "details": "Before returning final narration string from narrate() method, wrap with apply_filters('dr_subs_narration', $narration, $match) call. Pass both narration string and original RuleMatch object as filter params so third parties have full context. Follow WordPress plugin filter pattern from class-plugin.php lines 115 and 124 (do_action examples). Add inline docblock explaining filter purpose: 'Allows third-party plugins to modify health narration text before storage in dr_subs_sub_health table.' Store filtered result in $narration variable before return.",
             "status": "pending",
-            "testStrategy": "Unit test: add test filter callback via add_filter('dr_subs_narration', fn($text) => $text . ' [DECORATED]'), call narrate(), verify returned string ends with ' [DECORATED]'. Remove filter, verify subsequent call returns undecorated text."
+            "testStrategy": "Unit test: add test filter callback via add_filter('dr_subs_narration', fn($text) => $text . ' [DECORATED]'), call narrate(), verify returned string ends with ' [DECORATED]'. Remove filter, verify subsequent call returns undecorated text.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 11,
+        "id": "11",
         "title": "AJAX endpoints: Implement all 6 AJAX handlers with security",
         "description": "Build DR_Subs_AJAX_Handler with nonce verification and capability checks for all admin operations",
         "details": "1. Rewrite includes/class-ajax-handler.php for DR_Subs_AJAX_Handler\n2. Register AJAX actions: wp_ajax_dr_subs_get_fix_preview, wp_ajax_dr_subs_apply_fix, wp_ajax_dr_subs_revert_fix, wp_ajax_dr_subs_run_scan, wp_ajax_dr_subs_cancel_scan, wp_ajax_dr_subs_save_settings\n3. Each handler: verify nonce (DR_Subs_Security::verify_nonce), check manage_woocommerce capability, sanitize inputs\n4. get_fix_preview: load sub, load rule, call preview_fix(), check if AS action already executed (for revert warning), render modal-fix-preview.php partial, return HTML\n5. apply_fix: load sub, load rule, call apply_fix() with state guard, record journal entry, return JSON {success, entry_id, message}\n6. revert_fix: load journal entry, check state drift, call rule's revert_fix(), return JSON {success, message, warnings[]}\n7. run_scan: check transient lock, trigger DR_Subs_Health_Scanner::run() async (wp_schedule_single_event immediate), return JSON {success}\n8. cancel_scan: set cancellation flag (transient dr_subs_scan_cancel), scanner checks between batches, return JSON {success}\n9. save_settings: validate alerts_enabled (bool), alert_email (email), journal_retention_days (int 30-365 or -1), telemetry_enabled (bool), update_option('dr_subs_settings'), return JSON {success}",
         "testStrategy": "Integration test: simulate AJAX calls with correct nonce + capability, verify responses. Test without nonce: verify rejection. Test get_fix_preview with already-executed AS action: verify warning appears in HTML. Test state-guard: modify sub between preview and apply, verify apply fails with drift message.",
         "priority": "high",
         "dependencies": [
-          9,
-          10
+          "9",
+          "10"
         ],
         "status": "pending",
         "subtasks": [
@@ -697,7 +748,8 @@
             "dependencies": [],
             "details": "1. Rewrite includes/class-ajax-handler.php, replace WCST_Ajax_Handler with DR_Subs_AJAX_Handler\n2. In constructor, register 6 AJAX actions: add_action('wp_ajax_dr_subs_get_fix_preview', [$this, 'get_fix_preview']), wp_ajax_dr_subs_apply_fix, wp_ajax_dr_subs_revert_fix, wp_ajax_dr_subs_run_scan, wp_ajax_dr_subs_cancel_scan, wp_ajax_dr_subs_save_settings\n3. Create 6 empty public methods: get_fix_preview(), apply_fix(), revert_fix(), run_scan(), cancel_scan(), save_settings()\n4. Each method starts with try/catch wrapper, wp_send_json_error on exception\n5. Follow existing v1 AJAX handler pattern (class-ajax-handler.php:20-45) for structure\n6. Add phpcs:declare(strict_types=1) + ABSPATH guard like v1",
             "status": "pending",
-            "testStrategy": "Instantiate DR_Subs_AJAX_Handler, verify 6 AJAX hooks registered with has_action('wp_ajax_dr_subs_get_fix_preview'). Call each stub method directly, verify no fatal errors."
+            "testStrategy": "Instantiate DR_Subs_AJAX_Handler, verify 6 AJAX hooks registered with has_action('wp_ajax_dr_subs_get_fix_preview'). Call each stub method directly, verify no fatal errors.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -708,7 +760,8 @@
             ],
             "details": "1. In each of 6 methods (get_fix_preview, apply_fix, revert_fix, run_scan, cancel_scan, save_settings), add at top of try block: DR_Subs_Security::verify_nonce(isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '', 'dr_subs_admin_nonce')\n2. Add DR_Subs_Security::check_permissions('manage_woocommerce') after nonce check\n3. Follow existing v1 pattern (class-ajax-handler.php:50-56) for phpcs disable/enable WordPress.Security.NonceVerification.Missing comments\n4. Sanitize all $_POST inputs: subscription_id with absint(), sub_id/entry_id/rule_id with sanitize_text_field(), settings fields with sanitize_email/sanitize_text_field/absint\n5. Use wp_unslash() before sanitization for all $_POST values\n6. Throw Exception with esc_html__() message on security failure (Security class already handles this via verify_nonce/check_permissions)",
             "status": "pending",
-            "testStrategy": "Integration test: send AJAX request with missing nonce, verify wp_send_json_error response. Send with invalid nonce, verify rejection. Send with correct nonce but non-admin user, verify capability error. All 6 handlers must reject unauthorized requests."
+            "testStrategy": "Integration test: send AJAX request with missing nonce, verify wp_send_json_error response. Send with invalid nonce, verify rejection. Send with correct nonce but non-admin user, verify capability error. All 6 handlers must reject unauthorized requests.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -719,7 +772,8 @@
             ],
             "details": "1. After security checks, extract $_POST['sub_id'] (sanitized absint) and $_POST['rule_id'] (sanitized text)\n2. Load subscription: $sub = wcs_get_subscription($sub_id), throw Exception if null\n3. Load rule: $rule = DR_Subs_Rules_Registry::get_instance()->get_by_id($rule_id), throw Exception if null\n4. Call $preview_data = $rule->preview_fix($sub), returns array with before/after states + narration\n5. Check if AS action already executed: query action_scheduler table for hook matching sub ID + rule, check if status = 'complete' within last 7 days. If yes, add $preview_data['revert_warning'] = true\n6. Load partial: ob_start(), include(DR_SUBS_PLUGIN_DIR . '/admin/views/partials/modal-fix-preview.php'), pass $sub, $rule, $preview_data to template scope, $html = ob_get_clean()\n7. Return wp_send_json_success(['html' => $html, 'sub_id' => $sub_id, 'rule_id' => $rule_id])\n8. Revert warning shows in modal: 'This fix was recently applied. Reverting may cause state drift.'",
             "status": "pending",
-            "testStrategy": "Mock AJAX call with sub_id=123, rule_id='ghost_subscription'. Verify preview_fix() called, HTML rendered with before/after diff. Test with already-executed AS action: verify revert_warning=true in response. Inspect returned HTML for .ds-modal-fix-preview container."
+            "testStrategy": "Mock AJAX call with sub_id=123, rule_id='ghost_subscription'. Verify preview_fix() called, HTML rendered with before/after diff. Test with already-executed AS action: verify revert_warning=true in response. Inspect returned HTML for .ds-modal-fix-preview container.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -730,7 +784,8 @@
             ],
             "details": "apply_fix: 1. Extract $_POST['sub_id'], $_POST['rule_id']. 2. Load sub + rule (same as preview). 3. State guard: compute hash of sub's tracked fields (use $rule->tracked_fields()), compare to $_POST['expected_state_hash'] sent from frontend. If mismatch, throw Exception 'Subscription state changed since preview. Refresh and try again.' 4. Call $result = $rule->apply_fix($sub), returns ['success' => bool, 'changes' => array]. 5. Record journal entry: insert into dr_subs_fix_journal (sub_id, rule_id, batch_id=null, before_state=json_encode(tracked fields), after_state=json_encode(new state), applied_at=current_time('mysql'), reverted_at=null). Get insert ID. 6. Return wp_send_json_success(['entry_id' => $wpdb->insert_id, 'message' => 'Fix applied'])\n\nrevert_fix: 1. Extract $_POST['entry_id']. 2. Load journal entry: $wpdb->get_row('SELECT * FROM dr_subs_fix_journal WHERE entry_id = %d', $entry_id). 3. Check if already reverted: if reverted_at != null, return error 'Already reverted'. 4. Load sub + rule from entry. 5. State drift check: compare current sub state to entry's after_state. If mismatch, add warnings array to response. 6. Call $rule->revert_fix($entry), pass journal entry object. 7. Update journal: SET reverted_at = current_time('mysql'). 8. Return wp_send_json_success(['message' => 'Fix reverted', 'warnings' => $warnings])",
             "status": "pending",
-            "testStrategy": "apply_fix test: modify sub between preview and apply, verify state guard rejects with drift error. Test successful apply: verify journal entry created with correct before/after states. revert_fix test: apply fix, then revert, verify reverted_at timestamp set. Test double-revert: verify 'Already reverted' error."
+            "testStrategy": "apply_fix test: modify sub between preview and apply, verify state guard rejects with drift error. Test successful apply: verify journal entry created with correct before/after states. revert_fix test: apply fix, then revert, verify reverted_at timestamp set. Test double-revert: verify 'Already reverted' error.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -741,19 +796,20 @@
             ],
             "details": "run_scan: 1. Check transient lock: if get_transient('dr_subs_scan_running') !== false, return error 'Scan already running'. 2. Set transient: set_transient('dr_subs_scan_running', time(), 600) (10min TTL). 3. Trigger async scan: wp_schedule_single_event(time(), 'dr_subs_run_health_scan') (immediate execution). Scanner hook registered elsewhere, calls DR_Subs_Health_Scanner::run(). 4. Return wp_send_json_success(['message' => 'Scan started'])\n\ncancel_scan: 1. Set cancellation flag: set_transient('dr_subs_scan_cancel', true, 300) (5min TTL). Scanner checks this between batches, exits early if true. 2. Delete running lock: delete_transient('dr_subs_scan_running'). 3. Return wp_send_json_success(['message' => 'Scan cancelled'])\n\nsave_settings: 1. Extract $_POST['settings'] array. 2. Validate: alerts_enabled (bool via rest_sanitize_boolean), alert_email (sanitize_email + is_email()), journal_retention_days (absint, range 30-365 or -1 for unlimited), telemetry_enabled (bool). Throw Exception on invalid values. 3. Merge with existing: $current = get_option('dr_subs_settings', []), $new = array_merge($current, $validated). 4. update_option('dr_subs_settings', $new). 5. Return wp_send_json_success(['message' => 'Settings saved'])",
             "status": "pending",
-            "testStrategy": "run_scan test: call twice in parallel, verify second call returns 'Scan already running'. Verify wp_schedule_single_event called with dr_subs_run_health_scan hook. cancel_scan test: start scan, call cancel, verify transient dr_subs_scan_cancel=true. save_settings test: send invalid email, verify rejection. Send valid settings, verify dr_subs_settings option updated. Test journal_retention_days=20 (below 30), verify error."
+            "testStrategy": "run_scan test: call twice in parallel, verify second call returns 'Scan already running'. Verify wp_schedule_single_event called with dr_subs_run_health_scan hook. cancel_scan test: start scan, call cancel, verify transient dr_subs_scan_cancel=true. save_settings test: send invalid email, verify rejection. Send valid settings, verify dr_subs_settings option updated. Test journal_retention_days=20 (below 30), verify error.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 12,
+        "id": "12",
         "title": "Email alerts: Implement daily digest dispatcher",
         "description": "Create DR_Subs_Alert_Dispatcher to send digest emails when new broken subs detected",
         "details": "1. Create includes/alerts/class-alert-dispatcher.php\n2. Hook to dr_subs_after_scan action, receive ScanSummary\n3. Check if alerts_enabled in dr_subs_settings, skip if false\n4. Compare new_broken_since_last_run: if >0, compose digest email\n5. Email template (text + HTML): 'Doctor Subs found {count} new subscription issues. [View Dashboard] {siteurl}/wp-admin/admin.php?page=doctor-subs'\n6. Include list of broken subs (sub_id, customer name, rule matched) up to 10, '+ N more' if >10\n7. Send to dr_subs_settings.alert_email || get_option('admin_email')\n8. Use wp_mail with headers for HTML\n9. Respect suppressed_until column: exclude subs with suppressed_until > now() from digest and from new_broken count\n10. Add 'Dismiss' link in dashboard that sets suppressed_until = +7 days",
         "testStrategy": "Integration test: seed 5 new broken subs, run scanner, verify email sent to admin_email. Check email contains sub IDs and rule names. Test suppressed_until: dismiss 2 subs, re-run scanner, verify email only mentions 3. Test alerts_enabled=false: verify no email sent.",
         "priority": "medium",
         "dependencies": [
-          9
+          "9"
         ],
         "status": "pending",
         "subtasks": [
@@ -764,7 +820,8 @@
             "dependencies": [],
             "details": "Create new directory includes/alerts/, create class-alert-dispatcher.php with proper WordPress security check and DR_Subs_Alert_Dispatcher class. Add 'alert-dispatcher' => 'includes/alerts/' mapping to autoloader $class_directories in doctor-subs.php. Define static init() method that registers action: add_action('dr_subs_after_scan', [__CLASS__, 'on_scan_complete'], 10, 1). Call DR_Subs_Alert_Dispatcher::init() from DR_Subs_Plugin constructor or wcst_init_plugin(). Verify class follows WordPress coding standards with proper docblocks.",
             "status": "pending",
-            "testStrategy": "Verify file created with correct namespace and class name. Check autoloader resolves DR_Subs_Alert_Dispatcher. Confirm init() registers dr_subs_after_scan hook by inspecting $wp_filter['dr_subs_after_scan'] global after init."
+            "testStrategy": "Verify file created with correct namespace and class name. Check autoloader resolves DR_Subs_Alert_Dispatcher. Confirm init() registers dr_subs_after_scan hook by inspecting $wp_filter['dr_subs_after_scan'] global after init.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -775,7 +832,8 @@
             ],
             "details": "Implement public static function on_scan_complete($scan_summary) in DR_Subs_Alert_Dispatcher. Load dr_subs_settings via get_option('dr_subs_settings', []). Check if empty($settings['alerts_enabled']) - if true, return early (no-op). Add debug logging via DR_Subs_Logger (if available) for 'Alerts disabled, skipping digest'. Validate $scan_summary parameter has expected properties: total_subs, healthy_count, at_risk_count, broken_count, new_broken_since_last_run. If new_broken_since_last_run === 0, return early (nothing to report).",
             "status": "pending",
-            "testStrategy": "Unit test: call on_scan_complete with alerts_enabled=false, verify no email sent. Test new_broken_since_last_run=0, verify early return. Mock ScanSummary with new_broken_since_last_run=5, alerts_enabled=true, verify method continues to email composition."
+            "testStrategy": "Unit test: call on_scan_complete with alerts_enabled=false, verify no email sent. Test new_broken_since_last_run=0, verify early return. Mock ScanSummary with new_broken_since_last_run=5, alerts_enabled=true, verify method continues to email composition.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -786,7 +844,8 @@
             ],
             "details": "Query dr_subs_sub_health WHERE bucket='broken' AND (suppressed_until IS NULL OR suppressed_until <= NOW()) ORDER BY last_scanned_at DESC LIMIT 10. For each row: extract sub_id, load WC_Subscription via wcs_get_subscription(), get customer name, extract matched_rules JSON to show rule names. Count total non-suppressed broken subs for 'X new issues' message. Build text email body: 'Doctor Subs found {count} new subscription issues. View Dashboard: {admin_url}/wp-admin/admin.php?page=doctor-subs\\n\\nBroken subscriptions:\\n1. Sub #{sub_id} - {customer_name} - Rule: {rule_id}\\n...' (up to 10). If count > 10, append '+ {remaining} more issues'. Build HTML version with proper formatting, clickable dashboard link, table structure for sub list. Use admin_url('admin.php?page=doctor-subs') for link.",
             "status": "pending",
-            "testStrategy": "Integration test: seed 12 broken subs in dr_subs_sub_health (2 with suppressed_until in future, 10 valid). Run dispatcher, verify email body lists exactly 10 subs, message shows '12 new issues', includes '+ 2 more'. Verify suppressed subs not in list."
+            "testStrategy": "Integration test: seed 12 broken subs in dr_subs_sub_health (2 with suppressed_until in future, 10 valid). Run dispatcher, verify email body lists exactly 10 subs, message shows '12 new issues', includes '+ 2 more'. Verify suppressed subs not in list.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -797,7 +856,8 @@
             ],
             "details": "Determine recipient: $recipient = !empty($settings['alert_email']) ? $settings['alert_email'] : get_option('admin_email'). Validate email via is_email() - log error and return if invalid. Build email headers: 'Content-Type: text/html; charset=UTF-8', 'From: WordPress <wordpress@{site_domain}>'. Use wp_mail($recipient, $subject, $html_body, $headers). Subject line: 'Doctor Subs: {count} new subscription issues detected'. Add text fallback in multipart MIME or use HTML-only (WordPress default supports HTML). Log success/failure via DR_Subs_Logger. Return wp_mail result.",
             "status": "pending",
-            "testStrategy": "Unit test: mock dr_subs_settings with alert_email='test@example.com', verify wp_mail called with that recipient. Test fallback: alert_email empty, verify uses admin_email. Integration test: trigger scanner with real broken subs, check email sent to configured address with correct subject and HTML body."
+            "testStrategy": "Unit test: mock dr_subs_settings with alert_email='test@example.com', verify wp_mail called with that recipient. Test fallback: alert_email empty, verify uses admin_email. Integration test: trigger scanner with real broken subs, check email sent to configured address with correct subject and HTML body.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -808,19 +868,20 @@
             ],
             "details": "In dashboard view (admin/views/dashboard.php or wherever broken subs displayed): add 'Dismiss' link/button per sub with data-sub-id attribute, nonce for security. Create AJAX handler in DR_Subs_AJAX_Handler or new method: handle_dismiss_sub_alert(). Verify nonce, get sub_id from POST, validate sub_id is BIGINT. Update dr_subs_sub_health SET suppressed_until = DATE_ADD(NOW(), INTERVAL 7 DAY) WHERE sub_id = %d. Return success JSON. Add JS handler in admin.js to POST to admin-ajax.php action=dr_subs_dismiss_alert, update UI to remove dismissed sub from list or show 'Dismissed for 7 days' badge. Verify capability: current_user_can('manage_woocommerce').",
             "status": "pending",
-            "testStrategy": "Manual test: load dashboard with broken subs, click 'Dismiss' on sub #123, verify AJAX request succeeds, UI updates. Query dr_subs_sub_health WHERE sub_id=123, verify suppressed_until ~7 days from now. Re-run scanner, verify dismissed sub excluded from next digest email."
+            "testStrategy": "Manual test: load dashboard with broken subs, click 'Dismiss' on sub #123, verify AJAX request succeeds, UI updates. Query dr_subs_sub_health WHERE sub_id=123, verify suppressed_until ~7 days from now. Re-run scanner, verify dismissed sub excluded from next digest email.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 13,
+        "id": "13",
         "title": "Bulk operations: Implement batch fix and journal cleanup",
         "description": "Add bulk fix UI, batch revert, and automated journal cleanup task",
         "details": "1. Dashboard.php: add 'Fix all N ghost subs' button when ghost_sub matches exist\n2. AJAX handler wp_ajax_dr_subs_bulk_fix: receive rule_id + sub_ids array, generate batch_id (uniqid()), iterate subs calling rule's apply_fix(), all journal entries share batch_id, return JSON {success, batch_id, fixed_count, errors[]}\n3. Revert batch: AJAX handler wp_ajax_dr_subs_revert_batch receives batch_id, load all entries with that batch_id, call revert_fix() on each atomically (transaction if possible, else sequential with rollback tracking), return JSON {success, reverted_count}\n4. Journal cleanup: register Action Scheduler recurring action dr_subs_journal_cleanup (weekly), calls DR_Subs_Fix_Journal::purge_older_than(get_option('dr_subs_settings')['journal_retention_days'])\n5. Handle retention_days=-1 special case: never purge\n6. Bulk fix UI shows progress bar via JS polling (check scan status transient)",
         "testStrategy": "Integration test: seed 20 ghost subs, click 'Fix all 20', verify all get same batch_id in journal, all AS actions created. Revert batch: verify all 20 reverted atomically. Test journal cleanup: seed 200-day-old entries, set retention to 180 days, run cleanup, verify old entries deleted. Test retention=-1: verify nothing deleted.",
         "priority": "medium",
         "dependencies": [
-          11
+          "11"
         ],
         "status": "pending",
         "subtasks": [
@@ -831,7 +892,8 @@
             "dependencies": [],
             "details": "In design-brief/v2-assets/admin/views/dashboard.php, add conditional bulk fix button after the table header when broken_count > 0. Button text: 'Fix all {N} ghost subs'. Include data attributes: data-dr-subs-bulk-fix, data-count=\"{N}\". Add progress bar container with data-dr-subs-bulk-progress attribute (initially hidden). Progress bar shows: current/total count, animated progress fill. Button becomes disabled during operation. Wire in admin.js: add event listener for data-dr-subs-bulk-fix button click, POST to dr_subs_bulk_fix with rule_id='ghost_sub', poll scan status transient every 500ms, update progress bar, reload page on completion.",
             "status": "pending",
-            "testStrategy": "Manual test: seed 20 ghost subs via SQL insert into dr_subs_sub_health, load dashboard, verify 'Fix all 20 ghost subs' button appears. Click button, verify progress bar appears with 0/20, watch it increment, verify page reloads when complete."
+            "testStrategy": "Manual test: seed 20 ghost subs via SQL insert into dr_subs_sub_health, load dashboard, verify 'Fix all 20 ghost subs' button appears. Click button, verify progress bar appears with 0/20, watch it increment, verify page reloads when complete.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -842,7 +904,8 @@
             ],
             "details": "In includes/class-ajax-handler.php constructor, add: add_action('wp_ajax_dr_subs_bulk_fix', array($this, 'bulk_fix_subscriptions')). Implement bulk_fix_subscriptions() method: verify nonce (wcst_nonce), check manage_woocommerce capability, sanitize $_POST['rule_id'] and $_POST['sub_ids'] (array). Generate batch_id via uniqid('batch_'). Load rule instance from DR_Subs_Scanner_Rules by rule_id. Iterate sub_ids: call rule->apply_fix(sub_id, ['batch_id' => batch_id]), catch exceptions per sub, accumulate errors array. Store progress in transient 'dr_subs_bulk_scan_{batch_id}' with ['current' => N, 'total' => count, 'errors' => []]. Return wp_send_json_success(['batch_id' => batch_id, 'fixed_count' => success_count, 'errors' => errors]). All journal entries share the batch_id via context param to apply_fix().",
             "status": "pending",
-            "testStrategy": "Unit test via direct method call: mock 20 sub_ids, call bulk_fix_subscriptions(), verify batch_id is uniqid format, verify all 20 get same batch_id in dr_subs_fix_journal via SELECT GROUP BY batch_id, verify fixed_count=20 in JSON response, verify Action Scheduler actions created for each sub."
+            "testStrategy": "Unit test via direct method call: mock 20 sub_ids, call bulk_fix_subscriptions(), verify batch_id is uniqid format, verify all 20 get same batch_id in dr_subs_fix_journal via SELECT GROUP BY batch_id, verify fixed_count=20 in JSON response, verify Action Scheduler actions created for each sub.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -853,7 +916,8 @@
             ],
             "details": "In includes/class-ajax-handler.php, add: add_action('wp_ajax_dr_subs_revert_batch', array($this, 'revert_batch')). Implement revert_batch() method: verify nonce, check capability, sanitize $_POST['batch_id']. Query dr_subs_fix_journal WHERE batch_id=batch_id, ordered by entry_id DESC. Wrap in wpdb transaction if possible (START TRANSACTION, try revert loop, COMMIT or ROLLBACK). For each entry: load DR_Subs_Fix_Journal instance, call revert_fix(entry_id), catch exceptions, track rollback state. If any revert fails mid-transaction, rollback all and return error. If sequential (no transaction), track failed entry_ids for manual intervention. Return wp_send_json_success(['reverted_count' => count, 'failed' => failed_ids]). Add revert batch button to fix-history.php view for batch entries (group by batch_id in table, add 'Revert batch' button with data-dr-subs-revert-batch=\"{batch_id}\"). Wire in admin.js with confirm dialog.",
             "status": "pending",
-            "testStrategy": "Integration test: apply bulk fix to 20 subs via test in subtask 2, capture batch_id, call revert_batch with that batch_id, verify all 20 entries have is_active=0 in dr_subs_fix_journal, verify all 20 subs returned to previous state (check sub meta via wcs_get_subscription), verify reverted_count=20 in JSON response. Test rollback: mock exception on 10th revert, verify first 9 not reverted (still is_active=1)."
+            "testStrategy": "Integration test: apply bulk fix to 20 subs via test in subtask 2, capture batch_id, call revert_batch with that batch_id, verify all 20 entries have is_active=0 in dr_subs_fix_journal, verify all 20 subs returned to previous state (check sub meta via wcs_get_subscription), verify reverted_count=20 in JSON response. Test rollback: mock exception on 10th revert, verify first 9 not reverted (still is_active=1).",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -862,7 +926,8 @@
             "dependencies": [],
             "details": "Create includes/scanner/class-fix-journal.php with DR_Subs_Fix_Journal class (if not exists). Add static method purge_older_than($days): if $days === -1, return early (never purge). Calculate cutoff_date = current_time('Y-m-d H:i:s', strtotime('-{days} days')). Execute DELETE FROM dr_subs_fix_journal WHERE applied_at < cutoff_date AND is_active=0 (only purge inactive/reverted entries). Log purged count. In includes/class-plugin.php or main plugin file, on plugins_loaded hook priority 20, check if Action Scheduler is available (function_exists('as_schedule_recurring_action')). Schedule recurring action: as_schedule_recurring_action(strtotime('next Sunday 3am'), WEEK_IN_SECONDS, 'dr_subs_journal_cleanup', [], 'doctor-subs'). Hook the action: add_action('dr_subs_journal_cleanup', 'dr_subs_run_journal_cleanup'). Implement dr_subs_run_journal_cleanup(): load settings option dr_subs_settings, get retention_days (default 180), call DR_Subs_Fix_Journal::purge_older_than(retention_days).",
             "status": "pending",
-            "testStrategy": "Integration test: seed 50 journal entries with applied_at set to 200 days ago via SQL INSERT. Set dr_subs_settings[journal_retention_days]=180. Manually trigger: do_action('dr_subs_journal_cleanup'). Query dr_subs_fix_journal, verify old entries (>180 days) deleted, verify recent entries (<180 days) still exist. Test retention_days=-1: set -1 in settings, seed old entries, run cleanup, verify nothing deleted."
+            "testStrategy": "Integration test: seed 50 journal entries with applied_at set to 200 days ago via SQL INSERT. Set dr_subs_settings[journal_retention_days]=180. Manually trigger: do_action('dr_subs_journal_cleanup'). Query dr_subs_fix_journal, verify old entries (>180 days) deleted, verify recent entries (<180 days) still exist. Test retention_days=-1: set -1 in settings, seed old entries, run cleanup, verify nothing deleted.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -873,20 +938,21 @@
             ],
             "details": "In design-brief/v2-assets/admin/views/settings.php, add new field group after existing settings: Label 'Journal retention period', Input type=number name='dr_subs_settings[journal_retention_days]' value='{current_value}' min=-1 step=1. Add hint text: 'Days to keep fix journal history. Set to -1 to keep forever. Entries older than this will be purged weekly.' Default value: 180. In includes/class-ajax-handler.php AJAX handler wp_ajax_dr_subs_save_settings (or wherever settings are saved), validate journal_retention_days: must be integer >= -1, sanitize via absint if >= 0, allow -1 as special case. Save to dr_subs_settings option array. On settings load, pass journal_retention_days to settings.php view. Update settings JS in admin.js to handle this field in unsaved-changes guard and form submit.",
             "status": "pending",
-            "testStrategy": "Manual test: navigate to WooCommerce > Doctor Subs > Settings tab, verify 'Journal retention period' field exists with default 180, change to 90, save, reload, verify 90 persists. Change to -1, save, verify -1 persists. Test validation: try to set -2 or non-integer, verify rejected or sanitized. Verify unsaved-changes guard triggers when field modified."
+            "testStrategy": "Manual test: navigate to WooCommerce > Doctor Subs > Settings tab, verify 'Journal retention period' field exists with default 180, change to 90, save, reload, verify 90 persists. Change to -1, save, verify -1 persists. Test validation: try to set -2 or non-integer, verify rejected or sanitized. Verify unsaved-changes guard triggers when field modified.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 14,
+        "id": "14",
         "title": "Translations: Generate POT and translate to 20 locales",
         "description": "Create translation workflow using WP-CLI and Potomatic for 20 major languages",
         "details": "1. Create scripts/translate.sh:\n   - wp i18n make-pot . languages/doctor-subs.pot --slug=doctor-subs --domain=doctor-subs --include=doctor-subs.php,includes,admin\n   - potomatic -l fr_FR,es_ES,de_DE,it_IT,pt_BR,pt_PT,nl_NL,pl_PL,ru_RU,ja,zh_CN,zh_TW,ko_KR,ar,tr_TR,sv_SE,nb_NO,da_DK,fi,cs_CZ -p languages/doctor-subs.pot -o languages/ --po-file-prefix doctor-subs-\n   - wp i18n make-mo languages/\n   - wp i18n make-json languages/ --no-purge\n2. Create config/dictionaries/dictionary.json: {\"noTranslate\": [\"Doctor Subs\", \"WooCommerce\", \"WordPress\", \"Stripe\", \"Action Scheduler\", \"PayPal\", \"Subscription\"]}\n3. Configure Potomatic to use OPENAI_API_KEY or GEMINI_API_KEY from env\n4. Run --dry-run first to estimate cost\n5. Generate .po files, commit to git (source of truth)\n6. Compile .mo + .json (add to .gitignore, generated on build)\n7. Load text domain in DR_Subs_Plugin::__construct() via load_plugin_textdomain()\n8. Manual QA: review fr_FR, es_ES, de_DE, it_IT, pt_BR .po files for brand term preservation",
         "testStrategy": "Test POT generation: verify all strings from PHP templates + admin.js extracted. Test Potomatic: run on 2 test locales (fr_FR, es_ES), verify brand terms NOT translated. Test MO compilation: verify .mo files loadable. Test JS translations: verify admin.js strings have .json files. Load site in fr_FR locale, verify dashboard shows French strings.",
         "priority": "low",
         "dependencies": [
-          4,
-          11
+          "4",
+          "11"
         ],
         "status": "pending",
         "subtasks": [
@@ -897,7 +963,8 @@
             "dependencies": [],
             "details": "Create scripts/translate.sh with:\n1. wp i18n make-pot . languages/doctor-subs.pot --slug=doctor-subs --domain=doctor-subs --include=doctor-subs.php,includes,admin\n2. potomatic -l fr_FR,es_ES,de_DE,it_IT,pt_BR,pt_PT,nl_NL,pl_PL,ru_RU,ja,zh_CN,zh_TW,ko_KR,ar,tr_TR,sv_SE,nb_NO,da_DK,fi,cs_CZ -p languages/doctor-subs.pot -o languages/ --po-file-prefix doctor-subs- -d config/dictionaries/dictionary.json\n3. wp i18n make-mo languages/\n4. wp i18n make-json languages/ --no-purge\n5. Add shebang, error handling, and dry-run mode via --dry-run flag\n6. Make executable with chmod +x\n7. Source API key from .env: OPENAI_API_KEY or GEMINI_API_KEY",
             "status": "pending",
-            "testStrategy": "Run ./scripts/translate.sh --dry-run to verify cost estimate and no errors. Verify script exits with error if API key missing. Check POT file generated in languages/ directory."
+            "testStrategy": "Run ./scripts/translate.sh --dry-run to verify cost estimate and no errors. Verify script exits with error if API key missing. Check POT file generated in languages/ directory.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -908,7 +975,8 @@
             ],
             "details": "Create config/dictionaries/dictionary.json with:\n{\n  \"noTranslate\": [\n    \"Doctor Subs\",\n    \"WooCommerce\",\n    \"WordPress\",\n    \"Stripe\",\n    \"Action Scheduler\",\n    \"PayPal\",\n    \"Subscription\",\n    \"WC_Subscription\"\n  ]\n}\nEnsure config/ directory exists. This dictionary is referenced by Potomatic via -d flag in translate.sh.",
             "status": "pending",
-            "testStrategy": "Verify dictionary.json is valid JSON. Run translate.sh with 2 test locales (fr_FR, es_ES) and grep .po files to confirm brand terms NOT translated (e.g., grep 'Doctor Subs' languages/doctor-subs-fr_FR.po should find exact match)."
+            "testStrategy": "Verify dictionary.json is valid JSON. Run translate.sh with 2 test locales (fr_FR, es_ES) and grep .po files to confirm brand terms NOT translated (e.g., grep 'Doctor Subs' languages/doctor-subs-fr_FR.po should find exact match).",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -919,7 +987,8 @@
             ],
             "details": "1. Ensure OPENAI_API_KEY or GEMINI_API_KEY set in .env\n2. Run ./scripts/translate.sh (without --dry-run) to generate:\n   - languages/doctor-subs.pot (template)\n   - languages/doctor-subs-{locale}.po for all 20 locales\n3. Create languages/ directory if not exists\n4. Review 5 locales (fr_FR, es_ES, de_DE, it_IT, pt_BR) manually:\n   - Verify brand terms preserved\n   - Spot-check 3-5 strings per locale for quality\n5. git add languages/*.po languages/*.pot\n6. git commit -m 'Add translations for 20 locales via Potomatic'",
             "status": "pending",
-            "testStrategy": "Verify 20 .po files + 1 .pot file exist in languages/. Check .po file headers contain Language, Plural-Forms. Grep 5 test locales for brand terms: grep -E '(Doctor Subs|WooCommerce|WordPress)' languages/doctor-subs-fr_FR.po should NOT show translations of these terms."
+            "testStrategy": "Verify 20 .po files + 1 .pot file exist in languages/. Check .po file headers contain Language, Plural-Forms. Grep 5 test locales for brand terms: grep -E '(Doctor Subs|WooCommerce|WordPress)' languages/doctor-subs-fr_FR.po should NOT show translations of these terms.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -930,7 +999,8 @@
             ],
             "details": "Edit .gitignore to add:\nlanguages/*.mo\nlanguages/*.json\n\nThese are compiled artifacts generated from .po files via wp i18n make-mo and wp i18n make-json. Only .po and .pot files committed to git as source of truth. .mo and .json generated during build/deployment.",
             "status": "pending",
-            "testStrategy": "Verify .gitignore contains languages/*.mo and languages/*.json. Run git status after compiling translations - .mo and .json files should appear in 'Untracked files (use .gitignore)' section, not staged for commit."
+            "testStrategy": "Verify .gitignore contains languages/*.mo and languages/*.json. Run git status after compiling translations - .mo and .json files should appear in 'Untracked files (use .gitignore)' section, not staged for commit.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -941,29 +1011,95 @@
             ],
             "details": "In includes/class-plugin.php, add to DR_Subs_Plugin::__construct() (after Task 1 renames WCST_ to DR_Subs_):\n\nload_plugin_textdomain(\n  'doctor-subs',\n  false,\n  dirname( DR_SUBS_PLUGIN_BASENAME ) . '/languages'\n);\n\nThis hooks into WordPress i18n system. Place after init_hooks() call. Verify Text Domain header in doctor-subs.php matches 'doctor-subs'. Compile .mo files via wp i18n make-mo languages/ before testing.",
             "status": "pending",
-            "testStrategy": "Switch WordPress site to fr_FR locale in Settings > General. Load Doctor Subs admin page. Verify UI strings display in French (e.g., dashboard heading, button labels). Check browser console for missing translation warnings. Use Loco Translate or Poedit to verify .mo file loaded."
+            "testStrategy": "Switch WordPress site to fr_FR locale in Settings > General. Load Doctor Subs admin page. Verify UI strings display in French (e.g., dashboard heading, button labels). Check browser console for missing translation warnings. Use Loco Translate or Poedit to verify .mo file loaded.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 15,
+        "id": "15",
         "title": "QA and release: Test matrix, performance validation, and WP.org deployment",
         "description": "Run full QA test matrix, performance tests, and ship v2.0.0 to WordPress.org",
         "details": "1. Seed test store with 5000 subs via Subs Test Data Generator (mix of statuses, dates crossing Feb, sub IDs 1/11/111/110 for regression)\n2. Test matrix: PHP 7.4/8.2/8.3 x WP 5.0/6.9 x WCS 9.8.5/latest - verify activation, no fatal errors\n3. Manual smoke test all 5 surfaces: first-run → scan → dashboard (3 bucket states) → fix preview modal (including already-executed warning) → apply fix → revert fix → bulk fix → settings save → email digest\n4. Regression tests: sub ID substring (verify sub 11 != sub 1), Feb month crossing (Jan-31 monthly renewal doesn't flag as skipped on Feb-28), single autoload registration\n5. Performance test: 5000-sub store scanner completes <5min, dashboard loads <500ms, memory <128MB\n6. Bump version to 2.0.0 in doctor-subs.php + readme.txt\n7. Update readme.txt Description, Changelog, Upgrade Notice for v2\n8. Create .github/workflows/release.yml: on git tag v*, build zip excluding dev files, create GitHub Release, push to WP.org SVN via 10up/action-wordpress-plugin-deploy (requires WP.org SVN credentials in GitHub Secrets)\n9. Tag v2.0.0, push tag, verify workflow runs\n10. Monitor WP.org plugin review queue for approval\n11. Post launch announcement on woohappylearning.wordpress.com",
         "testStrategy": "Pre-release checklist: all 14 tests pass, no console errors, fonts load, translations work, email sends, journal cleans up, AS watchdog triggers. Post-release: monitor WP.org support forum for 'class not found' reports (class rename breakage), performance complaints, email delivery issues.",
         "priority": "high",
         "dependencies": [
-          13,
-          14
+          "13",
+          "14"
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create test data seeding script with WCS Subs Test Data Generator",
+            "description": "Build script to seed test store with 5000 subscriptions using WCS Subs Test Data Generator, with strategic mix of statuses, February date crossing cases, and specific sub IDs for regression testing",
+            "dependencies": [],
+            "details": "Create scripts/seed-test-data.sh script that uses WCS Subs Test Data Generator plugin. Generate 5000 total subscriptions with mix: 3500 active, 1000 on-hold, 300 cancelled, 200 pending-cancel. Include edge cases: 50 subs with next_payment=Jan-31 to test Feb crossing bug, sub IDs 1/11/111/110 for substring regression test. Script should install/activate generator plugin if not present, run seeding via WP-CLI command `wp wcs-test-data generate-subscriptions --count=5000 --mix=active:70,on-hold:20,cancelled:6,pending-cancel:4`, then manually create edge case subs via wp eval-file. Log seeding stats to scripts/seed-log.txt",
+            "status": "pending",
+            "testStrategy": "Run seed script on fresh WP+WCS install, verify 5000 subs created via WP-CLI `wp wcs list-subscriptions --count`, check sub IDs 1,11,111,110 exist, verify Feb-crossing subs have next_payment dates crossing month boundary",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Build PHP version and WP version test matrix automation",
+            "description": "Create test matrix automation script to verify plugin activation across PHP 7.4/8.2/8.3 x WP 5.0/6.9 x WCS 9.8.5/latest without fatal errors",
+            "dependencies": [
+              1
+            ],
+            "details": "Create scripts/test-matrix.sh using Docker Compose. Define 9 test environments (3 PHP versions x 3 WP/WCS combos): php:7.4-apache + WP 5.0 + WCS 9.8.5, php:7.4-apache + WP 6.9 + WCS latest, php:8.2-apache + WP 5.0 + WCS 9.8.5, etc. For each environment: spin up container, install WP via WP-CLI, install WooCommerce + WCS versions, activate Doctor Subs, seed 100 test subs, run basic smoke test (visit admin page, trigger scan, check for PHP errors in debug.log). Script outputs matrix results table: PASS/FAIL per environment. Create docker-compose.test-matrix.yml defining all 9 service variants. Script should run in CI or locally.",
+            "status": "pending",
+            "testStrategy": "Run scripts/test-matrix.sh locally, verify all 9 environments PASS. Check docker-compose.test-matrix.yml valid syntax. Verify script exits with code 1 if any environment fails, code 0 if all pass.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Manual QA smoke test checklist for all 5 UI surfaces",
+            "description": "Execute comprehensive manual smoke test checklist covering first-run, scanner, dashboard (3 bucket states), fix preview modal, apply/revert/bulk fix, settings save, email digest",
+            "dependencies": [
+              1
+            ],
+            "details": "Manual QA checklist (scripts/qa-checklist.md): 1) First-run: verify shows on fresh install, 'Run First Scan' button works, progress bar animates. 2) Scanner: verify scan completes <5min for 5000 subs, no fatal errors, results populate dr_subs_sub_health table. 3) Dashboard: verify 3 bucket states (healthy=green, at-risk=yellow, broken=red), click bucket expands issue list, issue counts match. 4) Fix preview modal: click 'Preview Fix' on issue, verify before/after state shows, 'already-executed' warning shows if fix applied before. 5) Apply fix: click Apply, verify dr_subs_fix_journal row created, subscription state updates. 6) Revert fix: click Revert, verify subscription rolls back. 7) Bulk fix: select multiple issues, bulk apply, verify all fix. 8) Settings: change email frequency, save, verify dr_subs_settings updated. 9) Email digest: trigger cron, verify email sends with issue summary. Check no console errors, fonts load, translations work.",
+            "status": "pending",
+            "testStrategy": "Execute full checklist on test store with 5000 seeded subs. Record results in scripts/qa-results.txt. All items must PASS. Check browser console for JS errors (0 errors required). Verify email received in inbox with correct issue counts.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Regression test suite for sub ID substring and Feb crossing bugs",
+            "description": "Create and run regression test suite verifying sub ID exact matching (not substring) and Feb month crossing logic for monthly renewals",
+            "dependencies": [
+              1
+            ],
+            "details": "Create tests/regression/ directory with two test scripts: 1) test-sub-id-exact-match.php: seed subs with IDs 1, 11, 111, 110. Query for sub 1, verify result is ONLY sub 1 (not 11/111/110). Verify scanner processes sub 11 separately from sub 1. Check dr_subs_sub_health table has distinct rows for each ID. 2) test-feb-crossing.php: seed monthly sub with next_payment=Jan-31, billing_period=month, billing_interval=1. Simulate renewal logic for Feb (28 days). Verify next_payment calculates to Feb-28 (not March-3), verify NOT flagged as skipped cycle. Use WP-CLI to run tests: `wp eval-file tests/regression/test-sub-id-exact-match.php`, check exit code 0. Tests should use assert() and exit(1) on failure.",
+            "status": "pending",
+            "testStrategy": "Run both regression test scripts via WP-CLI on seeded test store. Verify both exit with code 0 (pass). Check test output logs show expected assertions passed. Re-run scanner on test data, verify no false positives for Feb-crossing or sub ID substring matches.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Performance validation, version bump, changelog, and WP.org deployment",
+            "description": "Run performance tests (5000-sub scan <5min, dashboard load <500ms, memory <128MB), bump version to 2.0.0, update readme.txt Description/Changelog/Upgrade Notice, create GitHub Actions release workflow, tag v2.0.0, deploy to WP.org SVN, monitor approval queue",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "1) Performance tests: scripts/perf-test.sh runs scanner on 5000-sub store, times duration (assert <5min), measures peak memory via Xdebug (assert <128MB), times dashboard page load via curl (assert <500ms). 2) Version bump: update doctor-subs.php:14 and readme.txt:7 to 'Version: 2.0.0', update WCST_PLUGIN_VERSION constant to 2.0.0. 3) Update readme.txt:13-16 Description section with v2 feature highlights (dashboard, fix preview, bulk operations), update Changelog section (add '= 2.0.0 =\\n* Complete rewrite with dashboard UI...'), update Upgrade Notice. 4) Create .github/workflows/release.yml: trigger on tag push 'v*', checkout code, build zip excluding dev files (vendor/, .git/, tests/, scripts/), create GitHub Release via actions/create-release, deploy to WP.org SVN via 10up/action-wordpress-plugin-deploy (requires secrets.WP_ORG_USERNAME, secrets.WP_ORG_PASSWORD). 5) Tag release: `git tag v2.0.0 && git push origin v2.0.0`, monitor GitHub Actions workflow run. 6) Monitor WP.org plugin review queue at wordpress.org/plugins/doctor-subs/advanced/, check for approval email. 7) Post launch announcement on woohappylearning.wordpress.com with release highlights, link to plugin page.",
+            "status": "pending",
+            "testStrategy": "Pre-release checklist: run scripts/perf-test.sh, all 3 metrics pass. Verify readme.txt parses correctly via wordpress.org/plugins/developers/readme-validator/. Test GitHub Actions workflow on test repo first. Post-release: monitor WP.org support forum for 'class not found' reports (class rename breakage), performance complaints, email delivery issues. Check plugin auto-update works for existing users.",
+            "parentId": "undefined"
+          }
+        ]
       }
     ],
     "metadata": {
-      "created": "2026-04-22T21:57:40.835Z",
-      "updated": "2026-04-22T21:57:40.835Z",
-      "description": "Tasks for master context"
+      "version": "1.0.0",
+      "lastModified": "2026-04-22T22:18:44.188Z",
+      "taskCount": 15,
+      "completedCount": 0,
+      "tags": [
+        "master"
+      ]
     }
   }
 }

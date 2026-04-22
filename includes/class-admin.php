@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Admin {
+class DR_Subs_Admin {
 
 	/**
 	 * Constructor.
@@ -27,7 +27,7 @@ class WCST_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
-		add_filter( 'plugin_action_links_' . WCST_PLUGIN_BASENAME, array( $this, 'add_plugin_action_links' ) );
+		add_filter( 'plugin_action_links_' . DR_SUBS_PLUGIN_BASENAME, array( $this, 'add_plugin_action_links' ) );
 		add_filter( 'woocommerce_subscription_list_table_column_status_content', array( $this, 'add_doctor_subs_to_status_column' ), 10, 3 );
 	}
 
@@ -60,24 +60,24 @@ class WCST_Admin {
 
 		wp_enqueue_style(
 			'wcst-admin-styles',
-			WCST_PLUGIN_URL . 'admin/css/admin-styles.css',
+			DR_SUBS_PLUGIN_URL . 'admin/css/admin-styles.css',
 			array(),
-			WCST_PLUGIN_VERSION
+			DR_SUBS_PLUGIN_VERSION
 		);
 
 		wp_enqueue_script(
 			'wcst-admin-scripts',
-			WCST_PLUGIN_URL . 'admin/js/admin-scripts.js',
+			DR_SUBS_PLUGIN_URL . 'admin/js/admin-scripts.js',
 			array( 'jquery' ),
-			WCST_PLUGIN_VERSION,
+			DR_SUBS_PLUGIN_VERSION,
 			true
 		);
 
 		// Check for subscription_id parameter and validate nonce.
 		$auto_analyze_id = null;
-		if ( isset( $_GET['subscription_id'] ) && isset( $_GET['wcst_nonce'] ) ) {
+		if ( isset( $_GET['subscription_id'] ) && isset( $_GET['dr_subs_nonce'] ) ) {
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- wp_unslash() is applied below.
-			if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['wcst_nonce'] ) ), 'wcst_subscription_action' ) ) {
+			if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['dr_subs_nonce'] ) ), 'dr_subs_subscription_action' ) ) {
 				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- wp_unslash() is applied below.
 				$subscription_id = absint( wp_unslash( $_GET['subscription_id'] ) );
 				if ( $subscription_id > 0 ) {
@@ -93,10 +93,10 @@ class WCST_Admin {
 		// Localize script for AJAX.
 		wp_localize_script(
 			'wcst-admin-scripts',
-			'wcst_ajax',
+			'dr_subs_ajax',
 			array(
 				'ajax_url'        => admin_url( 'admin-ajax.php' ),
-				'nonce'           => wp_create_nonce( 'wcst_nonce' ),
+				'nonce'           => wp_create_nonce( 'dr_subs_nonce' ),
 				'auto_analyze_id' => $auto_analyze_id,
 				'strings'         => array(
 					'error'                   => __( 'An error occurred. Please try again.', 'doctor-subs' ),
@@ -158,8 +158,8 @@ class WCST_Admin {
 				),
 				admin_url( 'admin.php' )
 			),
-			'wcst_subscription_action',
-			'wcst_nonce'
+			'dr_subs_subscription_action',
+			'dr_subs_nonce'
 		);
 
 		// Create Doctor Subs action link.
@@ -343,3 +343,10 @@ class WCST_Admin {
 		<?php
 	}
 }
+
+/**
+ * Legacy v1 alias. Do not use in new code; DR_Subs_Admin is canonical.
+ *
+ * @deprecated 2.0.0 Use DR_Subs_Admin instead.
+ */
+class_alias( 'DR_Subs_Admin', 'WCST_Admin' );

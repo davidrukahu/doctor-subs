@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Skipped_Cycle_Detector {
+class DR_Subs_Skipped_Cycle_Detector {
 
 	/**
 	 * Safely get timestamp from date that might be a DateTime object or string (HPOS compatibility).

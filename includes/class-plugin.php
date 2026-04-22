@@ -17,13 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Plugin {
+class DR_Subs_Plugin {
 
 	/**
 	 * Plugin instance.
 	 *
 	 * @since 1.0.0
-	 * @var WCST_Plugin|null
+	 * @var DR_Subs_Plugin|null
 	 */
 	private static $instance = null;
 
@@ -31,7 +31,7 @@ class WCST_Plugin {
 	 * Admin instance.
 	 *
 	 * @since 1.0.0
-	 * @var WCST_Admin
+	 * @var DR_Subs_Admin
 	 */
 	public $admin;
 
@@ -39,7 +39,7 @@ class WCST_Plugin {
 	 * AJAX handler instance.
 	 *
 	 * @since 1.0.0
-	 * @var WCST_Ajax_Handler
+	 * @var DR_Subs_Ajax_Handler
 	 */
 	public $ajax_handler;
 
@@ -47,7 +47,7 @@ class WCST_Plugin {
 	 * Logger instance.
 	 *
 	 * @since 1.0.0
-	 * @var WCST_Logger
+	 * @var DR_Subs_Logger
 	 */
 	public $logger;
 
@@ -55,7 +55,7 @@ class WCST_Plugin {
 	 * Get plugin instance.
 	 *
 	 * @since 1.0.0
-	 * @return WCST_Plugin
+	 * @return DR_Subs_Plugin
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -84,7 +84,7 @@ class WCST_Plugin {
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 
 		// Add settings link to plugins page.
-		add_filter( 'plugin_action_links_' . WCST_PLUGIN_BASENAME, array( $this, 'add_settings_link' ) );
+		add_filter( 'plugin_action_links_' . DR_SUBS_PLUGIN_BASENAME, array( $this, 'add_settings_link' ) );
 	}
 
 	/**
@@ -95,14 +95,14 @@ class WCST_Plugin {
 	private function load_dependencies() {
 		// Load admin class for admin interface.
 		if ( is_admin() ) {
-			$this->admin = new WCST_Admin();
+			$this->admin = new DR_Subs_Admin();
 		}
 
 		// Load AJAX handler.
-		$this->ajax_handler = new WCST_Ajax_Handler();
+		$this->ajax_handler = new DR_Subs_Ajax_Handler();
 
 		// Load logger.
-		$this->logger = new WCST_Logger();
+		$this->logger = new DR_Subs_Logger();
 	}
 
 	/**
@@ -112,7 +112,7 @@ class WCST_Plugin {
 	 */
 	public function init() {
 		// Fire action for extensions.
-		do_action( 'wcst_init' );
+		do_action( 'dr_subs_init' );
 	}
 
 	/**
@@ -122,7 +122,7 @@ class WCST_Plugin {
 	 */
 	public function admin_init() {
 		// Fire action for admin-specific initialization.
-		do_action( 'wcst_admin_init' );
+		do_action( 'dr_subs_admin_init' );
 	}
 
 	/**
@@ -174,7 +174,7 @@ class WCST_Plugin {
 			'show_advanced_data' => false,
 		);
 
-		add_option( 'wcst_settings', $default_options );
+		add_option( 'dr_subs_settings', $default_options );
 	}
 
 	/**
@@ -186,7 +186,7 @@ class WCST_Plugin {
 	 * @return mixed Option value or default.
 	 */
 	public static function get_option( $key, $default = null ) {
-		$options = get_option( 'wcst_settings', array() );
+		$options = get_option( 'dr_subs_settings', array() );
 		return isset( $options[ $key ] ) ? $options[ $key ] : $default;
 	}
 
@@ -199,8 +199,15 @@ class WCST_Plugin {
 	 * @return bool True if option was updated, false otherwise.
 	 */
 	public static function update_option( $key, $value ) {
-		$options         = get_option( 'wcst_settings', array() );
+		$options         = get_option( 'dr_subs_settings', array() );
 		$options[ $key ] = $value;
-		return update_option( 'wcst_settings', $options );
+		return update_option( 'dr_subs_settings', $options );
 	}
 }
+
+/**
+ * Legacy v1 alias. Do not use in new code; DR_Subs_Plugin is canonical.
+ *
+ * @deprecated 2.0.0 Use DR_Subs_Plugin instead.
+ */
+class_alias( 'DR_Subs_Plugin', 'WCST_Plugin' );

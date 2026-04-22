@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Logger {
+class DR_Subs_Logger {
 
 	/**
 	 * WooCommerce logger instance.
@@ -56,7 +56,7 @@ class WCST_Logger {
 	 * @return bool True if logging is enabled.
 	 */
 	private static function is_logging_enabled() {
-		return WCST_Plugin::get_option( 'enable_logging', true );
+		return DR_Subs_Plugin::get_option( 'enable_logging', true );
 	}
 
 	/**
@@ -152,7 +152,7 @@ class WCST_Logger {
 			return;
 		}
 
-		$retention_days = WCST_Plugin::get_option( 'log_retention_days', 30 );
+		$retention_days = DR_Subs_Plugin::get_option( 'log_retention_days', 30 );
 
 		if ( $retention_days <= 0 ) {
 			return;
