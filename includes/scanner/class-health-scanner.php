@@ -210,12 +210,7 @@ class DR_Subs_Health_Scanner {
 						continue;
 					}
 					foreach ( $matches as $match ) {
-						try {
-							$match->narration = $rule->narrate( $match );
-						} catch ( \Throwable $t ) {
-							DR_Subs_Logger::error( "Rule {$rule_id} narrate failed: " . $t->getMessage() );
-							$match->narration = '';
-						}
+						$match->narration                  = DR_Subs_Narrator::for_match( $rule, $match );
 						$matches_by_sub[ $match->sub_id ][] = $match;
 					}
 				}

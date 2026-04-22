@@ -602,7 +602,7 @@
           "7",
           "8"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -662,7 +662,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:42:32.841Z"
+        "updatedAt": "2026-04-22T22:45:32.420Z"
       },
       {
         "id": "10",
@@ -674,7 +674,7 @@
         "dependencies": [
           "9"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -734,7 +734,8 @@
             "testStrategy": "Unit test: add test filter callback via add_filter('dr_subs_narration', fn($text) => $text . ' [DECORATED]'), call narrate(), verify returned string ends with ' [DECORATED]'. Remove filter, verify subsequent call returns undecorated text.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:45:33.924Z"
       },
       {
         "id": "11",
@@ -1102,9 +1103,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:42:32.842Z",
+      "lastModified": "2026-04-22T22:45:33.925Z",
       "taskCount": 15,
-      "completedCount": 8,
+      "completedCount": 9,
       "tags": [
         "master"
       ]
