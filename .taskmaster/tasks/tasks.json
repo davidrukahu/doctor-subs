@@ -821,7 +821,7 @@
         "dependencies": [
           "9"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -882,7 +882,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:49:13.117Z"
+        "updatedAt": "2026-04-22T22:50:45.947Z"
       },
       {
         "id": "13",
@@ -894,7 +894,7 @@
         "dependencies": [
           "11"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -952,7 +952,8 @@
             "testStrategy": "Manual test: navigate to WooCommerce > Doctor Subs > Settings tab, verify 'Journal retention period' field exists with default 180, change to 90, save, reload, verify 90 persists. Change to -1, save, verify -1 persists. Test validation: try to set -2 or non-integer, verify rejected or sanitized. Verify unsaved-changes guard triggers when field modified.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:50:47.442Z"
       },
       {
         "id": "14",
@@ -1105,9 +1106,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:49:13.117Z",
+      "lastModified": "2026-04-22T22:50:47.443Z",
       "taskCount": 15,
-      "completedCount": 11,
+      "completedCount": 12,
       "tags": [
         "master"
       ]

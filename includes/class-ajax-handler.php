@@ -49,6 +49,8 @@ class DR_Subs_Ajax_Handler {
 			'dr_subs_get_fix_preview' => 'get_fix_preview',
 			'dr_subs_apply_fix'       => 'apply_fix',
 			'dr_subs_revert_fix'      => 'revert_fix',
+			'dr_subs_bulk_fix'        => 'bulk_fix',
+			'dr_subs_revert_batch'    => 'revert_batch',
 			'dr_subs_run_scan'        => 'run_scan',
 			'dr_subs_cancel_scan'     => 'cancel_scan',
 			'dr_subs_save_settings'   => 'save_settings',
@@ -194,6 +196,121 @@ class DR_Subs_Ajax_Handler {
 	}
 
 	/**
+	 * Apply a rule's fix across every sub that currently matches it.
+	 *
+	 * Used by the "Fix all N ghost subs" button on the dashboard. All
+	 * journal entries created share a single batch_id so revert_batch()
+	 * can undo them atomically later.
+	 *
+	 * POST:
+	 *  - rule_id          required, the rule to batch-apply
+	 *  - sub_ids          optional array; if omitted, uses all current
+	 *                     broken subs matching this rule
+	 *
+	 * Returns JSON:
+	 *  - batch_id
+	 *  - applied       count of successful entries
+	 *  - failed        count of failed entries
+	 *  - errors        array of {sub_id, message} for failures
+	 *
+	 * @return void
+	 */
+	public function bulk_fix(): void {
+		$this->guard();
+		$rule_id = $this->post_string( 'rule_id' );
+		if ( '' === $rule_id ) {
+			wp_send_json_error( array( 'message' => __( 'Missing rule_id.', 'doctor-subs' ) ), 400 );
+		}
+
+		DR_Subs_Rules_Registry::bootstrap();
+		$rule = DR_Subs_Rules_Registry::get( $rule_id );
+		if ( ! $rule ) {
+			wp_send_json_error( array( 'message' => __( 'Unknown rule.', 'doctor-subs' ) ), 404 );
+		}
+
+		// Accept explicit sub_ids from the client, or auto-collect from
+		// the dashboard's current set of broken-matched subs.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- guard() verified nonce.
+		$posted_sub_ids = isset( $_POST['sub_ids'] ) ? (array) wp_unslash( $_POST['sub_ids'] ) : array();
+		$sub_ids        = array_values( array_filter( array_map( 'absint', $posted_sub_ids ) ) );
+		if ( empty( $sub_ids ) ) {
+			$sub_ids = $this->collect_matching_sub_ids( $rule_id );
+		}
+		if ( empty( $sub_ids ) ) {
+			wp_send_json_error( array( 'message' => __( 'No matching subscriptions to fix.', 'doctor-subs' ) ), 404 );
+		}
+
+		$context  = new DR_Subs_Scan_Context();
+		$batch_id = self::generate_batch_id();
+
+		$applied = 0;
+		$failed  = 0;
+		$errors  = array();
+
+		foreach ( $sub_ids as $sub_id ) {
+			$matches = $rule->detect_batch( array( (int) $sub_id ), $context );
+			$match   = $matches[0] ?? null;
+			if ( ! $match ) {
+				$failed++;
+				$errors[] = array(
+					'sub_id'  => (int) $sub_id,
+					'message' => __( 'No longer matches rule; skipped.', 'doctor-subs' ),
+				);
+				continue;
+			}
+
+			try {
+				$payload = $rule->apply_fix( $match );
+				DR_Subs_Fix_Journal::record( (int) $sub_id, $rule_id, $payload, $batch_id );
+				$applied++;
+			} catch ( \Throwable $t ) {
+				$failed++;
+				$errors[] = array(
+					'sub_id'  => (int) $sub_id,
+					'message' => $t->getMessage(),
+				);
+				DR_Subs_Logger::error( 'bulk_fix entry failed: ' . $t->getMessage(), array( 'sub' => $sub_id ) );
+			}
+		}
+
+		/**
+		 * Fires after a bulk fix batch completes.
+		 *
+		 * @since 2.0.0
+		 * @param string $batch_id
+		 * @param string $rule_id
+		 * @param int    $applied
+		 * @param int    $failed
+		 */
+		do_action( 'dr_subs_after_bulk_fix', $batch_id, $rule_id, $applied, $failed );
+
+		wp_send_json_success(
+			array(
+				'batch_id' => $batch_id,
+				'applied'  => $applied,
+				'failed'   => $failed,
+				'errors'   => $errors,
+			)
+		);
+	}
+
+	/**
+	 * Revert every entry in a given batch.
+	 *
+	 * @return void
+	 */
+	public function revert_batch(): void {
+		$this->guard();
+		$batch_id = $this->post_string( 'batch_id' );
+		if ( '' === $batch_id ) {
+			wp_send_json_error( array( 'message' => __( 'Missing batch_id.', 'doctor-subs' ) ), 400 );
+		}
+
+		$result = DR_Subs_Fix_Journal::revert_batch( $batch_id );
+		wp_send_json_success( $result );
+	}
+
+	/**
 	 * Kick off a one-shot scan. Returns the summary.
 	 *
 	 * @return void
@@ -323,6 +440,51 @@ class DR_Subs_Ajax_Handler {
 	private function post_string( string $key ): string {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- guard() validated nonce first.
 		return isset( $_POST[ $key ] ) ? sanitize_key( wp_unslash( $_POST[ $key ] ) ) : '';
+	}
+
+	/**
+	 * Generate a fresh batch id. 40 chars; suitable for the VARCHAR(40)
+	 * column on dr_subs_fix_journal.
+	 *
+	 * @return string
+	 */
+	private static function generate_batch_id(): string {
+		return 'b_' . wp_generate_password( 32, false, false );
+	}
+
+	/**
+	 * Collect all currently-broken sub_ids whose primary matched rule
+	 * equals $rule_id.
+	 *
+	 * @param string $rule_id
+	 * @return array<int, int>
+	 */
+	private function collect_matching_sub_ids( string $rule_id ): array {
+		global $wpdb;
+		$table = DR_Subs_Migration::sub_health_table();
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- bulk collect.
+		$rows = $wpdb->get_results(
+			"SELECT sub_id, matched_rules FROM {$table} WHERE bucket IN ('broken', 'risk')"
+		);
+		// phpcs:enable
+
+		$sub_ids = array();
+		foreach ( (array) $rows as $row ) {
+			$decoded = json_decode( (string) $row->matched_rules, true );
+			if ( ! is_array( $decoded ) ) {
+				continue;
+			}
+			foreach ( $decoded as $entry ) {
+				if ( ! is_array( $entry ) ) {
+					continue;
+				}
+				if ( ( $entry['rule_id'] ?? '' ) === $rule_id ) {
+					$sub_ids[] = (int) $row->sub_id;
+					break;
+				}
+			}
+		}
+		return $sub_ids;
 	}
 
 	/**
