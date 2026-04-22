@@ -966,7 +966,7 @@
           "4",
           "11"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -1027,7 +1027,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:52:23.838Z"
+        "updatedAt": "2026-04-22T22:54:01.080Z"
       },
       {
         "id": "15",
@@ -1040,7 +1040,7 @@
           "13",
           "14"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -1102,14 +1102,15 @@
             "testStrategy": "Pre-release checklist: run scripts/perf-test.sh, all 3 metrics pass. Verify readme.txt parses correctly via wordpress.org/plugins/developers/readme-validator/. Test GitHub Actions workflow on test repo first. Post-release: monitor WP.org support forum for 'class not found' reports (class rename breakage), performance complaints, email delivery issues. Check plugin auto-update works for existing users.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:54:02.597Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:52:23.838Z",
+      "lastModified": "2026-04-22T22:54:02.597Z",
       "taskCount": 15,
-      "completedCount": 13,
+      "completedCount": 14,
       "tags": [
         "master"
       ]

@@ -1,0 +1,121 @@
+name: Release
+
+# Triggered by tag pushes of the form v* (e.g. v2.0.0, v2.0.0-alpha.1).
+# Builds the plugin zip, creates a GitHub Release with the zip attached,
+# and optionally pushes to the WordPress.org plugin directory SVN.
+#
+# Required repository secrets for the WP.org SVN deploy step:
+#   - SVN_USERNAME  WordPress.org account username
+#   - SVN_PASSWORD  WordPress.org account password
+#
+# If the secrets aren't configured, the SVN deploy step is skipped - the
+# GitHub Release still ships.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Set up Node (for Potomatic + wp-cli)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install WP-CLI
+        run: |
+          curl -sSL -o wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x wp-cli.phar
+          sudo mv wp-cli.phar /usr/local/bin/wp
+
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify version in plugin header matches tag
+        run: |
+          HEADER_VER=$(grep -oP "Version:\s*\K[^\s]+" doctor-subs.php | head -1)
+          TAG_VER="${{ steps.version.outputs.version }}"
+          if [ "$HEADER_VER" != "$TAG_VER" ]; then
+            echo "::error::Plugin header version ($HEADER_VER) does not match tag ($TAG_VER)"
+            exit 1
+          fi
+
+      - name: PHP syntax check
+        run: |
+          find doctor-subs.php includes admin -name "*.php" -print0 | \
+            xargs -0 -n1 php -l
+
+      - name: Build plugin zip
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ZIP="doctor-subs-${VERSION}.zip"
+          BUILD_DIR="/tmp/build/doctor-subs"
+          mkdir -p "$BUILD_DIR"
+          # Copy only shippable files. Exclude dev assets, docs, CI config.
+          rsync -a --exclude-from=<(cat <<'EOF'
+          .git/
+          .github/
+          .claude/
+          .taskmaster/
+          .cursor/
+          .impeccable.md
+          .env.example
+          .gitignore
+          .DS_Store
+          branding/
+          composer.json
+          composer.lock
+          design-brief/
+          node_modules/
+          phpcs.xml
+          scripts/
+          tests/
+          TODOS.md
+          vendor/
+          *.zip
+          EOF
+          ) . "$BUILD_DIR/"
+          cd /tmp/build
+          zip -r "/tmp/$ZIP" doctor-subs
+          echo "zip=/tmp/$ZIP" >> "$GITHUB_ENV"
+          ls -lh "/tmp/$ZIP"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Doctor Subs ${{ steps.version.outputs.version }}
+          body: |
+            Release ${{ steps.version.outputs.version }}.
+
+            See readme.txt for the changelog.
+          files: ${{ env.zip }}
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+
+      - name: Deploy to WP.org SVN
+        # Only deploy stable tags (no alpha/beta/rc) and only when the
+        # SVN secrets exist on the repo.
+        if: "!contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')"
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: doctor-subs
+        continue-on-error: true
