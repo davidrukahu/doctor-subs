@@ -105,7 +105,7 @@ if ( ! function_exists( 'number_format_i18n' ) ) {
 
 // ---- Fixtures ---- //
 
-$VIEWS_DIR = __DIR__ . '/v2-assets/admin/views';
+$VIEWS_DIR = __DIR__ . '/../admin/views';
 
 $SUBS_FIXTURE = array(
 	array( 'id' => 4812, 'name' => 'Sarah Mendez',       'rule' => 'ghost',   'reason' => "Next payment didn't get rescheduled after the March 15 renewal.", 'bucket' => 'broken', 'amount' => '$29.00', 'since' => 'Mar 15' ),
@@ -293,9 +293,9 @@ $settings_default = render_view( "$VIEWS_DIR/settings.php", array(
 <meta charset="utf-8">
 <title>Doctor Subs v2 - All Surfaces Preview</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="v2-assets/admin/css/tokens.css">
-<link rel="stylesheet" href="v2-assets/admin/css/admin.css">
-<link rel="stylesheet" href="v2-assets/admin/css/responsive.css">
+<link rel="stylesheet" href="../admin/css/tokens.css">
+<link rel="stylesheet" href="../admin/css/admin.css">
+<link rel="stylesheet" href="../admin/css/responsive.css">
 <style>
 /* Preview chrome only - not part of the plugin */
 html, body {
