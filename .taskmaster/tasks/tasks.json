@@ -527,7 +527,7 @@
         "dependencies": [
           "5"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -588,7 +588,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:40:30.051Z"
+        "updatedAt": "2026-04-22T22:42:31.318Z"
       },
       {
         "id": "9",
@@ -602,7 +602,7 @@
           "7",
           "8"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -661,7 +661,8 @@
             "testStrategy": "Manual test: activate plugin, verify no PHP errors. Check DR_SUBS_SCAN_BATCH_SIZE constant defined via var_dump(DR_SUBS_SCAN_BATCH_SIZE). Instantiate DR_Subs_Health_Scanner and DR_Subs_Fix_Journal in test script, verify no class-not-found errors.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:42:32.841Z"
       },
       {
         "id": "10",
@@ -1101,9 +1102,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:40:30.051Z",
+      "lastModified": "2026-04-22T22:42:32.842Z",
       "taskCount": 15,
-      "completedCount": 7,
+      "completedCount": 8,
       "tags": [
         "master"
       ]
