@@ -380,7 +380,7 @@
         "dependencies": [
           "5"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -442,7 +442,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:36:53.632Z"
+        "updatedAt": "2026-04-22T22:38:45.487Z"
       },
       {
         "id": "7",
@@ -454,7 +454,7 @@
         "dependencies": [
           "5"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -514,7 +514,8 @@
             "testStrategy": "Unit test: apply_fix then revert_fix. Verify order and sub return to original on-hold/processing status. Modify sub between apply and revert, verify drift_detected=true in RevertResult. Check order notes contain 'Reverting fix' entry.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:38:46.985Z"
       },
       {
         "id": "8",
@@ -1099,9 +1100,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:36:53.632Z",
+      "lastModified": "2026-04-22T22:38:46.985Z",
       "taskCount": 15,
-      "completedCount": 5,
+      "completedCount": 6,
       "tags": [
         "master"
       ]
