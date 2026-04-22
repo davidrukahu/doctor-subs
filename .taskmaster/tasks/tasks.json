@@ -894,7 +894,7 @@
         "dependencies": [
           "11"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -953,7 +953,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:50:47.442Z"
+        "updatedAt": "2026-04-22T22:52:22.321Z"
       },
       {
         "id": "14",
@@ -966,7 +966,7 @@
           "4",
           "11"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -1026,7 +1026,8 @@
             "testStrategy": "Switch WordPress site to fr_FR locale in Settings > General. Load Doctor Subs admin page. Verify UI strings display in French (e.g., dashboard heading, button labels). Check browser console for missing translation warnings. Use Loco Translate or Poedit to verify .mo file loaded.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:52:23.838Z"
       },
       {
         "id": "15",
@@ -1106,9 +1107,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:50:47.443Z",
+      "lastModified": "2026-04-22T22:52:23.838Z",
       "taskCount": 15,
-      "completedCount": 12,
+      "completedCount": 13,
       "tags": [
         "master"
       ]
