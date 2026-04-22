@@ -748,7 +748,7 @@
           "9",
           "10"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -809,7 +809,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:46:33.798Z"
+        "updatedAt": "2026-04-22T22:49:11.621Z"
       },
       {
         "id": "12",
@@ -821,7 +821,7 @@
         "dependencies": [
           "9"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -881,7 +881,8 @@
             "testStrategy": "Manual test: load dashboard with broken subs, click 'Dismiss' on sub #123, verify AJAX request succeeds, UI updates. Query dr_subs_sub_health WHERE sub_id=123, verify suppressed_until ~7 days from now. Re-run scanner, verify dismissed sub excluded from next digest email.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:49:13.117Z"
       },
       {
         "id": "13",
@@ -1104,9 +1105,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:46:33.798Z",
+      "lastModified": "2026-04-22T22:49:13.117Z",
       "taskCount": 15,
-      "completedCount": 10,
+      "completedCount": 11,
       "tags": [
         "master"
       ]
