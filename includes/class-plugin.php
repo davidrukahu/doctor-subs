@@ -83,6 +83,11 @@ class DR_Subs_Plugin {
 
 		// Journal cleanup hook.
 		add_action( DR_Subs_Fix_Journal::CLEANUP_HOOK, array( 'DR_Subs_Fix_Journal', 'run_cleanup' ) );
+
+		// Alert dispatcher (listens on dr_subs_after_scan).
+		if ( class_exists( 'DR_Subs_Alert_Dispatcher' ) ) {
+			DR_Subs_Alert_Dispatcher::register();
+		}
 	}
 
 	/**

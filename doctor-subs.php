@@ -184,6 +184,9 @@ function dr_subs_autoloader( $class_name ) {
 		'alert-dispatcher'       => 'includes/alerts/',
 	);
 
+	// Explicit ambiguous-short-name overrides that can't be inferred from
+	// the short name alone (not needed yet, placeholder for future files).
+
 	$directory = isset( $class_directories[ $short ] ) ? $class_directories[ $short ] : 'includes/';
 	$file_path = DR_SUBS_PLUGIN_DIR . $directory . 'class-' . $short . '.php';
 
