@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Subscription_Data {
+class DR_Subs_Subscription_Data {
 
 	/**
 	 * Safely format a date that might be a DateTime object or string (HPOS compatibility).

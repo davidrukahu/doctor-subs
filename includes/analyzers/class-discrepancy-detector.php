@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Discrepancy_Detector {
+class DR_Subs_Discrepancy_Detector {
 
 	/**
 	 * Safely get timestamp from date that might be a DateTime object or string (HPOS compatibility).

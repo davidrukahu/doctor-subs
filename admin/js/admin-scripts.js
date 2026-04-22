@@ -34,8 +34,8 @@
             $( '#wcst-progress' ).hide();
             
             // Check if we should auto-analyze a subscription
-            if ( wcst_ajax.auto_analyze_id ) {
-                this.autoAnalyzeSubscription( wcst_ajax.auto_analyze_id );
+            if ( dr_subs_ajax.auto_analyze_id ) {
+                this.autoAnalyzeSubscription( dr_subs_ajax.auto_analyze_id );
             }
         },
 
@@ -121,12 +121,12 @@
             this.currentSubscriptionId = subscriptionId;
             
             $.ajax( {
-                url: wcst_ajax.ajax_url,
+                url: dr_subs_ajax.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'wcst_analyze_subscription',
                     subscription_id: subscriptionId,
-                    nonce: wcst_ajax.nonce
+                    nonce: dr_subs_ajax.nonce
                 },
                 success: ( response ) => {
                     if ( response.success ) {
@@ -182,12 +182,12 @@
 
         searchSubscriptions: function( searchTerm ) {
             $.ajax( {
-                url: wcst_ajax.ajax_url,
+                url: dr_subs_ajax.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'wcst_search_subscriptions',
                     search_term: searchTerm,
-                    nonce: wcst_ajax.nonce
+                    nonce: dr_subs_ajax.nonce
                 },
                 success: ( response ) => {
                     if ( response.success ) {
@@ -675,12 +675,12 @@
             this.showProgress( 'Generating bulk report...' );
             
             $.ajax( {
-                url: wcst_ajax.ajax_url,
+                url: dr_subs_ajax.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'wcst_generate_bulk_report',
                     filters: filters,
-                    nonce: wcst_ajax.nonce
+                    nonce: dr_subs_ajax.nonce
                 },
                 success: ( response ) => {
                     if ( response.success ) {
@@ -751,9 +751,9 @@
             // Create form and submit for download
             const form = $( '<form>' )
                 .attr( 'method', 'POST' )
-                .attr( 'action', wcst_ajax.ajax_url )
+                .attr( 'action', dr_subs_ajax.ajax_url )
                 .append( $( '<input>' ).attr( 'type', 'hidden' ).attr( 'name', 'action' ).val( 'wcst_export_csv' ) )
-                .append( $( '<input>' ).attr( 'type', 'hidden' ).attr( 'name', 'nonce' ).val( wcst_ajax.nonce ) )
+                .append( $( '<input>' ).attr( 'type', 'hidden' ).attr( 'name', 'nonce' ).val( dr_subs_ajax.nonce ) )
                 .append( $( '<input>' ).attr( 'type', 'hidden' ).attr( 'name', 'csv_data' ).val( this.currentCSVData ) )
                 .append( $( '<input>' ).attr( 'type', 'hidden' ).attr( 'name', 'filename' ).val( filename ) );
             
@@ -780,14 +780,14 @@
             this.showProgress( 'Previewing fix...' );
             
             $.ajax( {
-                url: wcst_ajax.ajax_url,
+                url: dr_subs_ajax.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'wcst_fix_subscription',
                     subscription_id: subscriptionId,
                     fix_type: 'payment_date',
                     dry_run: true,
-                    nonce: wcst_ajax.nonce
+                    nonce: dr_subs_ajax.nonce
                 },
                 success: ( response ) => {
                     if ( response.success ) {
@@ -855,14 +855,14 @@
             this.showProgress( dryRun ? 'Running dry run...' : 'Applying fix...' );
             
             $.ajax( {
-                url: wcst_ajax.ajax_url,
+                url: dr_subs_ajax.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'wcst_fix_subscription',
                     subscription_id: subscriptionId,
                     fix_type: 'payment_date',
                     dry_run: dryRun,
-                    nonce: wcst_ajax.nonce
+                    nonce: dr_subs_ajax.nonce
                 },
                 success: ( response ) => {
                     if ( response.success ) {
@@ -937,14 +937,14 @@
             this.showProgress( dryRun ? 'Running batch dry run...' : 'Applying batch fixes...' );
             
             $.ajax( {
-                url: wcst_ajax.ajax_url,
+                url: dr_subs_ajax.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'wcst_batch_fix_subscriptions',
                     subscription_ids: subscriptionIds,
                     fix_types: fixTypes,
                     dry_run: dryRun,
-                    nonce: wcst_ajax.nonce
+                    nonce: dr_subs_ajax.nonce
                 },
                 success: ( response ) => {
                     if ( response.success ) {
@@ -1004,13 +1004,13 @@
             this.showProgress( 'Running debug analysis...' );
             
             $.ajax( {
-                url: wcst_ajax.ajax_url,
+                url: dr_subs_ajax.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'wcst_get_developer_debug',
                     subscription_id: subscriptionId,
                     debug_type: debugType,
-                    nonce: wcst_ajax.nonce
+                    nonce: dr_subs_ajax.nonce
                 },
                 success: ( response ) => {
                     if ( response.success ) {

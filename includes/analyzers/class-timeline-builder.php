@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Timeline_Builder {
+class DR_Subs_Timeline_Builder {
 
 	/**
 	 * Safely format a date that might be a DateTime object or string (HPOS compatibility).
