@@ -58,17 +58,31 @@ class DR_Subs_Admin {
 			return;
 		}
 
+		// Design system - loaded in order: tokens -> surfaces -> responsive.
 		wp_enqueue_style(
-			'wcst-admin-styles',
-			DR_SUBS_PLUGIN_URL . 'admin/css/admin-styles.css',
+			'dr-subs-tokens',
+			DR_SUBS_PLUGIN_URL . 'admin/css/tokens.css',
 			array(),
 			DR_SUBS_PLUGIN_VERSION
 		);
+		wp_enqueue_style(
+			'dr-subs-admin',
+			DR_SUBS_PLUGIN_URL . 'admin/css/admin.css',
+			array( 'dr-subs-tokens' ),
+			DR_SUBS_PLUGIN_VERSION
+		);
+		wp_enqueue_style(
+			'dr-subs-responsive',
+			DR_SUBS_PLUGIN_URL . 'admin/css/responsive.css',
+			array( 'dr-subs-admin' ),
+			DR_SUBS_PLUGIN_VERSION
+		);
 
+		// Vanilla JS - no jQuery dependency.
 		wp_enqueue_script(
-			'wcst-admin-scripts',
-			DR_SUBS_PLUGIN_URL . 'admin/js/admin-scripts.js',
-			array( 'jquery' ),
+			'dr-subs-admin',
+			DR_SUBS_PLUGIN_URL . 'admin/js/admin.js',
+			array(),
 			DR_SUBS_PLUGIN_VERSION,
 			true
 		);
@@ -90,24 +104,25 @@ class DR_Subs_Admin {
 			}
 		}
 
-		// Localize script for AJAX.
+		// Localize for AJAX. admin.js reads the `drSubsAjax` global.
 		wp_localize_script(
-			'wcst-admin-scripts',
-			'dr_subs_ajax',
+			'dr-subs-admin',
+			'drSubsAjax',
 			array(
-				'ajax_url'        => admin_url( 'admin-ajax.php' ),
-				'nonce'           => wp_create_nonce( 'dr_subs_nonce' ),
-				'auto_analyze_id' => $auto_analyze_id,
-				'strings'         => array(
-					'error'                   => __( 'An error occurred. Please try again.', 'doctor-subs' ),
-					'searching'               => __( 'Searching...', 'doctor-subs' ),
-					'analyzing'               => __( 'Analyzing subscription...', 'doctor-subs' ),
-					'step1_complete'          => __( 'Step 1: Anatomy analysis complete', 'doctor-subs' ),
-					'step2_complete'          => __( 'Step 2: Expected behavior analysis complete', 'doctor-subs' ),
-					'step3_complete'          => __( 'Step 3: Timeline analysis complete', 'doctor-subs' ),
-					'analysis_complete'       => __( 'Analysis complete!', 'doctor-subs' ),
-					'no_subscription_found'   => __( 'No subscription found with that ID.', 'doctor-subs' ),
-					'invalid_subscription_id' => __( 'Please enter a valid subscription ID.', 'doctor-subs' ),
+				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+				'nonce'         => wp_create_nonce( 'dr_subs_admin' ),
+				'autoAnalyzeId' => $auto_analyze_id,
+				'strings'       => array(
+					'showingAll'     => __( 'showing all broken and at-risk', 'doctor-subs' ),
+					'filtering'      => __( 'filtering to %1$d %2$s', 'doctor-subs' ),
+					'modalLoadError' => __( 'Could not load the fix preview. Try again in a moment.', 'doctor-subs' ),
+					'applying'       => __( 'Applying…', 'doctor-subs' ),
+					'applyError'     => __( 'Something went wrong - nothing was changed.', 'doctor-subs' ),
+					'reverting'      => __( 'Reverting…', 'doctor-subs' ),
+					'confirmRevert'  => __( 'Revert this fix? The subscription will return to its previous state.', 'doctor-subs' ),
+					'saving'         => __( 'Saving…', 'doctor-subs' ),
+					'saved'          => __( 'Saved.', 'doctor-subs' ),
+					'saveError'      => __( 'Could not save. Check your connection and try again.', 'doctor-subs' ),
 				),
 			)
 		);
