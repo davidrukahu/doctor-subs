@@ -454,7 +454,7 @@
         "dependencies": [
           "5"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -515,7 +515,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:38:46.985Z"
+        "updatedAt": "2026-04-22T22:40:28.561Z"
       },
       {
         "id": "8",
@@ -527,7 +527,7 @@
         "dependencies": [
           "5"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -587,7 +587,8 @@
             "testStrategy": "Test 1: apply_fix, immediately call revert_fix before action runs. Verify action unscheduled, journal entry marked reverted. Test 2: apply_fix, manually mark AS action complete, call revert_fix. Verify returns warning about already-executed. Test 3: apply_fix, delete AS action row, call revert_fix. Verify handles missing action gracefully.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:40:30.051Z"
       },
       {
         "id": "9",
@@ -1100,9 +1101,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:38:46.985Z",
+      "lastModified": "2026-04-22T22:40:30.051Z",
       "taskCount": 15,
-      "completedCount": 6,
+      "completedCount": 7,
       "tags": [
         "master"
       ]
