@@ -232,7 +232,7 @@
           "2",
           "3"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -292,7 +292,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-22T22:30:36.305Z"
+        "updatedAt": "2026-04-22T22:33:30.734Z"
       },
       {
         "id": "5",
@@ -304,7 +304,7 @@
         "dependencies": [
           "1"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -367,7 +367,8 @@
             "testStrategy": "Integration test: activate plugin, verify DR_Subs_Rules_Registry instantiated. Add test rule registration on 'dr_subs_register_rules' hook, verify rule appears in get_all(). Check $this->rules_registry accessible from WCST_Plugin::get_instance(). No PHP errors on plugin load.",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-04-22T22:33:32.235Z"
       },
       {
         "id": "6",
@@ -1097,9 +1098,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-22T22:30:36.305Z",
+      "lastModified": "2026-04-22T22:33:32.236Z",
       "taskCount": 15,
-      "completedCount": 3,
+      "completedCount": 4,
       "tags": [
         "master"
       ]
