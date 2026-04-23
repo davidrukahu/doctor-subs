@@ -71,6 +71,7 @@ latest-woo-subs-plugin/
 *.backup
 backups*/
 *.zip
+build/
 
 # Development files
 .phpunit.result.cache

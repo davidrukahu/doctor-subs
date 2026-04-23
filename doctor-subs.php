@@ -16,7 +16,7 @@ declare( strict_types=1 );
  * Author URI: https://github.com/davidrukahu
  * Text Domain: doctor-subs
  * Domain Path: /languages
- * Requires at least: 5.0
+ * Requires at least: 6.4
  * Tested up to: 6.9
  * Requires PHP: 7.4
  * WC requires at least: 9.0
@@ -210,19 +210,6 @@ function dr_subs_init_plugin() {
 	}
 }
 add_action( 'plugins_loaded', 'dr_subs_init_plugin', 20 );
-
-/**
- * Load plugin translations.
- *
- * Domain Path: /languages. Self-hosted .mo files per WP.org plugin directory
- * rules (no runtime external fetches).
- *
- * @since 2.0.0
- */
-function dr_subs_load_textdomain() {
-	load_plugin_textdomain( 'doctor-subs', false, dirname( DR_SUBS_PLUGIN_BASENAME ) . '/languages' );
-}
-add_action( 'init', 'dr_subs_load_textdomain' );
 
 /**
  * Declare HPOS compatibility.

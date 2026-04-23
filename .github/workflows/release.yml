@@ -80,6 +80,7 @@ jobs:
           .gitignore
           .DS_Store
           branding/
+          build/
           composer.json
           composer.lock
           design-brief/
@@ -88,6 +89,8 @@ jobs:
           scripts/
           tests/
           TODOS.md
+          v2-STATUS.md
+          _review.md
           vendor/
           *.zip
           EOF

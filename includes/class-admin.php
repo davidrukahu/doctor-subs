@@ -113,6 +113,7 @@ class DR_Subs_Admin {
 				'nonce'   => wp_create_nonce( 'dr_subs_admin' ),
 				'strings' => array(
 					'showingAll'     => __( 'showing all broken and at-risk', 'doctor-subs' ),
+					/* translators: 1: count of filtered subs, 2: rule label (e.g. "ghost subs") */
 					'filtering'      => __( 'filtering to %1$d %2$s', 'doctor-subs' ),
 					'modalLoadError' => __( 'Could not load the fix preview. Try again in a moment.', 'doctor-subs' ),
 					'applying'       => __( 'Applying…', 'doctor-subs' ),
@@ -221,7 +222,9 @@ class DR_Subs_Admin {
 		$table = DR_Subs_Migration::sub_health_table();
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- read-only count for view routing.
-		$row_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
+		$row_count = (int) $wpdb->get_var(
+			$wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table )
+		);
 		// phpcs:enable
 
 		if ( 0 === $row_count ) {
@@ -377,7 +380,9 @@ class DR_Subs_Admin {
 		);
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- aggregation query, no caching.
-		$rows = $wpdb->get_results( "SELECT bucket, COUNT(*) AS n FROM {$table} GROUP BY bucket" );
+		$rows = $wpdb->get_results(
+			$wpdb->prepare( 'SELECT bucket, COUNT(*) AS n FROM %i GROUP BY bucket', $table )
+		);
 		// phpcs:enable
 
 		foreach ( (array) $rows as $row ) {
@@ -405,11 +410,11 @@ class DR_Subs_Admin {
 		}
 		$placeholders = implode( ',', array_fill( 0, count( $allowed ), '%s' ) );
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name and placeholder count are controlled.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholder count is controlled; %i escapes the table identifier.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT sub_id, bucket, matched_rules, narration, last_scanned_at FROM {$table} WHERE bucket IN ({$placeholders}) ORDER BY last_scanned_at DESC LIMIT 50",
-				$allowed
+				"SELECT sub_id, bucket, matched_rules, narration, last_scanned_at FROM %i WHERE bucket IN ({$placeholders}) ORDER BY last_scanned_at DESC LIMIT 50",
+				array_merge( array( $table ), $allowed )
 			)
 		);
 		// phpcs:enable
@@ -452,9 +457,15 @@ class DR_Subs_Admin {
 		$table = DR_Subs_Migration::fix_journal_table();
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- journal read.
-		$total       = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
-		$rows        = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY created_at DESC LIMIT 100" );
-		$rule_counts = $wpdb->get_results( "SELECT rule_id, COUNT(*) AS n FROM {$table} GROUP BY rule_id" );
+		$total       = (int) $wpdb->get_var(
+			$wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table )
+		);
+		$rows        = $wpdb->get_results(
+			$wpdb->prepare( 'SELECT * FROM %i ORDER BY created_at DESC LIMIT 100', $table )
+		);
+		$rule_counts = $wpdb->get_results(
+			$wpdb->prepare( 'SELECT rule_id, COUNT(*) AS n FROM %i GROUP BY rule_id', $table )
+		);
 		// phpcs:enable
 
 		$counts_map = array();
@@ -514,7 +525,9 @@ class DR_Subs_Admin {
 		$table = DR_Subs_Migration::sub_health_table();
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- view metadata.
-		$latest = $wpdb->get_var( "SELECT MAX(last_scanned_at) FROM {$table}" );
+		$latest = $wpdb->get_var(
+			$wpdb->prepare( 'SELECT MAX(last_scanned_at) FROM %i', $table )
+		);
 		// phpcs:enable
 
 		return $latest ? $this->relative_time( $latest ) : __( 'never', 'doctor-subs' );
@@ -530,7 +543,9 @@ class DR_Subs_Admin {
 		$table = DR_Subs_Migration::sub_health_table();
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- staleness check.
-		$latest = $wpdb->get_var( "SELECT MAX(last_scanned_at) FROM {$table}" );
+		$latest = $wpdb->get_var(
+			$wpdb->prepare( 'SELECT MAX(last_scanned_at) FROM %i', $table )
+		);
 		// phpcs:enable
 
 		if ( ! $latest ) {

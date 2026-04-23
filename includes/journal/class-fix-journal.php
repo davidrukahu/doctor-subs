@@ -99,7 +99,7 @@ class DR_Subs_Fix_Journal {
 		$table = DR_Subs_Migration::fix_journal_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- journal read.
 		return $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE entry_id = %d", $entry_id )
+			$wpdb->prepare( 'SELECT * FROM %i WHERE entry_id = %d', $table, $entry_id )
 		);
 		// phpcs:enable
 	}
@@ -115,7 +115,7 @@ class DR_Subs_Fix_Journal {
 		$table = DR_Subs_Migration::fix_journal_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- batch read.
 		$rows = $wpdb->get_results(
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE batch_id = %s ORDER BY entry_id ASC", $batch_id )
+			$wpdb->prepare( 'SELECT * FROM %i WHERE batch_id = %s ORDER BY entry_id ASC', $table, $batch_id )
 		);
 		// phpcs:enable
 		return is_array( $rows ) ? $rows : array();
@@ -230,7 +230,7 @@ class DR_Subs_Fix_Journal {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- pruning.
 		$rows = (int) $wpdb->query(
-			$wpdb->prepare( "DELETE FROM {$table} WHERE created_at < %s", $cutoff )
+			$wpdb->prepare( 'DELETE FROM %i WHERE created_at < %s', $table, $cutoff )
 		);
 		// phpcs:enable
 

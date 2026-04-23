@@ -17,6 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// View is included from DR_Subs_Admin::load_view(); variables are scoped to that
+// method's call frame, not globals, so the prefix-all-globals warning is a false
+// positive here.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
 $defaults = array(
 	'alerts_enabled'         => true,
 	'alert_email'            => get_option( 'admin_email', '' ),

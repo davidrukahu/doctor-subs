@@ -15,6 +15,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Partial is included from DR_Subs_Admin::load_view(); variables are scoped to
+// that method's call frame, not globals, so the prefix-all-globals warning is
+// a false positive here.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
 $active_tab   = isset( $active_tab ) ? $active_tab : 'dashboard';
 $show_meta    = isset( $show_meta ) ? (bool) $show_meta : true;
 $last_scanned = isset( $last_scanned ) ? $last_scanned : '';

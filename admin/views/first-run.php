@@ -15,6 +15,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// View is included from DR_Subs_Admin::load_view(); variables are scoped to that
+// method's call frame, not globals, so the prefix-all-globals warning is a false
+// positive here.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
 $state        = isset( $state ) ? $state : 'default';
 $scan_total   = isset( $scan_total ) ? absint( $scan_total ) : 247;
 $scan_left    = isset( $scan_left ) ? absint( $scan_left ) : 18;

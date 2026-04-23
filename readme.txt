@@ -8,7 +8,7 @@ Stable tag: 2.0.0-alpha.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Find and fix broken WooCommerce subscriptions. Detects ghost subs, stuck on-hold renewals, and repeated payment failures, with one-click reversible fixes.
+Find and fix broken WooCommerce subscriptions: ghost subs, stuck on-hold renewals, and repeated payment failures. One-click reversible fixes.
 
 == Description ==
 
@@ -168,7 +168,7 @@ Major rewrite. Single breaking change moment: every PHP class renamed from WCST_
 
 = 2.0.0-alpha.1 =
 
-Major rewrite. Single breaking class-name change: WCST_* renamed to DR_Subs_*. Third-party plugins extending Doctor Subs via the WCST_Plugin / WCST_Admin / WCST_Ajax_Handler class names continue to work via class_alias shims. All other identifiers (hooks, filters, nonces, constants) follow the new prefix without shims. Backup first if you run custom integrations.
+Major rewrite. Breaking class rename: WCST_* to DR_Subs_*. class_alias shims keep WCST_Plugin / WCST_Admin / WCST_Ajax_Handler working. All other identifiers (hooks, filters, nonces) follow the new prefix without shims. Backup before upgrading if you have custom integrations.
 
 = 1.2.4 =
 

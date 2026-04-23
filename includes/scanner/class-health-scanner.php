@@ -316,7 +316,9 @@ class DR_Subs_Health_Scanner {
 		global $wpdb;
 		$table = DR_Subs_Migration::sub_health_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- diff query.
-		$rows = $wpdb->get_col( "SELECT sub_id FROM {$table} WHERE bucket = 'broken'" );
+		$rows = $wpdb->get_col(
+			$wpdb->prepare( "SELECT sub_id FROM %i WHERE bucket = 'broken'", $table )
+		);
 		// phpcs:enable
 		return array_map( 'intval', (array) $rows );
 	}

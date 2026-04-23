@@ -16,6 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Partial is included from DR_Subs_Admin::load_view(); $size is scoped to that
+// method's call frame, not global.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
 $size = isset( $size ) ? absint( $size ) : 22;
 ?>
 <svg width="<?php echo esc_attr( $size ); ?>" height="<?php echo esc_attr( $size ); ?>"
