@@ -89,13 +89,16 @@ class DR_Subs_Rule_Ghost_Sub implements DR_Subs_Rule_Interface {
 			}
 
 			$next_payment = $sub->get_date( 'next_payment' );
-			if ( empty( $next_payment ) ) {
-				continue;
-			}
+			$next_ts      = $next_payment ? (int) strtotime( $next_payment . ' UTC' ) : 0;
 
-			$next_ts = strtotime( $next_payment . ' UTC' );
-			if ( ! $next_ts || $next_ts >= $now ) {
-				// next_payment is in the future - this is a healthy sub.
+			// Two ghost flavours:
+			//   A) next_payment set but in the past (WCS scheduled it then
+			//      dropped the AS event).
+			//   B) next_payment not set at all on an active recurring sub
+			//      (WCS never scheduled it; silent ghost from activation).
+			// Both are broken iff there's no pending AS payment event for
+			// this sub. A sub with next_payment in the future is healthy.
+			if ( $next_ts > 0 && $next_ts >= $now ) {
 				continue;
 			}
 
@@ -104,14 +107,17 @@ class DR_Subs_Rule_Ghost_Sub implements DR_Subs_Rule_Interface {
 				continue;
 			}
 
+			$days_overdue = $next_ts > 0 ? (int) floor( ( $now - $next_ts ) / DAY_IN_SECONDS ) : 0;
+
 			$matches[] = new DR_Subs_Rule_Match(
 				$this->id(),
 				$sub_id,
 				$this->bucket(),
 				array(
 					'expected_payment_ts'    => $next_ts,
-					'expected_payment_date'  => $next_payment,
-					'days_overdue'           => (int) floor( ( $now - $next_ts ) / DAY_IN_SECONDS ),
+					'expected_payment_date'  => $next_payment ?: '',
+					'days_overdue'           => $days_overdue,
+					'next_payment_missing'   => 0 === $next_ts,
 					'tracked_fields_snapshot' => $this->snapshot_fields( $sub ),
 				)
 			);
@@ -285,9 +291,15 @@ class DR_Subs_Rule_Ghost_Sub implements DR_Subs_Rule_Interface {
 		}
 
 		$days_overdue = (int) ( $match->context['days_overdue'] ?? 0 );
+		$missing      = ! empty( $match->context['next_payment_missing'] );
 
-		// Template variants: select by days_overdue bucket.
-		if ( $days_overdue < 1 ) {
+		// Template variants: next_payment missing entirely, vs overdue by N days.
+		if ( $missing ) {
+			$template = __(
+				"%1\$s's subscription is active but has no scheduled renewal. WordPress never queued the payment event, so %1\$s hasn't been billed for any renewal cycle.",
+				'doctor-subs'
+			);
+		} elseif ( $days_overdue < 1 ) {
 			$template = __(
 				"%1\$s's subscription was supposed to renew <em>today</em>. WordPress didn't schedule the payment event, so nothing was charged.",
 				'doctor-subs'
