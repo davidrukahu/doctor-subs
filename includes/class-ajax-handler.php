@@ -230,10 +230,11 @@ class DR_Subs_Ajax_Handler {
 
 		// Accept explicit sub_ids from the client, or auto-collect from
 		// the dashboard's current set of broken-matched subs.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- guard() verified nonce.
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- guard() verified nonce above.
 		$posted_sub_ids = ( isset( $_POST['sub_ids'] ) && is_array( $_POST['sub_ids'] ) )
 			? array_map( 'absint', wp_unslash( $_POST['sub_ids'] ) )
 			: array();
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		$sub_ids        = array_values( array_filter( $posted_sub_ids ) );
 		if ( empty( $sub_ids ) ) {
 			$sub_ids = $this->collect_matching_sub_ids( $rule_id );

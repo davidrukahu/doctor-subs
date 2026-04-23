@@ -410,7 +410,7 @@ class DR_Subs_Admin {
 		}
 		$placeholders = implode( ',', array_fill( 0, count( $allowed ), '%s' ) );
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholder count is controlled; %i escapes the table identifier.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- placeholder count is controlled (one %s per allowed bucket); %i escapes the table identifier. Static analyser can't count the interpolated placeholder string.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT sub_id, bucket, matched_rules, narration, last_scanned_at FROM %i WHERE bucket IN ({$placeholders}) ORDER BY last_scanned_at DESC LIMIT 50",
