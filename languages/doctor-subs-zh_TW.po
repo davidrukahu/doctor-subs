@@ -7,52 +7,57 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2026-04-23T07:15:40+00:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2026-04-23 07:27+0000\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: doctor-subs\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh-TW\n"
 
-#. Plugin Name of the plugin
 #: doctor-subs.php
 #: admin/views/partials/plugin-header.php:46
 #: includes/class-admin.php:59
 #: includes/class-admin.php:60
 #: includes/class-admin.php:172
+#. Plugin Name of the plugin
 msgid "Doctor Subs"
-msgstr ""
+msgstr "Doctor Subs"
 
+#: doctor-subs.php
 #. Plugin URI of the plugin
-#: doctor-subs.php
 msgid "https://github.com/davidrukahu/doctor-subs"
-msgstr ""
+msgstr "https://github.com/davidrukahu/doctor-subs"
 
+#: doctor-subs.php
 #. Description of the plugin
-#: doctor-subs.php
-msgid "Find and fix broken WooCommerce subscriptions. Detects ghost subs, stuck-on-hold renewals, and repeated payment failures, with one-click reversible fixes."
-msgstr ""
+msgid ""
+"Find and fix broken WooCommerce subscriptions. Detects ghost subs, "
+"stuck-on-hold renewals, and repeated payment failures, with one-click "
+"reversible fixes."
+msgstr "尋找並修復損壞的 WooCommerce 訂閱。偵測幽靈訂閱、停留在等待中的續訂，以及重複付款失敗，並提供一鍵可逆的修復。"
 
+#: doctor-subs.php
 #. Author of the plugin
-#: doctor-subs.php
 msgid "DavidR"
-msgstr ""
+msgstr "DavidR"
 
-#. Author URI of the plugin
 #: doctor-subs.php
+#. Author URI of the plugin
 msgid "https://github.com/davidrukahu"
-msgstr ""
+msgstr "https://github.com/davidrukahu"
 
 #: admin/views/dashboard.php:24
 msgid "2 hours ago"
-msgstr ""
+msgstr "2 小時前"
 
 #: admin/views/dashboard.php:36
 #: admin/views/fix-history.php:25
 #: admin/views/modal-fix-preview.php:34
 #: includes/rules/class-rule-ghost-sub.php:62
 msgid "Ghost"
-msgstr ""
+msgstr "幽靈"
 
 #: admin/views/dashboard.php:37
 #: admin/views/first-run.php:155
@@ -60,528 +65,561 @@ msgstr ""
 #: admin/views/modal-fix-preview.php:35
 #: includes/rules/class-rule-on-hold-paid.php:59
 msgid "Stuck on-hold"
-msgstr ""
+msgstr "停留在等待中"
 
 #: admin/views/dashboard.php:38
 #: admin/views/fix-history.php:27
 #: admin/views/modal-fix-preview.php:36
 #: includes/rules/class-rule-repeated-failures.php:70
 msgid "Repeated fails"
-msgstr ""
+msgstr "重複失敗"
 
 #: admin/views/dashboard.php:72
 msgid "The last scan didn&rsquo;t complete. Nothing was changed."
-msgstr ""
+msgstr "上次掃描未完成。未做任何更改。"
 
 #: admin/views/dashboard.php:74
 msgid "Try again"
-msgstr ""
+msgstr "再試一次"
 
 #: admin/views/dashboard.php:77
 msgid "View logs"
-msgstr ""
+msgstr "查看日誌"
 
 #: admin/views/dashboard.php:84
 msgid "Subscription health counts"
-msgstr ""
+msgstr "訂閱健康統計"
 
 #: admin/views/dashboard.php:89
 msgid "Healthy"
-msgstr ""
+msgstr "健康"
 
 #: admin/views/dashboard.php:90
 msgid "no problems"
-msgstr ""
+msgstr "無問題"
 
 #: admin/views/dashboard.php:93
 msgid "At risk"
-msgstr ""
+msgstr "風險"
 
 #: admin/views/dashboard.php:94
 msgid "might need attention"
-msgstr ""
+msgstr "可能需要注意"
 
 #: admin/views/dashboard.php:97
 msgid "Broken"
-msgstr ""
+msgstr "損壞"
 
 #: admin/views/dashboard.php:98
 msgid "needs you now"
-msgstr ""
+msgstr "現在需要您處理"
 
 #: admin/views/dashboard.php:130
 msgid "All clear"
-msgstr ""
+msgstr "一切正常"
 
 #: admin/views/dashboard.php:132
 msgid "Everything looks good."
-msgstr ""
+msgstr "一切看起來良好。"
 
-#. translators: %s: relative time
 #: admin/views/dashboard.php:136
+#. translators: %s: relative time
 #, php-format
 msgid "We&rsquo;ll keep watching. Last checked %s."
-msgstr ""
+msgstr "我們會持續監控。最後檢查時間 %s。"
 
 #: admin/views/dashboard.php:147
 msgid "Needs attention"
-msgstr ""
+msgstr "需要注意"
 
 #: admin/views/dashboard.php:151
 #: includes/class-admin.php:115
 msgid "showing all broken and at-risk"
-msgstr ""
+msgstr "顯示所有損壞和有風險的項目"
 
-#. translators: %d: number of broken subs filtered
 #: admin/views/dashboard.php:155
+#. translators: %d: number of broken subs filtered
 #, php-format
 msgid "filtering to %d broken"
 msgid_plural "filtering to %d broken"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "篩選至 %d 個損壞項目"
 
-#. translators: %d: number of at-risk subs filtered
 #: admin/views/dashboard.php:161
+#. translators: %d: number of at-risk subs filtered
 #, php-format
 msgid "filtering to %d at-risk"
 msgid_plural "filtering to %d at-risk"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "篩選至 %d 個有風險項目"
 
 #: admin/views/dashboard.php:170
 msgid "clear filter"
-msgstr ""
+msgstr "清除篩選條件"
 
 #: admin/views/dashboard.php:179
 msgid "Rule indicator"
-msgstr ""
+msgstr "規則指示器"
 
 #: admin/views/dashboard.php:180
 msgid "Customer"
-msgstr ""
+msgstr "客戶"
 
 #: admin/views/dashboard.php:181
 msgid "Subscription"
-msgstr ""
+msgstr "Subscription"
 
 #: admin/views/dashboard.php:182
 msgid "Issue"
-msgstr ""
+msgstr "問題"
 
 #: admin/views/dashboard.php:183
 msgid "Reason"
-msgstr ""
+msgstr "原因"
 
 #: admin/views/dashboard.php:184
 msgid "Actions"
-msgstr ""
+msgstr "操作"
 
 #: admin/views/dashboard.php:222
 msgid "Fix"
-msgstr ""
+msgstr "修復"
 
 #: admin/views/dashboard.php:230
 msgid "No subscriptions match this filter."
-msgstr ""
+msgstr "沒有符合此篩選條件的 Subscriptions。"
 
 #: admin/views/first-run.php:42
 msgid "First visit"
-msgstr ""
+msgstr "首次訪問"
 
-#. translators: %s: italic accent phrase "for problems"
 #: admin/views/first-run.php:50
+#. translators: %s: italic accent phrase "for problems"
 #, php-format
 msgid "Let&rsquo;s check your subscriptions %s."
-msgstr ""
+msgstr "讓我們檢查您的 Subscriptions %s。"
 
 #: admin/views/first-run.php:51
 msgid "for problems"
-msgstr ""
+msgstr "for problems"
 
 #: admin/views/first-run.php:59
-msgid "We&rsquo;ll scan your active subscriptions for three common renewal failures. Takes about 30 seconds. Runs entirely on your server - nothing sent anywhere."
-msgstr ""
+msgid ""
+"We&rsquo;ll scan your active subscriptions for three common renewal "
+"failures. Takes about 30 seconds. Runs entirely on your server - nothing "
+"sent anywhere."
+msgstr "我們將掃描您的有效 Subscriptions，以檢查三種常見的續訂失敗。大約需要 30 秒。全部在您的伺服器執行，資料不會傳送到任何地方。"
 
 #: admin/views/first-run.php:64
 msgid "Scan my subscriptions"
-msgstr ""
+msgstr "掃描我的 Subscriptions"
 
 #: admin/views/first-run.php:73
 msgid "or"
-msgstr ""
+msgstr "或"
 
 #: admin/views/first-run.php:74
 msgid "configure settings first"
-msgstr ""
+msgstr "請先設定"
 
 #: admin/views/first-run.php:80
 msgid "Scanning"
-msgstr ""
+msgstr "掃描中"
 
 #: admin/views/first-run.php:83
 msgid "Scanning your subscriptions"
-msgstr ""
+msgstr "正在掃描您的 Subscriptions"
 
-#. translators: 1: total active subs, 2: seconds remaining
 #: admin/views/first-run.php:91
+#. translators: 1: total active subs, 2: seconds remaining
 #, php-format
-msgid "Checking <span class=\"mono tnum\">%1$d</span> active subs - about <span class=\"mono tnum\">%2$d</span> seconds left."
+msgid ""
+"Checking <span class=\"mono tnum\">%1$d</span> active subs - about <span "
+"class=\"mono tnum\">%2$d</span> seconds left."
 msgstr ""
+"正在檢查 <span class=\"mono tnum\">%1$d</span> 個啟用的 Subscriptions - 約剩餘 <span "
+"class=\"mono tnum\">%2$d</span> 秒。"
 
 #: admin/views/first-run.php:102
 msgid "Scan progress"
-msgstr ""
+msgstr "掃描進度"
 
-#. translators: %s: sub_id being scanned right now
 #: admin/views/first-run.php:109
+#. translators: %s: sub_id being scanned right now
 #, php-format
 msgid "checking sub_%s"
-msgstr ""
+msgstr "正在檢查 sub_%s"
 
 #: admin/views/first-run.php:113
 #: admin/views/modal-fix-preview.php:129
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: admin/views/first-run.php:120
 msgid "Nothing to scan yet"
-msgstr ""
+msgstr "尚無可掃描內容"
 
-#. translators: %s: italic muted phrase "to scan yet"
 #: admin/views/first-run.php:127
+#. translators: %s: italic muted phrase "to scan yet"
 #, php-format
 msgid "You don&rsquo;t have any active subscriptions %s."
-msgstr ""
+msgstr "您沒有任何啟用中的 Subscriptions %s。"
 
 #: admin/views/first-run.php:128
 msgid "to scan yet"
-msgstr ""
+msgstr "可掃描內容"
 
 #: admin/views/first-run.php:136
-msgid "Doctor Subs will start watching once you do. You can leave this tab open - or come back when your first customer subscribes."
-msgstr ""
+msgid ""
+"Doctor Subs will start watching once you do. You can leave this tab open - "
+"or come back when your first customer subscribes."
+msgstr "Doctor Subs 將在您開始時開始監視。您可以保持此分頁開啟，或在您的第一位客戶訂閱時回來查看。"
 
 #: admin/views/first-run.php:144
 msgid "What this detects"
-msgstr ""
+msgstr "本功能偵測項目"
 
 #: admin/views/first-run.php:149
 msgid "Ghost subscriptions"
-msgstr ""
+msgstr "幽靈 Subscriptions"
 
 #: admin/views/first-run.php:150
-msgid "Active subscriptions that won&rsquo;t renew because the payment didn&rsquo;t get scheduled."
-msgstr ""
+msgid ""
+"Active subscriptions that won&rsquo;t renew because the payment "
+"didn&rsquo;t get scheduled."
+msgstr "因付款未排程，無法續訂的啟用中 Subscriptions。"
 
 #: admin/views/first-run.php:156
 msgid "Payment went through, but the subscription never switched back to active."
-msgstr ""
+msgstr "付款已成功，但 Subscription 並未切回啟用狀態。"
 
 #: admin/views/first-run.php:161
 msgid "Repeated payment failures"
-msgstr ""
+msgstr "重複付款失敗"
 
 #: admin/views/first-run.php:162
 msgid "Something has been failing to process a payment for a while."
-msgstr ""
+msgstr "一段時間內持續無法處理付款。"
 
 #: admin/views/fix-history.php:44
 #: admin/views/fix-history.php:58
 #: admin/views/partials/plugin-header.php:29
 msgid "Fix history"
-msgstr ""
+msgstr "修復歷史"
 
 #: admin/views/fix-history.php:48
 msgid "Nothing here yet"
-msgstr ""
+msgstr "此處尚無資料"
 
 #: admin/views/fix-history.php:49
 msgid "No fixes applied."
-msgstr ""
+msgstr "未套用任何修正。"
 
 #: admin/views/fix-history.php:51
-msgid "When you apply a fix from the dashboard, it&rsquo;ll show up here so you can undo it. Fixes stay revertible for 180 days by default - change that in Settings."
-msgstr ""
+msgid ""
+"When you apply a fix from the dashboard, it&rsquo;ll show up here so you "
+"can undo it. Fixes stay revertible for 180 days by default - change that in "
+"Settings."
+msgstr "當您從儀表板套用修正時，它會顯示在這裡，方便您進行復原。修正預設可復原180天 - 可在設定中更改此期限。"
 
-#. translators: %d: total number of fix entries
 #: admin/views/fix-history.php:63
+#. translators: %d: total number of fix entries
 #, php-format
 msgid "%d fix · showing most recent first"
 msgid_plural "%d fixes · showing most recent first"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d 修正 · 以最新顯示優先"
 
 #: admin/views/fix-history.php:70
 msgid "Filter fixes by rule"
-msgstr ""
+msgstr "依規則篩選修正"
 
 #: admin/views/fix-history.php:75
 msgid "All"
-msgstr ""
+msgstr "全部"
 
-#. translators: %d: number of subs in batch
 #: admin/views/fix-history.php:116
+#. translators: %d: number of subs in batch
 #, php-format
 msgid "Fixed %d subscription in one batch"
 msgid_plural "Fixed %d subscriptions in one batch"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "一次批次修正了 %d 個 Subscription"
 
 #: admin/views/fix-history.php:137
 msgid "batch id"
-msgstr ""
+msgstr "批次編號"
 
 #: admin/views/fix-history.php:158
 msgid "Reverted"
-msgstr ""
+msgstr "已復原"
 
-#. translators: %s: when the revert happened, e.g. "1h ago"
 #: admin/views/fix-history.php:172
+#. translators: %s: when the revert happened, e.g. "1h ago"
 #, php-format
 msgid "Reverted %s"
-msgstr ""
+msgstr "已復原 %s"
 
 #: admin/views/fix-history.php:177
 msgid "Too old to revert"
-msgstr ""
+msgstr "太久無法復原"
 
-#. translators: %d: number of subs in batch
 #: admin/views/fix-history.php:187
+#. translators: %d: number of subs in batch
 #, php-format
 msgid "Revert all %d"
-msgstr ""
+msgstr "復原全部 %d 筆"
 
 #: admin/views/fix-history.php:191
 msgid "Revert"
-msgstr ""
+msgstr "復原"
 
 #: admin/views/modal-fix-preview.php:70
 msgid "What will change"
-msgstr ""
+msgstr "將變更內容"
 
 #: admin/views/modal-fix-preview.php:87
 #: includes/rules/class-rule-repeated-failures.php:146
 #: includes/rules/class-rule-repeated-failures.php:147
 msgid "unchanged"
-msgstr ""
+msgstr "未更動"
 
 #: admin/views/modal-fix-preview.php:95
 msgid "You can undo this from Fix history at any time."
-msgstr ""
+msgstr "您可隨時從修正歷史中復原此操作。"
 
 #: admin/views/modal-fix-preview.php:115
 msgid "Heads up:"
-msgstr ""
+msgstr "注意："
 
 #: admin/views/modal-fix-preview.php:117
-msgid "the payment we re-scheduled already went through. Reverting this fix will not refund the customer - it only removes the fix from your history. If a refund is needed, handle it in the WooCommerce order directly."
-msgstr ""
+msgid ""
+"the payment we re-scheduled already went through. Reverting this fix will "
+"not refund the customer - it only removes the fix from your history. If a "
+"refund is needed, handle it in the WooCommerce order directly."
+msgstr "我們重新排程的付款已經完成。復原此修正不會退款給客戶 — 它僅會從您的歷史紀錄中移除修正。如需退款，請直接在 WooCommerce 訂單中處理。"
 
 #: admin/views/modal-fix-preview.php:132
 msgid "Fix subscription"
-msgstr ""
+msgstr "修正 Subscription"
 
 #: admin/views/partials/plugin-header.php:25
 msgid "Dashboard"
-msgstr ""
+msgstr "儀表板"
 
 #: admin/views/partials/plugin-header.php:33
 #: admin/views/settings.php:53
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 #: admin/views/partials/plugin-header.php:47
 msgid "Find and fix broken WooCommerce subscriptions."
-msgstr ""
+msgstr "尋找並修復損壞的 WooCommerce 訂閱。"
 
-#. translators: %s: relative time, e.g. "2 hours ago"
 #: admin/views/partials/plugin-header.php:56
+#. translators: %s: relative time, e.g. "2 hours ago"
 #, php-format
 msgid "Last scanned %s"
-msgstr ""
+msgstr "最後掃描於 %s"
 
 #: admin/views/partials/plugin-header.php:62
 msgid "Keyboard shortcut: R"
-msgstr ""
+msgstr "快速鍵：R"
 
 #: admin/views/partials/plugin-header.php:69
 msgid "Refresh now"
-msgstr ""
+msgstr "立即重新整理"
 
 #: admin/views/partials/plugin-header.php:69
 msgid "Refresh"
-msgstr ""
+msgstr "重新整理"
 
 #: admin/views/partials/plugin-header.php:77
 msgid "Doctor Subs sections"
-msgstr ""
+msgstr "Doctor Subs 區段"
 
 #: admin/views/settings.php:34
 msgid "Forever"
-msgstr ""
+msgstr "永遠"
 
 #: admin/views/settings.php:37
 msgid "365 days"
-msgstr ""
+msgstr "365 天"
 
-#. translators: %d: number of days
 #: admin/views/settings.php:40
+#. translators: %d: number of days
 #, php-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d 天"
 
 #: admin/views/settings.php:57
 msgid "Alerts"
-msgstr ""
+msgstr "警示"
 
 #: admin/views/settings.php:59
-msgid "When something breaks between scans, we&rsquo;ll email you a daily digest. Off by default."
-msgstr ""
+msgid ""
+"When something breaks between scans, we&rsquo;ll email you a daily digest. "
+"Off by default."
+msgstr "當掃描期間發生問題時，我們會每天發送摘要電子郵件給您。預設為關閉。"
 
 #: admin/views/settings.php:64
 msgid "Email alerts"
-msgstr ""
+msgstr "電子郵件警示"
 
 #: admin/views/settings.php:75
 #: admin/views/settings.php:76
 #: admin/views/settings.php:171
 #: admin/views/settings.php:172
 msgid "On"
-msgstr ""
+msgstr "開啟"
 
 #: admin/views/settings.php:75
 #: admin/views/settings.php:76
 #: admin/views/settings.php:171
 #: admin/views/settings.php:172
 msgid "Off"
-msgstr ""
+msgstr "關閉"
 
 #: admin/views/settings.php:80
-msgid "When new broken subscriptions appear, you&rsquo;ll get a daily summary email."
-msgstr ""
+msgid ""
+"When new broken subscriptions appear, you&rsquo;ll get a daily summary "
+"email."
+msgstr "當出現新的損壞訂閱時，您會收到每日摘要電子郵件。"
 
 #: admin/views/settings.php:87
 msgid "Send to"
-msgstr ""
+msgstr "寄送至"
 
 #: admin/views/settings.php:97
 msgid "Defaults to your WordPress admin email."
-msgstr ""
+msgstr "預設為您的 WordPress 管理員電子郵件。"
 
 #: admin/views/settings.php:110
 msgid "Fix history retention"
-msgstr ""
+msgstr "修復歷史保留"
 
 #: admin/views/settings.php:112
 msgid "Older entries get pruned automatically. Recent entries stay revertible."
-msgstr ""
+msgstr "舊的條目會自動被清除。最近的條目可恢復。"
 
 #: admin/views/settings.php:118
 msgid "Keep fixes for"
-msgstr ""
+msgstr "保留修復時間"
 
 #: admin/views/settings.php:121
 msgid "More about retention"
-msgstr ""
+msgstr "更多關於留存率"
 
 #: admin/views/settings.php:123
-msgid "Fixes older than this stay in your history for reference, but the Revert button is removed. They are not deleted from the database unless you prune manually."
-msgstr ""
+msgid ""
+"Fixes older than this stay in your history for reference, but the Revert "
+"button is removed. They are not deleted from the database unless you prune "
+"manually."
+msgstr "比這個更舊的修正會保留在您的歷史記錄中以供參考，但「還原」按鈕已被移除。除非您手動清理，否則不會從資料庫中刪除。"
 
 #: admin/views/settings.php:137
 msgid "Older fixes stay in your history but can&rsquo;t be reverted anymore."
-msgstr ""
+msgstr "較舊的修正會保留在您的歷史記錄中，但無法再還原。"
 
 #: admin/views/settings.php:145
 msgid "Help us improve"
-msgstr ""
+msgstr "幫助我們改進"
 
 #: admin/views/settings.php:147
-msgid "Anonymous telemetry helps us know which fixes are actually used. We only send the rule name and a timestamp when a fix is applied. Nothing else - no customer data, no subscription details, no identifying information."
-msgstr ""
+msgid ""
+"Anonymous telemetry helps us know which fixes are actually used. We only "
+"send the rule name and a timestamp when a fix is applied. Nothing else - no "
+"customer data, no subscription details, no identifying information."
+msgstr "匿名遙測幫助我們了解哪些修正實際被使用。我們只會在應用修正時傳送規則名稱和時間戳。沒有其他資料 - 沒有客戶資料、訂閱細節或識別資訊。"
 
 #: admin/views/settings.php:153
 msgid "Send anonymous fix stats"
-msgstr ""
+msgstr "傳送匿名修正統計"
 
 #: admin/views/settings.php:156
 msgid "What exactly gets sent"
-msgstr ""
+msgstr "實際傳送內容"
 
 #: admin/views/settings.php:158
-msgid "Three fields only: (1) the rule name (e.g. ghost_sub), (2) an anonymous install hash, (3) a timestamp. We never see your store URL, customer data, subscription details, or store name."
+msgid ""
+"Three fields only: (1) the rule name (e.g. ghost_sub), (2) an anonymous "
+"install hash, (3) a timestamp. We never see your store URL, customer data, "
+"subscription details, or store name."
 msgstr ""
+"僅含三個欄位：(1) 規則名稱（例如 ghost_sub），(2) 匿名安裝哈希，(3) "
+"時間戳。我們從未看到您的商店網址、客戶資料、訂閱細節或商店名稱。"
 
 #: admin/views/settings.php:176
 msgid "Off by default. Turn it on if you want to help us build the plugin better."
-msgstr ""
+msgstr "預設關閉。若您想幫助我們改進插件，請開啟此項。"
 
 #: admin/views/settings.php:184
 msgid "Save changes"
-msgstr ""
+msgstr "儲存變更"
 
 #: admin/views/settings.php:187
 msgid "Discard"
-msgstr ""
+msgstr "放棄"
 
 #: admin/views/settings.php:190
 #: includes/class-admin.php:123
 msgid "Saved."
-msgstr ""
+msgstr "已儲存。"
 
-#. translators: %s: relative time
 #: admin/views/settings.php:195
+#. translators: %s: relative time
 #, php-format
 msgid "Last saved %s."
-msgstr ""
+msgstr "最後儲存於 %s。"
 
 #: doctor-subs.php:74
 msgid "Doctor Subs requires WooCommerce to be installed and activated."
-msgstr ""
+msgstr "Doctor Subs 需要安裝並啟用 WooCommerce。"
 
 #: doctor-subs.php:110
-msgid "Doctor Subs requires WooCommerce Subscriptions to be installed and activated."
-msgstr ""
+msgid ""
+"Doctor Subs requires WooCommerce Subscriptions to be installed and "
+"activated."
+msgstr "Doctor Subs 需要安裝並啟用 WooCommerce Subscriptions。"
 
-#. translators: %d: number of affected subscriptions.
 #: includes/alerts/class-alert-dispatcher.php:147
+#. translators: %d: number of affected subscriptions.
 #, php-format
 msgid "Doctor Subs: %d subscription needs attention"
 msgid_plural "Doctor Subs: %d subscriptions need attention"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Doctor Subs：%d 個訂閱需要注意"
 
-#. translators: 1: site name, 2: count
 #: includes/alerts/class-alert-dispatcher.php:169
+#. translators: 1: site name, 2: count
 #, php-format
-msgid "%2$d subscription on %1$s started showing problems between the last scan and this one."
-msgid_plural "%2$d subscriptions on %1$s started showing problems between the last scan and this one."
-msgstr[0] ""
-msgstr[1] ""
+msgid ""
+"%2$d subscription on %1$s started showing problems between the last scan "
+"and this one."
+msgid_plural ""
+"%2$d subscriptions on %1$s started showing problems between the last scan "
+"and this one."
+msgstr[0] "%2$d 個訂閱在 %1$s 於上次掃描與本次掃描之間開始顯示問題。"
 
 #: includes/alerts/class-alert-dispatcher.php:186
 msgid "Open Doctor Subs:"
-msgstr ""
+msgstr "打開 Doctor Subs："
 
 #: includes/alerts/class-alert-dispatcher.php:189
-msgid "You received this because email alerts are on in Doctor Subs. Change settings:"
-msgstr ""
+msgid ""
+"You received this because email alerts are on in Doctor Subs. Change "
+"settings:"
+msgstr "您會收到此通知是因為 Doctor Subs 中啟用了電子郵件警報。變更設定："
 
-#. translators: 1: customer name, 2: sub ID, 3: rule label
 #: includes/alerts/class-alert-dispatcher.php:231
+#. translators: 1: customer name, 2: sub ID, 3: rule label
 #, php-format
 msgid "- %1$s (#%2$d) - %3$s"
-msgstr ""
+msgstr "- %1$s (#%2$d) - %3$s"
 
 #: includes/alerts/class-alert-dispatcher.php:232
 msgid "(no name)"
-msgstr ""
+msgstr "(無名稱)"
 
 #: includes/alerts/class-alert-dispatcher.php:234
 msgid "Issue detected"
-msgstr ""
+msgstr "偵測到問題"
 
 #: includes/analyzers/class-discrepancy-detector.php:55
 #: includes/analyzers/class-expected-behavior.php:64
@@ -589,464 +627,486 @@ msgstr ""
 #: includes/analyzers/class-subscription-anatomy.php:61
 #: includes/analyzers/class-timeline-builder.php:75
 msgid "Subscription not found."
-msgstr ""
+msgstr "找不到 Subscription。"
 
-#. translators: %d: number of days overdue
 #: includes/analyzers/class-discrepancy-detector.php:109
+#. translators: %d: number of days overdue
 #, php-format
 msgid "Payment is %d days overdue"
-msgstr ""
+msgstr "付款逾期 %d 天"
 
 #: includes/analyzers/class-discrepancy-detector.php:115
 msgid "Check payment method and retry payment or contact customer."
-msgstr ""
+msgstr "請檢查付款方式並重新嘗試付款或聯絡客戶。"
 
-#. translators: %d: number of days until payment is due
 #: includes/analyzers/class-discrepancy-detector.php:126
+#. translators: %d: number of days until payment is due
 #, php-format
 msgid "Payment due in %d days"
-msgstr ""
+msgstr "付款期限剩餘 %d 天"
 
 #: includes/analyzers/class-discrepancy-detector.php:131
 msgid "Monitor payment processing and ensure payment method is valid."
-msgstr ""
+msgstr "監控付款處理並確保付款方式有效。"
 
 #: includes/analyzers/class-discrepancy-detector.php:147
 msgid "Payment interval differs from expected schedule"
-msgstr ""
+msgstr "付款間隔與預期排程不同"
 
 #: includes/analyzers/class-discrepancy-detector.php:153
 msgid "Review subscription schedule and payment processing."
-msgstr ""
+msgstr "檢視 Subscription 排程及付款處理。"
 
 #: includes/analyzers/class-discrepancy-detector.php:208
 msgid "No renewal action scheduled for next payment"
-msgstr ""
+msgstr "下一次付款沒有排定續訂動作"
 
 #: includes/analyzers/class-discrepancy-detector.php:213
 msgid "Manually schedule renewal action or check Action Scheduler configuration."
-msgstr ""
+msgstr "請手動排定續訂動作或檢查 Action Scheduler 設定。"
 
-#. translators: %d: number of failed actions
 #: includes/analyzers/class-discrepancy-detector.php:238
+#. translators: %d: number of failed actions
 #, php-format
 msgid "%d failed actions detected"
-msgstr ""
+msgstr "%d 個失敗動作被偵測到"
 
 #: includes/analyzers/class-discrepancy-detector.php:243
 msgid "Review failed actions in Action Scheduler and resolve underlying issues."
-msgstr ""
+msgstr "檢視 Action Scheduler 中的失敗動作並解決根本問題。"
 
-#. translators: %s: subscription status
 #: includes/analyzers/class-discrepancy-detector.php:269
+#. translators: %s: subscription status
 #, php-format
 msgid "Subscription in unexpected status: %s"
-msgstr ""
+msgstr "Subscription 處於意外狀態：%s"
 
 #: includes/analyzers/class-discrepancy-detector.php:274
 msgid "Review subscription status and take appropriate action."
-msgstr ""
+msgstr "檢視 Subscription 狀態並採取適當行動。"
 
-#. translators: 1: subscription status, 2: number of days
 #: includes/analyzers/class-discrepancy-detector.php:289
+#. translators: 1: subscription status, 2: number of days
 #, php-format
 msgid "Subscription stuck in %1$s status for %2$d days"
-msgstr ""
+msgstr "Subscription 在 %1$s 狀態停留 %2$d 天"
 
 #: includes/analyzers/class-discrepancy-detector.php:295
 msgid "Investigate why subscription is stuck and take corrective action."
-msgstr ""
+msgstr "調查 Subscription 停滯原因並採取糾正行動。"
 
 #: includes/analyzers/class-discrepancy-detector.php:321
 msgid "No payment token found for subscription"
-msgstr ""
+msgstr "找不到 Subscription 的付款代幣"
 
 #: includes/analyzers/class-discrepancy-detector.php:326
 msgid "Check payment method configuration and ensure tokenization is working."
-msgstr ""
+msgstr "檢查付款方式設定並確保代幣化功能正常。"
 
 #: includes/analyzers/class-discrepancy-detector.php:341
 msgid "Payment method has expired"
-msgstr ""
+msgstr "付款方式已過期"
 
 #: includes/analyzers/class-discrepancy-detector.php:346
 msgid "Contact customer to update payment method."
-msgstr ""
+msgstr "請聯絡客戶以更新付款方式。"
 
-#. translators: %d: number of days until payment method expires
 #: includes/analyzers/class-discrepancy-detector.php:354
+#. translators: %d: number of days until payment method expires
 #, php-format
 msgid "Payment method expires in %d days"
-msgstr ""
+msgstr "付款方式將於 %d 天後到期"
 
 #: includes/analyzers/class-discrepancy-detector.php:359
 msgid "Notify customer to update payment method before expiry."
-msgstr ""
+msgstr "請通知客戶在付款方式到期前更新。"
 
 #: includes/analyzers/class-discrepancy-detector.php:397
 msgid "Renewal reminder emails are disabled"
-msgstr ""
+msgstr "續訂提醒電子郵件已停用"
 
 #: includes/analyzers/class-discrepancy-detector.php:401
 msgid "Enable renewal reminder emails to improve customer experience."
-msgstr ""
+msgstr "啟用續訂提醒電子郵件以提升客戶體驗。"
 
 #: includes/analyzers/class-discrepancy-detector.php:412
 msgid "Payment failed emails are disabled"
-msgstr ""
+msgstr "付款失敗電子郵件已停用"
 
 #: includes/analyzers/class-discrepancy-detector.php:416
 msgid "Enable payment failed emails to notify customers of payment issues."
-msgstr ""
+msgstr "啟用付款失敗電子郵件以通知客戶付款問題。"
 
 #: includes/analyzers/class-discrepancy-detector.php:440
 msgid "Subscription requires manual renewal"
-msgstr ""
+msgstr "訂閱需要手動續訂"
 
 #: includes/analyzers/class-discrepancy-detector.php:444
 msgid "Monitor subscription and process payments manually."
-msgstr ""
+msgstr "監控訂閱並手動處理付款。"
 
-#. translators: %d: number of retry attempts
 #: includes/analyzers/class-discrepancy-detector.php:456
+#. translators: %d: number of retry attempts
 #, php-format
 msgid "High payment retry count: %d attempts"
-msgstr ""
+msgstr "高付款重試次數：%d 次嘗試"
 
 #: includes/analyzers/class-discrepancy-detector.php:460
 msgid "Contact customer to resolve payment method issues."
-msgstr ""
+msgstr "請聯絡客戶以解決付款方式問題。"
 
 #: includes/analyzers/class-discrepancy-detector.php:486
 msgid "Subscription contains non-subscription product"
-msgstr ""
+msgstr "訂閱包含非訂閱產品"
 
 #: includes/analyzers/class-discrepancy-detector.php:491
 msgid "Review subscription products and ensure all are subscription products."
-msgstr ""
+msgstr "檢查訂閱產品，確保全部為訂閱產品。"
 
 #: includes/analyzers/class-discrepancy-detector.php:516
 msgid "No Stripe customer ID found"
-msgstr ""
+msgstr "未找到 Stripe 客戶 ID"
 
 #: includes/analyzers/class-discrepancy-detector.php:520
 msgid "Check Stripe integration and customer creation process."
-msgstr ""
+msgstr "檢查 Stripe 整合與客戶建立流程。"
 
 #: includes/analyzers/class-discrepancy-detector.php:587
-msgid "Stripe payment method detachment detected - likely caused by cloned/staging site"
-msgstr ""
+msgid ""
+"Stripe payment method detachment detected - likely caused by cloned/staging "
+"site"
+msgstr "偵測到 Stripe 付款方式解除綁定 - 可能因為複製/測試網站所致"
 
 #: includes/analyzers/class-discrepancy-detector.php:595
-msgid "This is a known issue when cloning sites with WooCommerce Subscriptions. Update to WooCommerce Stripe Gateway 7.x+ which includes fixes. If already updated, re-attach the payment method to the Stripe customer or contact Stripe support."
+msgid ""
+"This is a known issue when cloning sites with WooCommerce Subscriptions. "
+"Update to WooCommerce Stripe Gateway 7.x+ which includes fixes. If already "
+"updated, re-attach the payment method to the Stripe customer or contact "
+"Stripe support."
 msgstr ""
+"這是 WooCommerce Subscriptions 複製網站時的已知問題。請更新至包含修正的 WooCommerce Stripe "
+"Gateway 7.x 以上版本。如已更新，請重新綁定付款方式至 Stripe 客戶或聯絡 Stripe 支援。"
 
-#. translators: %d: number of failed renewals
 #: includes/analyzers/class-discrepancy-detector.php:636
+#. translators: %d: number of failed renewals
 #, php-format
 msgid "Potential payment method detachment: %d failed renewal(s) with Stripe errors"
-msgstr ""
+msgstr "潛在付款方式解除綁定：%d 次帶有 Stripe 錯誤的續訂失敗"
 
 #: includes/analyzers/class-discrepancy-detector.php:645
-msgid "Review failed renewal orders for Stripe payment method errors. This may indicate a detached payment method issue from cloned/staging sites."
-msgstr ""
+msgid ""
+"Review failed renewal orders for Stripe payment method errors. This may "
+"indicate a detached payment method issue from cloned/staging sites."
+msgstr "檢查續訂失敗訂單是否有 Stripe 付款方式錯誤。這可能表示複製/測試網站導致付款方式解除綁定問題。"
 
 #: includes/analyzers/class-discrepancy-detector.php:671
-msgid "WooCommerce Subscriptions duplicate site detected - payment methods may be detached"
-msgstr ""
+msgid ""
+"WooCommerce Subscriptions duplicate site detected - payment methods may be "
+"detached"
+msgstr "偵測到 WooCommerce Subscriptions 複製網站 - 付款方式可能已解除綁定"
 
 #: includes/analyzers/class-discrepancy-detector.php:676
-msgid "Ensure WooCommerce Stripe Gateway 7.x+ is installed with fixes for cloned sites. Monitor subscription renewals closely."
-msgstr ""
+msgid ""
+"Ensure WooCommerce Stripe Gateway 7.x+ is installed with fixes for cloned "
+"sites. Monitor subscription renewals closely."
+msgstr "請確保已安裝包含克隆網站修正的 WooCommerce Stripe Gateway 7.x+。密切監控訂閱續訂。"
 
-#. translators: %s: environment type
 #: includes/analyzers/class-discrepancy-detector.php:693
+#. translators: %s: environment type
 #, php-format
-msgid "Running in %s environment with Stripe - ensure payment methods are properly configured"
-msgstr ""
+msgid ""
+"Running in %s environment with Stripe - ensure payment methods are properly "
+"configured"
+msgstr "在 %s 環境中使用 Stripe 運行 - 請確保支付方式已正確配置"
 
 #: includes/analyzers/class-discrepancy-detector.php:700
-msgid "Staging/development environments can cause payment method detachment issues. Ensure WooCommerce Stripe Gateway has proper safeguards enabled."
-msgstr ""
+msgid ""
+"Staging/development environments can cause payment method detachment "
+"issues. Ensure WooCommerce Stripe Gateway has proper safeguards enabled."
+msgstr "測試/開發環境可能導致支付方式解除綁定問題。請確保已啟用 WooCommerce Stripe Gateway 的適當防護措施。"
 
-#. translators: 1: error type, 2: count
 #: includes/analyzers/class-discrepancy-detector.php:781
+#. translators: 1: error type, 2: count
 #, php-format
 msgid "Stripe renewal error detected: %1$s (%2$d occurrence(s))"
-msgstr ""
+msgstr "偵測到 Stripe 續訂錯誤：%1$s（發生 %2$d 次）"
 
 #: includes/analyzers/class-discrepancy-detector.php:791
-msgid "Review failed renewal orders and contact customer to resolve payment method issues."
-msgstr ""
+msgid ""
+"Review failed renewal orders and contact customer to resolve payment method "
+"issues."
+msgstr "請檢視失敗的續訂訂單並聯繫客戶以解決支付方式問題。"
 
 #: includes/analyzers/class-discrepancy-detector.php:815
 msgid "No PayPal subscription ID found"
-msgstr ""
+msgstr "未找到 PayPal 訂閱 ID"
 
 #: includes/analyzers/class-discrepancy-detector.php:819
 msgid "Check PayPal integration and subscription creation process."
-msgstr ""
+msgstr "請檢查 PayPal 整合與訂閱建立流程。"
 
 #: includes/analyzers/class-expected-behavior.php:34
 #: includes/analyzers/class-expected-behavior.php:45
 msgid "unknown"
-msgstr ""
+msgstr "未知"
 
 #: includes/analyzers/class-expected-behavior.php:58
 #: includes/analyzers/class-skipped-cycle-detector.php:57
 #: includes/analyzers/class-subscription-anatomy.php:55
 #: includes/analyzers/class-timeline-builder.php:69
 msgid "WooCommerce Subscriptions is not active or properly loaded."
-msgstr ""
+msgstr "WooCommerce Subscriptions 未啟用或未正確載入。"
 
 #: includes/analyzers/class-expected-behavior.php:126
 msgid "Payment method not found or WooCommerce not available."
-msgstr ""
+msgstr "找不到支付方式或 WooCommerce 無法使用。"
 
 #: includes/analyzers/class-expected-behavior.php:135
 msgid "Payment gateway not found."
-msgstr ""
+msgstr "找不到支付閘道。"
 
 #: includes/analyzers/class-expected-behavior.php:178
 msgid "Manual renewals require customer action to complete payments."
-msgstr ""
+msgstr "手動續訂需客戶操作以完成支付。"
 
 #: includes/analyzers/class-expected-behavior.php:179
 msgid "Customer must manually renew the subscription."
-msgstr ""
+msgstr "客戶必須手動續訂訂閱。"
 
 #: includes/analyzers/class-expected-behavior.php:189
 msgid "Renewals are handled by WordPress Action Scheduler."
-msgstr ""
+msgstr "續訂由 WordPress Action Scheduler 處理。"
 
-#. translators: %s: next payment date
 #: includes/analyzers/class-expected-behavior.php:196
+#. translators: %s: next payment date
 #, php-format
 msgid "Automated renewal scheduled for %s"
-msgstr ""
+msgstr "自動續訂排程於 %s"
 
 #: includes/analyzers/class-expected-behavior.php:209
 msgid "Renewals are controlled by the payment gateway."
-msgstr ""
+msgstr "續訂由支付閘道控制。"
 
 #: includes/analyzers/class-expected-behavior.php:210
 msgid "Gateway will notify site when payment is processed."
-msgstr ""
+msgstr "支付閘道將在付款處理後通知網站。"
 
 #: includes/analyzers/class-expected-behavior.php:254
 msgid "No further automatic actions expected."
-msgstr ""
+msgstr "預期不會有進一步的自動操作。"
 
 #: includes/analyzers/class-expected-behavior.php:273
 msgid "No parent order found for this subscription."
-msgstr ""
+msgstr "找不到此訂閱的父訂單。"
 
 #: includes/analyzers/class-expected-behavior.php:300
 msgid "No subscription switches detected."
-msgstr ""
+msgstr "未偵測到訂閱切換。"
 
 #: includes/analyzers/class-expected-behavior.php:308
 msgid "This subscription has been modified through subscription switching."
-msgstr ""
+msgstr "此訂閱已透過訂閱切換進行修改。"
 
 #: includes/analyzers/class-expected-behavior.php:310
 msgid "Switch logs should contain detailed information about the changes."
-msgstr ""
+msgstr "切換記錄應包含有關變更的詳細資訊。"
 
 #: includes/analyzers/class-expected-behavior.php:311
 msgid "Prorated amounts should be calculated based on timing and pricing."
-msgstr ""
+msgstr "應根據時間和價格計算按比例分攤的金額。"
 
 #: includes/analyzers/class-expected-behavior.php:312
 msgid "New billing schedule should reflect the switched product configuration."
-msgstr ""
+msgstr "新的帳單排程應反映所切換產品的配置。"
 
 #: includes/analyzers/class-expected-behavior.php:411
 msgid "WordPress cron triggers Action Scheduler"
-msgstr ""
+msgstr "WordPress 排程觸發 Action Scheduler"
 
 #: includes/analyzers/class-expected-behavior.php:412
 msgid "Action Scheduler executes scheduled renewal action"
-msgstr ""
+msgstr "Action Scheduler 執行預定的續訂動作"
 
 #: includes/analyzers/class-expected-behavior.php:413
 #: includes/analyzers/class-expected-behavior.php:439
 msgid "New renewal order is created"
-msgstr ""
+msgstr "已建立新的續訂訂單"
 
 #: includes/analyzers/class-expected-behavior.php:414
 msgid "Payment is processed via the payment gateway"
-msgstr ""
+msgstr "付款透過付款閘道處理"
 
 #: includes/analyzers/class-expected-behavior.php:415
 msgid "Subscription dates are updated"
-msgstr ""
+msgstr "訂閱日期已更新"
 
 #: includes/analyzers/class-expected-behavior.php:416
 msgid "Next renewal action is scheduled"
-msgstr ""
+msgstr "下一次續訂動作已排程"
 
 #: includes/analyzers/class-expected-behavior.php:419
 msgid "WordPress cron must be functioning"
-msgstr ""
+msgstr "WordPress 排程必須運作正常"
 
 #: includes/analyzers/class-expected-behavior.php:420
 msgid "Action Scheduler must be operational"
-msgstr ""
+msgstr "Action Scheduler 必須運作正常"
 
 #: includes/analyzers/class-expected-behavior.php:421
 msgid "Payment gateway must be available"
-msgstr ""
+msgstr "付款閘道必須可用"
 
 #: includes/analyzers/class-expected-behavior.php:436
 msgid "Payment gateway processes payment on their schedule"
-msgstr ""
+msgstr "付款閘道依其排程處理付款"
 
 #: includes/analyzers/class-expected-behavior.php:437
 msgid "Gateway sends webhook notification to your site"
-msgstr ""
+msgstr "閘道將 webhook 通知發送到您的網站"
 
 #: includes/analyzers/class-expected-behavior.php:438
 msgid "Site receives and processes webhook"
-msgstr ""
+msgstr "網站接收並處理 webhook"
 
 #: includes/analyzers/class-expected-behavior.php:440
 msgid "Subscription is updated with new payment information"
-msgstr ""
+msgstr "訂閱已使用新的付款資訊更新"
 
 #: includes/analyzers/class-expected-behavior.php:443
 msgid "Gateway subscription must be active"
-msgstr ""
+msgstr "閘道訂閱必須處於啟用狀態"
 
 #: includes/analyzers/class-expected-behavior.php:444
 msgid "Webhook endpoint must be accessible"
-msgstr ""
+msgstr "webhook 端點必須可存取"
 
 #: includes/analyzers/class-expected-behavior.php:445
 msgid "Webhook authentication must be valid"
-msgstr ""
+msgstr "webhook 驗證必須有效"
 
 #: includes/analyzers/class-expected-behavior.php:446
 msgid "Site must be able to receive external requests"
-msgstr ""
+msgstr "網站必須能夠接收外部請求"
 
 #: includes/analyzers/class-expected-behavior.php:461
 msgid "Subscription is active and should process renewals automatically."
-msgstr ""
+msgstr "Subscription 是啟用狀態，應自動處理續訂。"
 
 #: includes/analyzers/class-expected-behavior.php:462
 msgid "Subscription is suspended and will not process renewals until reactivated."
-msgstr ""
+msgstr "Subscription 已暫停，直到重新啟用前不會處理續訂。"
 
 #: includes/analyzers/class-expected-behavior.php:463
 msgid "Subscription has been cancelled and will not renew."
-msgstr ""
+msgstr "Subscription 已取消，將不會續訂。"
 
 #: includes/analyzers/class-expected-behavior.php:464
 msgid "Subscription has reached its natural end date."
-msgstr ""
+msgstr "Subscription 已達自然結束日期。"
 
 #: includes/analyzers/class-expected-behavior.php:465
 msgid "Subscription is set to cancel at the end of the current billing period."
-msgstr ""
+msgstr "Subscription 設定於當前計費週期結束時取消。"
 
 #: includes/analyzers/class-expected-behavior.php:466
 msgid "Subscription is awaiting initial payment or activation."
-msgstr ""
+msgstr "Subscription 正等待初次付款或啟用。"
 
 #: includes/analyzers/class-expected-behavior.php:469
 msgid "Unknown status."
-msgstr ""
+msgstr "未知狀態。"
 
-#. translators: %s: next payment date
 #: includes/analyzers/class-expected-behavior.php:507
+#. translators: %s: next payment date
 #, php-format
 msgid "Next renewal payment due: %s"
-msgstr ""
+msgstr "下一次續訂付款到期日：%s"
 
-#. translators: %s: end date
 #: includes/analyzers/class-expected-behavior.php:515
+#. translators: %s: end date
 #, php-format
 msgid "Subscription will expire on: %s"
-msgstr ""
+msgstr "Subscription 將於 %s 到期"
 
 #: includes/analyzers/class-expected-behavior.php:521
 msgid "Subscription will continue indefinitely until cancelled."
-msgstr ""
+msgstr "Subscription 將無限期持續，直到取消為止。"
 
 #: includes/analyzers/class-expected-behavior.php:536
 msgid "No automatic renewals will occur while subscription is on hold."
-msgstr ""
+msgstr "Subscription 暫停期間不會自動續訂。"
 
 #: includes/analyzers/class-expected-behavior.php:537
 msgid "Subscription must be reactivated to resume billing."
-msgstr ""
+msgstr "必須重新啟用 Subscription 以恢復計費。"
 
 #: includes/analyzers/class-expected-behavior.php:538
 msgid "Customer access to subscription content may be restricted."
-msgstr ""
+msgstr "客戶對 Subscription 內容的存取可能會被限制。"
 
-#. translators: %s: next payment date
 #: includes/analyzers/class-expected-behavior.php:556
+#. translators: %s: next payment date
 #, php-format
 msgid "Subscription will be cancelled after the next payment on: %s"
-msgstr ""
+msgstr "Subscription 將於下一次付款後取消，付款日期為：%s"
 
 #: includes/analyzers/class-expected-behavior.php:559
 msgid "One final renewal payment will be processed."
-msgstr ""
+msgstr "將處理最後一次續訂付款。"
 
 #: includes/analyzers/class-expected-behavior.php:560
 msgid "After final payment, status will change to cancelled."
-msgstr ""
+msgstr "最後付款後，狀態將變更為已取消。"
 
 #: includes/analyzers/class-expected-behavior.php:565
 msgid "Subscription will be cancelled immediately as no next payment is scheduled."
-msgstr ""
+msgstr "由於無下一次付款排程，Subscription 將立即取消。"
 
 #: includes/analyzers/class-expected-behavior.php:593
 msgid "Customer completes checkout with subscription product"
-msgstr ""
+msgstr "客戶完成含 Subscription 商品的結帳"
 
 #: includes/analyzers/class-expected-behavior.php:594
 msgid "Parent order is created first"
-msgstr ""
+msgstr "父訂單先建立"
 
 #: includes/analyzers/class-expected-behavior.php:595
 msgid "Subscription is created as a copy of the parent order"
-msgstr ""
+msgstr "訂閱是作為父訂單的複本建立"
 
 #: includes/analyzers/class-expected-behavior.php:596
 msgid "Future renewals are created as copies of the subscription"
-msgstr ""
+msgstr "未來的續訂將作為訂閱的複本建立"
 
 #: includes/analyzers/class-expected-behavior.php:615
 msgid "Currency matches"
-msgstr ""
+msgstr "貨幣相符"
 
 #: includes/analyzers/class-expected-behavior.php:617
 msgid "Currency does not match parent order"
-msgstr ""
+msgstr "貨幣與父訂單不符"
 
 #: includes/analyzers/class-expected-behavior.php:621
 msgid "Customer ID matches"
-msgstr ""
+msgstr "客戶 ID 相符"
 
 #: includes/analyzers/class-expected-behavior.php:623
 msgid "Customer ID does not match parent order"
-msgstr ""
+msgstr "客戶 ID 與父訂單不符"
 
 #: includes/analyzers/class-expected-behavior.php:628
 msgid "Payment method matches"
-msgstr ""
+msgstr "付款方式相符"
 
 #: includes/analyzers/class-expected-behavior.php:630
 msgid "Payment method does not match parent order"
-msgstr ""
+msgstr "付款方式與父訂單不符"
 
 #: includes/analyzers/class-expected-behavior.php:637
-msgid "Some differences may be expected due to subscription switching, admin edits, or customizations."
-msgstr ""
+msgid ""
+"Some differences may be expected due to subscription switching, admin "
+"edits, or customizations."
+msgstr "由於訂閱切換、管理員編輯或自訂，某些差異是預期的。"
 
 #: includes/analyzers/class-expected-behavior.php:652
 #: includes/analyzers/class-expected-behavior.php:733
@@ -1055,421 +1115,424 @@ msgstr ""
 #: includes/analyzers/class-expected-behavior.php:805
 #: includes/analyzers/class-expected-behavior.php:829
 msgid "Mode could not be determined"
-msgstr ""
+msgstr "無法確定模式"
 
 #: includes/analyzers/class-expected-behavior.php:677
 #: includes/analyzers/class-expected-behavior.php:688
 msgid "Sandbox/Test Mode"
-msgstr ""
+msgstr "沙盒/測試模式"
 
 #: includes/analyzers/class-expected-behavior.php:677
 #: includes/analyzers/class-expected-behavior.php:693
 msgid "Live/Production Mode"
-msgstr ""
+msgstr "實際/生產模式"
 
 #: includes/analyzers/class-expected-behavior.php:741
 msgid "Stripe Test Mode"
-msgstr ""
+msgstr "Stripe 測試模式"
 
 #: includes/analyzers/class-expected-behavior.php:741
 msgid "Stripe Live Mode"
-msgstr ""
+msgstr "Stripe 實際模式"
 
 #: includes/analyzers/class-expected-behavior.php:765
 msgid "PayPal Sandbox Mode"
-msgstr ""
+msgstr "PayPal 沙盒模式"
 
 #: includes/analyzers/class-expected-behavior.php:765
 msgid "PayPal Live Mode"
-msgstr ""
+msgstr "PayPal 實際模式"
 
 #: includes/analyzers/class-expected-behavior.php:789
 msgid "Square Sandbox Mode"
-msgstr ""
+msgstr "Square 沙盒模式"
 
 #: includes/analyzers/class-expected-behavior.php:789
 msgid "Square Live Mode"
-msgstr ""
+msgstr "Square 實際模式"
 
 #: includes/analyzers/class-expected-behavior.php:813
 msgid "Braintree Sandbox Mode"
-msgstr ""
+msgstr "Braintree 沙盒模式"
 
 #: includes/analyzers/class-expected-behavior.php:813
 msgid "Braintree Live Mode"
-msgstr ""
+msgstr "Braintree 實際模式"
 
 #: includes/analyzers/class-expected-behavior.php:837
 msgid "Authorize.net Test Mode"
-msgstr ""
+msgstr "Authorize.net 測試模式"
 
 #: includes/analyzers/class-expected-behavior.php:837
 msgid "Authorize.net Live Mode"
-msgstr ""
+msgstr "Authorize.net 實時模式"
 
-#. translators: %s: start date
 #: includes/analyzers/class-skipped-cycle-detector.php:133
+#. translators: %s: start date
 #, php-format
 msgid "No payments received since start date %s"
-msgstr ""
+msgstr "自起始日期 %s 起未收到任何付款"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:142
 msgid "Check if payments are being processed correctly."
-msgstr ""
+msgstr "檢查付款是否正確處理。"
 
-#. translators: 1: expected payment date, 2: actual next payment date
 #: includes/analyzers/class-skipped-cycle-detector.php:182
+#. translators: 1: expected payment date, 2: actual next payment date
 #, php-format
 msgid "Payment cycle skipped — expected payment around %1$s, next payment was %2$s"
-msgstr ""
+msgstr "付款週期跳過 — 預計付款約在 %1$s，下一次付款為 %2$s"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:194
-msgid "Review what happened during this period and consider if payment should be collected."
-msgstr ""
+msgid ""
+"Review what happened during this period and consider if payment should be "
+"collected."
+msgstr "檢視此期間發生的情況並考慮是否應收取付款。"
 
-#. translators: 1: expected payment date, 2: current date
 #: includes/analyzers/class-skipped-cycle-detector.php:224
+#. translators: 1: expected payment date, 2: current date
 #, php-format
 msgid "Payment overdue — expected payment around %1$s, now %2$s"
-msgstr ""
+msgstr "付款逾期 — 預計付款約在 %1$s，現在為 %2$s"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:235
 msgid "Check payment processing and customer status."
-msgstr ""
+msgstr "檢查付款處理及客戶狀態。"
 
-#. translators: %d: order ID
 #: includes/analyzers/class-skipped-cycle-detector.php:282
+#. translators: %d: order ID
 #, php-format
 msgid "Manual payment completion detected for order #%d"
-msgstr ""
+msgstr "偵測到訂單 #%d 的手動付款完成"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:292
 msgid "Verify manual payment was properly recorded."
-msgstr ""
+msgstr "確認手動付款是否已正確記錄。"
 
-#. translators: %d: order ID
 #: includes/analyzers/class-skipped-cycle-detector.php:303
+#. translators: %d: order ID
 #, php-format
 msgid "Order #%d marked complete without transaction ID"
-msgstr ""
+msgstr "訂單 #%d 標記為完成但無交易編號"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:312
 msgid "Verify payment was actually received and properly recorded."
-msgstr ""
+msgstr "確認付款是否實際收到並正確記錄。"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:343
 msgid "Subscription shows Expired but has a valid future next payment date"
-msgstr ""
+msgstr "Subscription 顯示已過期但擁有有效的未來下一次付款日期"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:349
 msgid "Review subscription status and payment schedule for consistency."
-msgstr ""
+msgstr "檢視 Subscription 狀態及付款排程的一致性。"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:363
 msgid "Subscription shows Active but has passed its end date"
-msgstr ""
+msgstr "Subscription 顯示為有效但已超過結束日期"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:369
 msgid "Consider updating subscription status to reflect actual state."
-msgstr ""
+msgstr "考慮更新 Subscription 狀態以反映實際狀況。"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:408
 msgid "No scheduled subscription payment actions found"
-msgstr ""
+msgstr "未發現任何預定的 Subscription 付款動作"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:413
 msgid "Check if subscription payments are properly scheduled."
-msgstr ""
+msgstr "檢查 Subscription 付款是否已正確排程。"
 
-#. translators: %s: action hook name
 #: includes/analyzers/class-skipped-cycle-detector.php:434
+#. translators: %s: action hook name
 #, php-format
 msgid "Failed Action Scheduler event: %s"
-msgstr ""
+msgstr "Action Scheduler 事件失敗：%s"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:444
 msgid "Review failed action and consider manual intervention."
-msgstr ""
+msgstr "檢視失敗動作並考慮手動干預。"
 
-#. translators: %d: year
 #: includes/analyzers/class-skipped-cycle-detector.php:502
+#. translators: %d: year
 #, php-format
 msgid "No renewals found for year %d"
-msgstr ""
+msgstr "未找到 %d 年的續訂記錄"
 
 #: includes/analyzers/class-skipped-cycle-detector.php:507
 msgid "Investigate why no renewals occurred during this period."
-msgstr ""
+msgstr "調查為何在此期間沒有續訂發生。"
 
 #: includes/analyzers/class-subscription-anatomy.php:235
 msgid "Action Scheduler tables not found."
-msgstr ""
+msgstr "找不到 Action Scheduler 資料表。"
 
 #: includes/analyzers/class-subscription-anatomy.php:375
 msgid "Payment gateway not found or not available."
-msgstr ""
+msgstr "找不到付款閘道或付款閘道不可用。"
 
 #: includes/analyzers/class-subscription-anatomy.php:378
 msgid "Payment gateway is disabled or not available."
-msgstr ""
+msgstr "付款閘道已停用或不可用。"
 
 #: includes/analyzers/class-subscription-anatomy.php:384
-msgid "Subscription is set to manual renewal but payment gateway supports automatic renewals."
-msgstr ""
+msgid ""
+"Subscription is set to manual renewal but payment gateway supports "
+"automatic renewals."
+msgstr "訂閱設定為手動續訂，但付款閘道支援自動續訂。"
 
 #: includes/analyzers/class-subscription-anatomy.php:390
 msgid "Payment token appears to be invalid or expired."
-msgstr ""
+msgstr "付款憑證似乎無效或已過期。"
 
 #: includes/analyzers/class-subscription-anatomy.php:431
 msgid "Token not found or invalid."
-msgstr ""
+msgstr "找不到憑證或憑證無效。"
 
 #: includes/analyzers/class-timeline-builder.php:144
 msgid "Subscription created"
-msgstr ""
+msgstr "Subscription 已建立"
 
 #: includes/analyzers/class-timeline-builder.php:145
 msgid "Subscription started"
-msgstr ""
+msgstr "Subscription 已開始"
 
 #: includes/analyzers/class-timeline-builder.php:146
 msgid "Trial period ended"
-msgstr ""
+msgstr "試用期已結束"
 
 #: includes/analyzers/class-timeline-builder.php:147
 msgid "Last payment processed"
-msgstr ""
+msgstr "最後付款已處理"
 
 #: includes/analyzers/class-timeline-builder.php:148
 msgid "Next payment scheduled"
-msgstr ""
+msgstr "下一次付款已排程"
 
 #: includes/analyzers/class-timeline-builder.php:149
 msgid "Subscription cancelled"
-msgstr ""
+msgstr "Subscription 已取消"
 
 #: includes/analyzers/class-timeline-builder.php:150
 msgid "Subscription ended"
-msgstr ""
+msgstr "Subscription 已結束"
 
-#. translators: 1: order type, 2: order ID
 #: includes/analyzers/class-timeline-builder.php:266
+#. translators: 1: order type, 2: order ID
 #, php-format
 msgid "%1$s order #%2$d created"
-msgstr ""
+msgstr "%1$s 訂單 #%2$d 已建立"
 
-#. translators: 1: order type, 2: order ID, 3: order total
 #: includes/analyzers/class-timeline-builder.php:272
+#. translators: 1: order type, 2: order ID, 3: order total
 #, php-format
 msgid "%1$s order #%2$d created with total %3$s"
-msgstr ""
+msgstr "%1$s 訂單 #%2$d 已建立，總金額為 %3$s"
 
-#. translators: %d: order ID
 #: includes/analyzers/class-timeline-builder.php:296
+#. translators: %d: order ID
 #, php-format
 msgid "Payment completed for order #%d"
-msgstr ""
+msgstr "訂單 #%d 付款完成"
 
-#. translators: 1: order ID, 2: payment amount
 #: includes/analyzers/class-timeline-builder.php:301
+#. translators: 1: order ID, 2: payment amount
 #, php-format
 msgid "Payment of %2$s completed for order #%1$d"
-msgstr ""
+msgstr "訂單 #%1$d 的付款 %2$s 已完成"
 
-#. translators: %d: order ID
 #: includes/analyzers/class-timeline-builder.php:332
+#. translators: %d: order ID
 #, php-format
 msgid "Order #%d note"
-msgstr ""
+msgstr "訂單 #%d 備註"
 
 #: includes/analyzers/class-timeline-builder.php:612
 msgid "Scheduled subscription payment"
-msgstr ""
+msgstr "Scheduled Subscription Payment"
 
 #: includes/analyzers/class-timeline-builder.php:613
 msgid "Scheduled subscription expiration"
-msgstr ""
+msgstr "Scheduled Subscription Expiration"
 
 #: includes/analyzers/class-timeline-builder.php:614
 msgid "Scheduled trial end"
-msgstr ""
+msgstr "Scheduled Trial End"
 
 #: includes/analyzers/class-timeline-builder.php:615
 msgid "End of prepaid term"
-msgstr ""
+msgstr "End of prepaid term"
 
-#. translators: 1: hook name, 2: action status, 3: action arguments
 #: includes/analyzers/class-timeline-builder.php:635
+#. translators: 1: hook name, 2: action status, 3: action arguments
 #, php-format
 msgid "Action: %1$s | Status: %2$s | Args: %3$s"
-msgstr ""
+msgstr "Action: %1$s | Status: %2$s | Args: %3$s"
 
 #: includes/analyzers/class-timeline-builder.php:695
 msgid "Failed Scheduled Action"
-msgstr ""
+msgstr "Failed Scheduled Action"
 
-#. translators: 1: action hook, 2: timestamp
 #: includes/analyzers/class-timeline-builder.php:698
+#. translators: 1: action hook, 2: timestamp
 #, php-format
 msgid "Scheduled action \"%1$s\" failed at %2$s"
-msgstr ""
+msgstr "Scheduled action \"%1$s\" failed at %2$s"
 
 #: includes/class-admin.php:116
 #, php-format
 msgid "filtering to %1$d %2$s"
-msgstr ""
+msgstr "filtering to %1$d %2$s"
 
 #: includes/class-admin.php:117
 msgid "Could not load the fix preview. Try again in a moment."
-msgstr ""
+msgstr "Could not load the fix preview. Try again in a moment."
 
 #: includes/class-admin.php:118
 msgid "Applying…"
-msgstr ""
+msgstr "Applying…"
 
 #: includes/class-admin.php:119
 msgid "Something went wrong - nothing was changed."
-msgstr ""
+msgstr "Something went wrong - nothing was changed."
 
 #: includes/class-admin.php:120
 msgid "Reverting…"
-msgstr ""
+msgstr "Reverting…"
 
 #: includes/class-admin.php:121
 msgid "Revert this fix? The subscription will return to its previous state."
-msgstr ""
+msgstr "Revert this fix? The Subscription will return to its previous state."
 
 #: includes/class-admin.php:122
 msgid "Saving…"
-msgstr ""
+msgstr "Saving…"
 
 #: includes/class-admin.php:124
 msgid "Could not save. Check your connection and try again."
-msgstr ""
+msgstr "Could not save. Check your connection and try again."
 
 #: includes/class-admin.php:141
 msgid "Open"
-msgstr ""
+msgstr "Open"
 
 #: includes/class-admin.php:291
 #: includes/class-ajax-handler.php:383
 msgid "You do not have permission to do this."
-msgstr ""
+msgstr "You do not have permission to do this."
 
 #: includes/class-admin.php:517
 msgid "never"
-msgstr ""
+msgstr "never"
 
 #: includes/class-admin.php:565
 msgid "just now"
-msgstr ""
+msgstr "just now"
 
-#. translators: %d: minutes
 #: includes/class-admin.php:570
+#. translators: %d: minutes
 #, php-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d 分鐘前"
 
-#. translators: %d: hours
 #: includes/class-admin.php:575
+#. translators: %d: hours
 #, php-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d 小時前"
 
-#. translators: %d: days
 #: includes/class-admin.php:580
+#. translators: %d: days
 #, php-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d 天前"
 
 #: includes/class-admin.php:582
 msgid "M j"
-msgstr ""
+msgstr "M j"
 
 #: includes/class-ajax-handler.php:75
 #: includes/class-ajax-handler.php:122
 msgid "Invalid subscription ID."
-msgstr ""
+msgstr "無效的 Subscription ID。"
 
 #: includes/class-ajax-handler.php:81
 msgid "No matching rule found for this subscription."
-msgstr ""
+msgstr "找不到符合此 Subscription 的規則。"
 
 #: includes/class-ajax-handler.php:89
-msgid "This subscription no longer matches the rule (state changed since scan). Re-scan and try again."
-msgstr ""
+msgid ""
+"This subscription no longer matches the rule (state changed since scan). "
+"Re-scan and try again."
+msgstr "此 Subscription 不再符合規則（掃描後狀態改變）。請重新掃描並再試一次。"
 
 #: includes/class-ajax-handler.php:128
 msgid "No matching rule for this subscription."
-msgstr ""
+msgstr "此 Subscription 沒有符合的規則。"
 
 #: includes/class-ajax-handler.php:136
 msgid "State changed since scan. Re-scan and try again."
-msgstr ""
+msgstr "掃描後狀態已改變。請重新掃描並再試一次。"
 
 #: includes/class-ajax-handler.php:172
 msgid "Fix applied."
-msgstr ""
+msgstr "修正已套用。"
 
 #: includes/class-ajax-handler.php:186
 msgid "Invalid journal entry."
-msgstr ""
+msgstr "無效的日誌紀錄。"
 
 #: includes/class-ajax-handler.php:222
 msgid "Missing rule_id."
-msgstr ""
+msgstr "遺漏 rule_id。"
 
 #: includes/class-ajax-handler.php:228
 msgid "Unknown rule."
-msgstr ""
+msgstr "未知的規則。"
 
 #: includes/class-ajax-handler.php:240
 msgid "No matching subscriptions to fix."
-msgstr ""
+msgstr "沒有可修正的符合 Subscription。"
 
 #: includes/class-ajax-handler.php:257
 msgid "No longer matches rule; skipped."
-msgstr ""
+msgstr "不再符合規則；已略過。"
 
 #: includes/class-ajax-handler.php:306
 msgid "Missing batch_id."
-msgstr ""
+msgstr "遺漏 batch_id。"
 
 #: includes/class-ajax-handler.php:361
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "請輸入有效的電子郵件地址。"
 
-#. translators: %d: subscription ID
 #: includes/collectors/class-subscription-data.php:67
 #: includes/collectors/class-subscription-data.php:136
+#. translators: %d: subscription ID
 #, php-format
 msgid "Subscription #%d"
-msgstr ""
+msgstr "Subscription #%d"
 
 #: includes/journal/class-fix-journal.php:140
 msgid "Journal entry not found."
-msgstr ""
+msgstr "找不到日誌紀錄。"
 
 #: includes/journal/class-fix-journal.php:147
 msgid "Already reverted."
-msgstr ""
+msgstr "已還原。"
 
-#. translators: %s: rule_id
 #: includes/journal/class-fix-journal.php:159
+#. translators: %s: rule_id
 #, php-format
 msgid "Rule \"%s\" is not registered; cannot revert."
-msgstr ""
+msgstr "規則「%s」未註冊，無法還原。"
 
 #: includes/journal/class-fix-journal.php:172
 msgid "Revert raised an error; nothing was changed."
-msgstr ""
+msgstr "復原時發生錯誤；未做任何更改。"
 
 #: includes/narrator/class-narrator.php:88
 #: includes/narrator/class-narrator.php:92
@@ -1478,141 +1541,166 @@ msgstr ""
 #: includes/rules/class-rule-on-hold-paid.php:276
 #: includes/rules/class-rule-repeated-failures.php:274
 msgid "This customer"
-msgstr ""
+msgstr "此客戶"
 
 #: includes/rules/class-rule-ghost-sub.php:130
 msgid "Next payment"
-msgstr ""
+msgstr "下一次付款"
 
 #: includes/rules/class-rule-ghost-sub.php:131
 msgid "— (not scheduled)"
-msgstr ""
+msgstr "—（未排程）"
 
 #: includes/rules/class-rule-ghost-sub.php:132
 msgid "(UTC)"
-msgstr ""
+msgstr "(UTC)"
 
 #: includes/rules/class-rule-ghost-sub.php:136
 msgid "AS event"
-msgstr ""
+msgstr "AS 事件"
 
 #: includes/rules/class-rule-ghost-sub.php:137
 msgid "missing"
-msgstr ""
+msgstr "遺失"
 
 #: includes/rules/class-rule-ghost-sub.php:142
 #: includes/rules/class-rule-on-hold-paid.php:139
 #: includes/rules/class-rule-repeated-failures.php:145
 msgid "Sub status"
-msgstr ""
+msgstr "訂閱狀態"
 
 #: includes/rules/class-rule-ghost-sub.php:143
 #: includes/rules/class-rule-ghost-sub.php:144
 #: includes/rules/class-rule-on-hold-paid.php:141
 msgid "active"
-msgstr ""
+msgstr "啟用中"
 
 #: includes/rules/class-rule-ghost-sub.php:291
 #, php-format
-msgid "%1$s's subscription was supposed to renew <em>today</em>. WordPress didn't schedule the payment event, so nothing was charged."
-msgstr ""
+msgid ""
+"%1$s's subscription was supposed to renew <em>today</em>. WordPress didn't "
+"schedule the payment event, so nothing was charged."
+msgstr "%1$s 的訂閱應該在<em>今天</em>續訂。WordPress 未排程付款事件，因此未收取任何費用。"
 
 #: includes/rules/class-rule-ghost-sub.php:296
 #, php-format
-msgid "%1$s's subscription was supposed to renew on <em>%2$s</em> (%3$d days ago). WordPress didn't schedule the payment event, so nothing was charged."
-msgstr ""
+msgid ""
+"%1$s's subscription was supposed to renew on <em>%2$s</em> (%3$d days ago). "
+"WordPress didn't schedule the payment event, so nothing was charged."
+msgstr "%1$s 的訂閱應該在<em>%2$s</em>續訂（%3$d 天前）。WordPress 未排程付款事件，因此未收取任何費用。"
 
 #: includes/rules/class-rule-ghost-sub.php:301
 #, php-format
-msgid "%1$s's subscription was supposed to renew on <em>%2$s</em>, about %3$d days ago. WordPress didn't schedule the payment event, so %1$s hasn't been billed for any cycles since."
+msgid ""
+"%1$s's subscription was supposed to renew on <em>%2$s</em>, about %3$d days "
+"ago. WordPress didn't schedule the payment event, so %1$s hasn't been "
+"billed for any cycles since."
 msgstr ""
+"%1$s 的訂閱應該在<em>%2$s</em>續訂，約 %3$d 天前。WordPress 未排程付款事件，因此 %1$s "
+"自那時起未被收取任何週期費用。"
 
 #: includes/rules/class-rule-ghost-sub.php:306
 #, php-format
-msgid "%1$s's subscription was supposed to renew on <em>%2$s</em>, over a month ago. WordPress didn't schedule the payment event, so %1$s hasn't been billed for any cycles since."
-msgstr ""
+msgid ""
+"%1$s's subscription was supposed to renew on <em>%2$s</em>, over a month "
+"ago. WordPress didn't schedule the payment event, so %1$s hasn't been "
+"billed for any cycles since."
+msgstr "%1$s 的訂閱應該在<em>%2$s</em>續訂，已超過一個月。WordPress 未排程付款事件，因此 %1$s 自那時起未被收取任何週期費用。"
 
 #: includes/rules/class-rule-on-hold-paid.php:140
 msgid "on-hold"
-msgstr ""
+msgstr "暫停中"
 
-#. translators: %d: renewal order id
 #: includes/rules/class-rule-on-hold-paid.php:145
+#. translators: %d: renewal order id
 #, php-format
 msgid "Renewal #%d"
-msgstr ""
+msgstr "續訂 #%d"
 
-#. translators: used as a note on the order when Doctor Subs flips it.
 #: includes/rules/class-rule-on-hold-paid.php:191
-msgid "Doctor Subs: marked complete after matching Stripe charge capture on on-hold subscription."
-msgstr ""
+#. translators: used as a note on the order when Doctor Subs flips it.
+msgid ""
+"Doctor Subs: marked complete after matching Stripe charge capture on "
+"on-hold subscription."
+msgstr "Doctor Subs：在暫停訂閱上匹配 Stripe 收費擷取後標記為完成。"
 
-#. translators: order note on the subscription when Doctor Subs activates it.
 #: includes/rules/class-rule-on-hold-paid.php:198
+#. translators: order note on the subscription when Doctor Subs activates it.
 msgid "Doctor Subs: flipped to active after matching Stripe-paid renewal."
-msgstr ""
+msgstr "Doctor Subs：在匹配 Stripe 付費續訂後切換為啟用中。"
 
 #: includes/rules/class-rule-on-hold-paid.php:245
 #: includes/rules/class-rule-on-hold-paid.php:256
 msgid "Doctor Subs: reverted status change."
-msgstr ""
+msgstr "Doctor Subs：復原狀態變更。"
 
-#. translators: 1: first name, 2: amount, 3: date
 #: includes/rules/class-rule-on-hold-paid.php:285
+#. translators: 1: first name, 2: amount, 3: date
 #, php-format
-msgid "%1$s's last renewal payment went through in Stripe on <em>%3$s</em> - they were charged %2$s. But the subscription status stayed \"on-hold\" instead of switching back to active."
+msgid ""
+"%1$s's last renewal payment went through in Stripe on <em>%3$s</em> - they "
+"were charged %2$s. But the subscription status stayed \"on-hold\" instead "
+"of switching back to active."
 msgstr ""
+"%1$s 的最後一次續訂付款已於 <em>%3$s</em> 在 Stripe 成功完成 - 他們被收取 "
+"%2$s。但訂閱狀態仍為「暫停中」，未切回啟用中。"
 
-#. translators: %s: first name
 #: includes/rules/class-rule-on-hold-paid.php:294
+#. translators: %s: first name
 #, php-format
-msgid "%s's last renewal payment went through in Stripe, but the subscription stayed on-hold instead of flipping back to active."
-msgstr ""
+msgid ""
+"%s's last renewal payment went through in Stripe, but the subscription "
+"stayed on-hold instead of flipping back to active."
+msgstr "%s 的最後一次續訂付款已在 Stripe 成功完成，但訂閱仍為暫停中，未切換回啟用中。"
 
 #: includes/rules/class-rule-repeated-failures.php:139
 msgid "Retry payment"
-msgstr ""
+msgstr "重試付款"
 
-#. translators: %d: count
 #: includes/rules/class-rule-repeated-failures.php:140
+#. translators: %d: count
 #, php-format
 msgid "%d failed attempt"
 msgid_plural "%d failed attempts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d 失敗嘗試"
 
-#. translators: %s: time
 #: includes/rules/class-rule-repeated-failures.php:141
+#. translators: %s: time
 #, php-format
 msgid "one retry at %s (UTC)"
-msgstr ""
+msgstr "一次重試於 %s（UTC）"
 
-#. translators: 1: first name, 2: count, 3: window days
 #: includes/rules/class-rule-repeated-failures.php:283
-#, php-format
-msgid "Something has been failing to process %1$s's renewal for a while - %2$d failed attempts in the last %3$d days. Worth looking at the card on file or the gateway log."
-msgstr ""
-
 #. translators: 1: first name, 2: count, 3: window days
-#: includes/rules/class-rule-repeated-failures.php:292
 #, php-format
-msgid "%1$s's renewal has failed %2$d times in the last %3$d days. Often a gateway blip that clears on retry, but worth another look if this retry fails too."
-msgstr ""
+msgid ""
+"Something has been failing to process %1$s's renewal for a while - %2$d "
+"failed attempts in the last %3$d days. Worth looking at the card on file or "
+"the gateway log."
+msgstr "某些事情已經無法處理 %1$s 的續訂一段時間 - 過去 %3$d 天內有 %2$d 次失敗嘗試。值得查看檔案中的卡片或閘道記錄。"
+
+#: includes/rules/class-rule-repeated-failures.php:292
+#. translators: 1: first name, 2: count, 3: window days
+#, php-format
+msgid ""
+"%1$s's renewal has failed %2$d times in the last %3$d days. Often a gateway "
+"blip that clears on retry, but worth another look if this retry fails too."
+msgstr "%1$s 的續訂在過去 %3$d 天內失敗了 %2$d 次。通常是閘道的暫時故障，重試後會清除，但如果這次重試也失敗，值得再次檢查。"
 
 #: includes/utilities/class-security.php:32
 msgid "Security check failed. Please refresh the page and try again."
-msgstr ""
+msgstr "安全檢查失敗。請重新整理頁面並重試。"
 
 #: includes/utilities/class-security.php:45
 msgid "You do not have permission to perform this action."
-msgstr ""
+msgstr "您沒有執行此操作的權限。"
 
 #: includes/utilities/class-security.php:61
 msgid "Invalid subscription ID provided."
-msgstr ""
+msgstr "提供了無效的 Subscription ID。"
 
-#. translators: 1: action name, 2: time window in seconds
 #: includes/utilities/class-security.php:114
+#. translators: 1: action name, 2: time window in seconds
 #, php-format
 msgid "Rate limit exceeded for %1$s. Please wait %2$d seconds before trying again."
-msgstr ""
+msgstr "%1$s 的速率限制已超出。請等待 %2$d 秒後再試。"
