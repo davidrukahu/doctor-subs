@@ -297,21 +297,51 @@
 	 * Refresh (manual scan trigger)
 	 * ============================================================ */
 
+	function runScan( btn, labelWhileScanning ) {
+		var counters = $( '.counters' );
+		if ( counters ) counters.classList.add( 'refreshing' );
+
+		var originalHTML = btn ? btn.innerHTML : null;
+		if ( btn ) {
+			btn.disabled = true;
+			btn.classList.add( 'is-busy' );
+			btn.setAttribute( 'aria-busy', 'true' );
+			btn.textContent = labelWhileScanning;
+		}
+
+		return postForm( 'dr_subs_run_scan', {} )
+			.then( function () {
+				window.location.reload();
+			} )
+			.catch( function ( err ) {
+				if ( counters ) counters.classList.remove( 'refreshing' );
+				if ( btn ) {
+					btn.disabled = false;
+					btn.classList.remove( 'is-busy' );
+					btn.removeAttribute( 'aria-busy' );
+					btn.innerHTML = originalHTML;
+				}
+				console.error( 'Doctor Subs: scan failed', err );
+				alert( ( ajax.strings && ajax.strings.scanError ) || 'Scan failed. Check your connection and try again.' );
+			} );
+	}
+
 	function wireRefresh() {
 		$$( '[data-dr-subs-refresh]' ).forEach( function ( link ) {
 			link.addEventListener( 'click', function ( e ) {
 				e.preventDefault();
-				var counters = $( '.counters' );
-				if ( counters ) counters.classList.add( 'refreshing' );
+				if ( link.disabled ) return;
+				runScan( link, ( ajax.strings && ajax.strings.refreshing ) || 'Refreshing…' );
+			} );
+		} );
+	}
 
-				postForm( 'dr_subs_run_scan', {} )
-					.then( function () {
-						window.location.reload();
-					} )
-					.catch( function ( err ) {
-						if ( counters ) counters.classList.remove( 'refreshing' );
-						console.error( 'Doctor Subs: scan failed', err );
-					} );
+	function wireScan() {
+		$$( '[data-dr-subs-scan]' ).forEach( function ( btn ) {
+			btn.addEventListener( 'click', function ( e ) {
+				e.preventDefault();
+				if ( btn.disabled ) return;
+				runScan( btn, ( ajax.strings && ajax.strings.scanning ) || 'Scanning…' );
 			} );
 		} );
 	}
@@ -556,6 +586,7 @@
 		wireCounters();
 		wireRowsAndFixButtons();
 		wireRefresh();
+		wireScan();
 		wireHistory();
 		wireSettings();
 		wireCancelScan();

@@ -122,6 +122,9 @@ class DR_Subs_Admin {
 					'saving'         => __( 'Saving…', 'doctor-subs' ),
 					'saved'          => __( 'Saved.', 'doctor-subs' ),
 					'saveError'      => __( 'Could not save. Check your connection and try again.', 'doctor-subs' ),
+					'scanning'       => __( 'Scanning…', 'doctor-subs' ),
+					'refreshing'     => __( 'Refreshing…', 'doctor-subs' ),
+					'scanError'      => __( 'Scan failed. Check your connection and try again.', 'doctor-subs' ),
 				),
 			)
 		);
