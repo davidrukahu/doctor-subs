@@ -231,8 +231,10 @@ class DR_Subs_Ajax_Handler {
 		// Accept explicit sub_ids from the client, or auto-collect from
 		// the dashboard's current set of broken-matched subs.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- guard() verified nonce.
-		$posted_sub_ids = isset( $_POST['sub_ids'] ) ? (array) wp_unslash( $_POST['sub_ids'] ) : array();
-		$sub_ids        = array_values( array_filter( array_map( 'absint', $posted_sub_ids ) ) );
+		$posted_sub_ids = ( isset( $_POST['sub_ids'] ) && is_array( $_POST['sub_ids'] ) )
+			? array_map( 'absint', wp_unslash( $_POST['sub_ids'] ) )
+			: array();
+		$sub_ids        = array_values( array_filter( $posted_sub_ids ) );
 		if ( empty( $sub_ids ) ) {
 			$sub_ids = $this->collect_matching_sub_ids( $rule_id );
 		}
@@ -347,14 +349,21 @@ class DR_Subs_Ajax_Handler {
 		$this->guard();
 
 		$defaults = DR_Subs_Migration::default_settings();
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- guard() verified nonce above.
 		$settings = array(
 			'alerts_enabled'         => ! empty( $_POST['alerts_enabled'] ),
 			'alert_email'            => sanitize_email(
-				(string) wp_unslash( $_POST['alert_email'] ?? $defaults['alert_email'] )
+				isset( $_POST['alert_email'] )
+					? (string) wp_unslash( $_POST['alert_email'] )
+					: (string) $defaults['alert_email']
 			),
-			'journal_retention_days' => (int) ( $_POST['journal_retention_days'] ?? $defaults['journal_retention_days'] ),
+			'journal_retention_days' => isset( $_POST['journal_retention_days'] )
+				? (int) sanitize_text_field( wp_unslash( $_POST['journal_retention_days'] ) )
+				: (int) $defaults['journal_retention_days'],
 			'telemetry_enabled'      => ! empty( $_POST['telemetry_enabled'] ),
 		);
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		if ( ! empty( $settings['alert_email'] ) && ! is_email( $settings['alert_email'] ) ) {
 			wp_send_json_error(
@@ -404,7 +413,7 @@ class DR_Subs_Ajax_Handler {
 		$table = DR_Subs_Migration::sub_health_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- ad-hoc lookup.
 		$matched_rules = $wpdb->get_var(
-			$wpdb->prepare( "SELECT matched_rules FROM {$table} WHERE sub_id = %d", $sub_id )
+			$wpdb->prepare( 'SELECT matched_rules FROM %i WHERE sub_id = %d', $table, $sub_id )
 		);
 		// phpcs:enable
 
@@ -464,7 +473,10 @@ class DR_Subs_Ajax_Handler {
 		$table = DR_Subs_Migration::sub_health_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- bulk collect.
 		$rows = $wpdb->get_results(
-			"SELECT sub_id, matched_rules FROM {$table} WHERE bucket IN ('broken', 'risk')"
+			$wpdb->prepare(
+				"SELECT sub_id, matched_rules FROM %i WHERE bucket IN ('broken', 'risk')",
+				$table
+			)
 		);
 		// phpcs:enable
 

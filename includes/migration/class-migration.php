@@ -192,8 +192,8 @@ class DR_Subs_Migration {
 		$health  = self::sub_health_table();
 		$journal = self::fix_journal_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- intentional schema change on uninstall.
-		$wpdb->query( "DROP TABLE IF EXISTS {$health}" );
-		$wpdb->query( "DROP TABLE IF EXISTS {$journal}" );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $health ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $journal ) );
 		// phpcs:enable
 		delete_option( self::VERSION_OPTION );
 		delete_option( self::SETTINGS_OPTION );

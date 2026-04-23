@@ -46,6 +46,7 @@ rsync -a \
 	--exclude=".gitignore" \
 	--exclude=".DS_Store" \
 	--exclude="branding/" \
+	--exclude="build/" \
 	--exclude="composer.json" \
 	--exclude="composer.lock" \
 	--exclude="design-brief/" \
@@ -54,6 +55,8 @@ rsync -a \
 	--exclude="scripts/" \
 	--exclude="tests/" \
 	--exclude="TODOS.md" \
+	--exclude="v2-STATUS.md" \
+	--exclude="_review.md" \
 	--exclude="vendor/" \
 	--exclude="*.zip" \
 	./ "$BUILD_DIR/"

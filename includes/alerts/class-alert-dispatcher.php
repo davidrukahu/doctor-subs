@@ -107,11 +107,11 @@ class DR_Subs_Alert_Dispatcher {
 		$placeholders = implode( ',', array_fill( 0, count( $sub_ids ), '%d' ) );
 		$now          = current_time( 'mysql', true );
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholder count controlled.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholder count controlled; %i escapes the table identifier.
 		$suppressed = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT sub_id FROM {$table} WHERE sub_id IN ({$placeholders}) AND suppressed_until IS NOT NULL AND suppressed_until > %s",
-				array_merge( array_map( 'intval', $sub_ids ), array( $now ) )
+				"SELECT sub_id FROM %i WHERE sub_id IN ({$placeholders}) AND suppressed_until IS NOT NULL AND suppressed_until > %s",
+				array_merge( array( $table ), array_map( 'intval', $sub_ids ), array( $now ) )
 			)
 		);
 		// phpcs:enable
@@ -213,7 +213,7 @@ class DR_Subs_Alert_Dispatcher {
 		$table = DR_Subs_Migration::sub_health_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- alert composer.
 		$matched_rules = (string) $wpdb->get_var(
-			$wpdb->prepare( "SELECT matched_rules FROM {$table} WHERE sub_id = %d", $sub_id )
+			$wpdb->prepare( 'SELECT matched_rules FROM %i WHERE sub_id = %d', $table, $sub_id )
 		);
 		// phpcs:enable
 		if ( ! empty( $matched_rules ) ) {
