@@ -107,7 +107,7 @@ class DR_Subs_Alert_Dispatcher {
 		$placeholders = implode( ',', array_fill( 0, count( $sub_ids ), '%d' ) );
 		$now          = current_time( 'mysql', true );
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholder count controlled; %i escapes the table identifier.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- placeholder count is controlled (one %d per sub_id); %i escapes the table identifier. Static analyser can't count the interpolated placeholder string.
 		$suppressed = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT sub_id FROM %i WHERE sub_id IN ({$placeholders}) AND suppressed_until IS NOT NULL AND suppressed_until > %s",
