@@ -123,4 +123,7 @@ jobs:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: doctor-subs
+          # 10up action defaults to .wordpress-org/ for SVN assets/. We
+          # already keep banner + icon + screenshot files in branding/.
+          ASSETS_DIR: branding
         continue-on-error: true
