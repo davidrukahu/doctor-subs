@@ -1,6 +1,6 @@
 <?php
 /**
- * Rule interface — every detection rule implements this.
+ * Rule interface - every detection rule implements this.
  *
  * @package Dr_Subs
  * @since   2.0.0

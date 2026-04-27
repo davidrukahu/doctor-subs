@@ -173,7 +173,7 @@ class DR_Subs_Rule_Repeated_Failures implements DR_Subs_Rule_Interface {
 			throw new RuntimeException( 'Action Scheduler not available.' );
 		}
 
-		$retry_ts = time() + self::RETRY_DELAY;
+		$retry_ts  = time() + self::RETRY_DELAY;
 		$action_id = as_schedule_single_action(
 			$retry_ts,
 			self::PAYMENT_HOOK,
@@ -183,6 +183,17 @@ class DR_Subs_Rule_Repeated_Failures implements DR_Subs_Rule_Interface {
 		if ( ! $action_id || $action_id <= 0 ) {
 			throw new RuntimeException( 'Failed to schedule retry action.' );
 		}
+
+		$failed_count = (int) ( $match->context['failed_count'] ?? 0 );
+		$sub->add_order_note(
+			sprintf(
+				/* translators: 1: count of failed attempts in last 30 days, 2: retry time (site timezone), 3: AS action id */
+				__( 'Doctor Subs: scheduled a one-shot payment retry at %2$s after %1$d failed attempts (AS action #%3$d).', 'doctor-subs' ),
+				$failed_count,
+				wp_date( 'M j H:i', $retry_ts ),
+				(int) $action_id
+			)
+		);
 
 		$side_effects = array(
 			array(
@@ -218,6 +229,7 @@ class DR_Subs_Rule_Repeated_Failures implements DR_Subs_Rule_Interface {
 		$side_effects     = is_array( $side_effects ) ? $side_effects : array();
 		$already_executed = false;
 		$messages         = array();
+		$sub              = function_exists( 'wcs_get_subscription' ) ? wcs_get_subscription( (int) $entry->sub_id ) : null;
 
 		foreach ( array_reverse( $side_effects ) as $effect ) {
 			if ( ! is_array( $effect ) || 'as_action' !== ( $effect['type'] ?? '' ) ) {
@@ -256,6 +268,13 @@ class DR_Subs_Rule_Repeated_Failures implements DR_Subs_Rule_Interface {
 				}
 			}
 			$messages[] = sprintf( 'Unscheduled retry %d.', $action_id );
+		}
+
+		if ( $sub ) {
+			$note = $already_executed
+				? __( 'Doctor Subs: revert requested but the retry payment had already executed.', 'doctor-subs' )
+				: __( 'Doctor Subs: reverted repeated-failures fix - unscheduled the one-shot retry.', 'doctor-subs' );
+			$sub->add_order_note( $note );
 		}
 
 		return array(

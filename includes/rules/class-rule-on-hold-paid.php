@@ -104,8 +104,8 @@ class DR_Subs_Rule_On_Hold_Paid implements DR_Subs_Rule_Interface {
 			}
 
 			// Look for Stripe capture evidence on the renewal order.
-			$captured   = $this->is_stripe_captured( $renewal_order );
-			$charge_id  = $this->stripe_charge_id( $renewal_order );
+			$captured  = $this->is_stripe_captured( $renewal_order );
+			$charge_id = $this->stripe_charge_id( $renewal_order );
 			if ( ! $captured || empty( $charge_id ) ) {
 				continue;
 			}
@@ -115,12 +115,12 @@ class DR_Subs_Rule_On_Hold_Paid implements DR_Subs_Rule_Interface {
 				$sub_id,
 				$this->bucket(),
 				array(
-					'renewal_order_id'         => (int) $renewal_order_id,
-					'renewal_order_status'     => $order_status,
-					'stripe_charge_id'         => $charge_id,
-					'renewal_total'            => $renewal_order->get_formatted_order_total(),
-					'renewal_date'             => $renewal_order->get_date_created() ? $renewal_order->get_date_created()->date( 'Y-m-d' ) : '',
-					'tracked_fields_snapshot'  => $this->snapshot_fields( $sub, $renewal_order ),
+					'renewal_order_id'        => (int) $renewal_order_id,
+					'renewal_order_status'    => $order_status,
+					'stripe_charge_id'        => $charge_id,
+					'renewal_total'           => $renewal_order->get_formatted_order_total(),
+					'renewal_date'            => $renewal_order->get_date_created() ? $renewal_order->get_date_created()->date( 'Y-m-d' ) : '',
+					'tracked_fields_snapshot' => $this->snapshot_fields( $sub, $renewal_order ),
 				)
 			);
 		}
@@ -130,8 +130,8 @@ class DR_Subs_Rule_On_Hold_Paid implements DR_Subs_Rule_Interface {
 
 	/** {@inheritDoc} */
 	public function preview_fix( DR_Subs_Rule_Match $match ): array {
-		$renewal_id = (int) ( $match->context['renewal_order_id'] ?? 0 );
-		$old_order_status = (string) ( $match->context['renewal_order_status'] ?? 'on-hold' );
+		$renewal_id        = (int) ( $match->context['renewal_order_id'] ?? 0 );
+		$old_order_status  = (string) ( $match->context['renewal_order_status'] ?? 'on-hold' );
 		$next_order_status = $this->target_order_status( $renewal_id );
 
 		$diff = array(

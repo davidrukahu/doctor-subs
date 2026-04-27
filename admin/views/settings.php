@@ -22,13 +22,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 // positive here.
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
-$defaults = array(
+$defaults    = array(
 	'alerts_enabled'         => true,
 	'alert_email'            => get_option( 'admin_email', '' ),
 	'journal_retention_days' => 180,
 	'telemetry_enabled'      => false,
+	'rules'                  => array(),
 );
 $settings    = isset( $settings ) ? wp_parse_args( $settings, $defaults ) : $defaults;
+$rules_state = class_exists( 'DR_Subs_Rule_Catalog' ) ? DR_Subs_Rule_Catalog::enabled_map() : array();
+$rules_meta  = class_exists( 'DR_Subs_Rule_Catalog' ) ? DR_Subs_Rule_Catalog::all() : array();
 $last_saved  = isset( $last_saved ) ? $last_saved : '';
 $just_saved  = isset( $just_saved ) ? (bool) $just_saved : false;
 $email_error = isset( $email_error ) ? $email_error : '';
@@ -71,11 +74,11 @@ $retention_label   = static function ( $days ) {
 				<div>
 					<label class="toggle">
 						<input type="checkbox"
-						       name="alerts_enabled"
-						       id="dr-subs-alerts-enabled"
-						       value="1"
-						       <?php checked( ! empty( $settings['alerts_enabled'] ) ); ?>
-						       aria-describedby="dr-subs-alerts-helper">
+								name="alerts_enabled"
+								id="dr-subs-alerts-enabled"
+								value="1"
+								<?php checked( ! empty( $settings['alerts_enabled'] ) ); ?>
+								aria-describedby="dr-subs-alerts-helper">
 						<span class="track" aria-hidden="true"></span>
 						<span class="toggle-state" data-on-label="<?php esc_attr_e( 'On', 'doctor-subs' ); ?>" data-off-label="<?php esc_attr_e( 'Off', 'doctor-subs' ); ?>">
 							<?php echo ! empty( $settings['alerts_enabled'] ) ? esc_html__( 'On', 'doctor-subs' ) : esc_html__( 'Off', 'doctor-subs' ); ?>
@@ -93,11 +96,11 @@ $retention_label   = static function ( $days ) {
 				</label>
 				<div>
 					<input type="email"
-					       name="alert_email"
-					       id="dr-subs-alert-email"
-					       value="<?php echo esc_attr( $settings['alert_email'] ); ?>"
-					       aria-describedby="dr-subs-alert-email-helper<?php echo $email_error ? ' dr-subs-alert-email-error' : ''; ?>"
-					       autocomplete="email">
+							name="alert_email"
+							id="dr-subs-alert-email"
+							value="<?php echo esc_attr( $settings['alert_email'] ); ?>"
+							aria-describedby="dr-subs-alert-email-helper<?php echo $email_error ? ' dr-subs-alert-email-error' : ''; ?>"
+							autocomplete="email">
 					<div class="helper" id="dr-subs-alert-email-helper">
 						<?php esc_html_e( 'Defaults to your WordPress admin email.', 'doctor-subs' ); ?>
 					</div>
@@ -133,7 +136,7 @@ $retention_label   = static function ( $days ) {
 					<select name="journal_retention_days" id="dr-subs-retention" aria-describedby="dr-subs-retention-helper">
 						<?php foreach ( $retention_options as $days ) : ?>
 							<option value="<?php echo esc_attr( (string) $days ); ?>"
-							        <?php selected( (int) $settings['journal_retention_days'], (int) $days ); ?>>
+									<?php selected( (int) $settings['journal_retention_days'], (int) $days ); ?>>
 								<?php echo esc_html( $retention_label( $days ) ); ?>
 							</option>
 						<?php endforeach; ?>
@@ -167,11 +170,11 @@ $retention_label   = static function ( $days ) {
 				<div>
 					<label class="toggle">
 						<input type="checkbox"
-						       name="telemetry_enabled"
-						       id="dr-subs-telemetry"
-						       value="1"
-						       <?php checked( ! empty( $settings['telemetry_enabled'] ) ); ?>
-						       aria-describedby="dr-subs-telemetry-helper">
+								name="telemetry_enabled"
+								id="dr-subs-telemetry"
+								value="1"
+								<?php checked( ! empty( $settings['telemetry_enabled'] ) ); ?>
+								aria-describedby="dr-subs-telemetry-helper">
 						<span class="track" aria-hidden="true"></span>
 						<span class="toggle-state" data-on-label="<?php esc_attr_e( 'On', 'doctor-subs' ); ?>" data-off-label="<?php esc_attr_e( 'Off', 'doctor-subs' ); ?>">
 							<?php echo ! empty( $settings['telemetry_enabled'] ) ? esc_html__( 'On', 'doctor-subs' ) : esc_html__( 'Off', 'doctor-subs' ); ?>
@@ -183,6 +186,56 @@ $retention_label   = static function ( $days ) {
 				</div>
 			</div>
 		</div>
+
+		<!-- Group 4 - Detection rules -->
+		<?php if ( ! empty( $rules_meta ) ) : ?>
+			<div class="settings-group">
+				<h2><?php esc_html_e( 'Detection rules', 'doctor-subs' ); ?></h2>
+				<div class="blurb">
+					<?php esc_html_e( 'Doctor Subs runs each rule on every scan. All rules are on by default; turn one off if it&rsquo;s noisy in your store.', 'doctor-subs' ); ?>
+				</div>
+
+				<div class="rules-list">
+					<?php
+					foreach ( $rules_meta as $rid => $info ) :
+						$enabled      = isset( $rules_state[ $rid ] ) ? (bool) $rules_state[ $rid ] : true;
+						$bucket_label = ( 'risk' === ( $info['bucket'] ?? '' ) )
+							? __( 'At risk', 'doctor-subs' )
+							: __( 'Broken', 'doctor-subs' );
+						$dot_class    = ( 'risk' === ( $info['bucket'] ?? '' ) ) ? 'dot-risk' : 'dot-broken';
+						?>
+						<div class="rule-card">
+							<div class="rule-card-head">
+								<div class="rule-card-title">
+									<span class="dot <?php echo esc_attr( $dot_class ); ?>" aria-hidden="true"></span>
+									<span class="name"><?php echo esc_html( $info['label'] ); ?></span>
+									<span class="bucket-tag"><?php echo esc_html( $bucket_label ); ?></span>
+								</div>
+								<label class="toggle">
+									<input type="checkbox"
+											name="rules[<?php echo esc_attr( $rid ); ?>]"
+											value="1"
+											<?php checked( $enabled ); ?>
+											aria-label="<?php echo esc_attr( sprintf( /* translators: %s: rule label */ __( 'Enable %s rule', 'doctor-subs' ), $info['label'] ) ); ?>">
+									<span class="track" aria-hidden="true"></span>
+									<span class="toggle-state" data-on-label="<?php esc_attr_e( 'On', 'doctor-subs' ); ?>" data-off-label="<?php esc_attr_e( 'Off', 'doctor-subs' ); ?>">
+										<?php echo $enabled ? esc_html__( 'On', 'doctor-subs' ) : esc_html__( 'Off', 'doctor-subs' ); ?>
+									</span>
+								</label>
+							</div>
+							<p class="rule-card-detects">
+								<strong><?php esc_html_e( 'Detects:', 'doctor-subs' ); ?></strong>
+								<?php echo esc_html( $info['detects'] ); ?>
+							</p>
+							<p class="rule-card-fixes">
+								<strong><?php esc_html_e( 'Fix:', 'doctor-subs' ); ?></strong>
+								<?php echo esc_html( $info['fixes'] ); ?>
+							</p>
+						</div>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		<?php endif; ?>
 
 		<div class="settings-foot">
 			<button type="submit" class="btn btn-primary">

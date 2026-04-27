@@ -11,7 +11,7 @@ declare( strict_types=1 );
  * Plugin Name: Doctor Subs
  * Plugin URI: https://github.com/davidrukahu/doctor-subs
  * Description: Find and fix broken WooCommerce subscriptions. Detects ghost subs, stuck-on-hold renewals, and repeated payment failures, with one-click reversible fixes.
- * Version: 2.0.0-alpha.1
+ * Version: 2.1.0
  * Author: DavidR
  * Author URI: https://github.com/davidrukahu
  * Text Domain: doctor-subs
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'DR_SUBS_PLUGIN_FILE', __FILE__ );
 define( 'DR_SUBS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'DR_SUBS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'DR_SUBS_PLUGIN_VERSION', '2.0.0-alpha.1' );
+define( 'DR_SUBS_PLUGIN_VERSION', '2.1.0' );
 define( 'DR_SUBS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
@@ -157,31 +157,37 @@ function dr_subs_autoloader( $class_name ) {
 	// Define class file mappings.
 	$class_directories = array(
 		// v1 legacy classes (kept during v2 transition for back-compat shims).
-		'plugin'                 => 'includes/',
-		'admin'                  => 'includes/',
-		'ajax-handler'           => 'includes/',
-		'subscription-anatomy'   => 'includes/analyzers/',
-		'expected-behavior'      => 'includes/analyzers/',
-		'timeline-builder'       => 'includes/analyzers/',
-		'discrepancy-detector'   => 'includes/analyzers/',
-		'skipped-cycle-detector' => 'includes/analyzers/',
-		'subscription-data'      => 'includes/collectors/',
-		'logger'                 => 'includes/utilities/',
-		'security'               => 'includes/utilities/',
+		'plugin'                    => 'includes/',
+		'admin'                     => 'includes/',
+		'ajax-handler'              => 'includes/',
+		'subscription-anatomy'      => 'includes/analyzers/',
+		'expected-behavior'         => 'includes/analyzers/',
+		'timeline-builder'          => 'includes/analyzers/',
+		'discrepancy-detector'      => 'includes/analyzers/',
+		'skipped-cycle-detector'    => 'includes/analyzers/',
+		'subscription-data'         => 'includes/collectors/',
+		'logger'                    => 'includes/utilities/',
+		'security'                  => 'includes/utilities/',
 		// v2 new classes (populated as tasks ship).
-		'migration'              => 'includes/migration/',
-		'rule-interface'         => 'includes/rules/',
-		'rules-registry'         => 'includes/rules/',
-		'rule-match'             => 'includes/rules/',
-		'rule-ghost-sub'         => 'includes/rules/',
-		'rule-on-hold-paid'      => 'includes/rules/',
-		'rule-repeated-failures' => 'includes/rules/',
-		'scan-context'           => 'includes/scanner/',
-		'health-scanner'         => 'includes/scanner/',
-		'fix-journal'            => 'includes/journal/',
-		'fix-journal-entry'      => 'includes/journal/',
-		'narrator'               => 'includes/narrator/',
-		'alert-dispatcher'       => 'includes/alerts/',
+		'migration'                 => 'includes/migration/',
+		'rule-interface'            => 'includes/rules/',
+		'rules-registry'            => 'includes/rules/',
+		'rule-match'                => 'includes/rules/',
+		'rule-ghost-sub'            => 'includes/rules/',
+		'rule-on-hold-paid'         => 'includes/rules/',
+		'rule-repeated-failures'    => 'includes/rules/',
+		'rule-mass-hold'            => 'includes/rules/',
+		'rule-total-drift'          => 'includes/rules/',
+		'rule-manual-renewal-drift' => 'includes/rules/',
+		'rule-catalog'              => 'includes/rules/',
+		'scan-context'              => 'includes/scanner/',
+		'health-scanner'            => 'includes/scanner/',
+		'fix-journal'               => 'includes/journal/',
+		'fix-journal-entry'         => 'includes/journal/',
+		'narrator'                  => 'includes/narrator/',
+		'alert-dispatcher'          => 'includes/alerts/',
+		'telemetry'                 => 'includes/telemetry/',
+		'status-transition-log'     => 'includes/observers/',
 	);
 
 	// Explicit ambiguous-short-name overrides that can't be inferred from

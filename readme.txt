@@ -4,23 +4,26 @@ Tags: woocommerce, subscriptions, troubleshooting, diagnostics, payment issues
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.0-alpha.1
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Find and fix broken WooCommerce subscriptions: ghost subs, stuck on-hold renewals, and repeated payment failures. One-click reversible fixes.
+Find and fix broken WooCommerce subscriptions: ghost subs, mass on-hold cascades, manual-renewal drift, total drift, stuck on-hold, and repeated payment failures. One-click reversible fixes.
 
 == Description ==
 
-Doctor Subs v2 is a focused diagnostic and fix tool for WooCommerce Subscriptions. It runs a background scan across every active subscription on your store, classifies each into healthy / at-risk / broken, and gives you a one-click preview + fix + undo for the three most common renewal failures.
+Doctor Subs is a focused diagnostic tool for WooCommerce Subscriptions. It runs a daily background scan across every active and on-hold subscription on your store, classifies each one as healthy / at risk / broken, and gives you a one-click preview + fix + undo for the six most common renewal failure patterns - including the silent manual-renewal-flag bugs that quietly stop auto-renewals.
 
 Built for solo, non-technical store owners with 20 to 500 active subscriptions. No log-reading, no WP-CLI, no support tickets.
 
 = What it detects =
 
+* **Manual-renewal drift** - active subs silently flipped to "manual renewal" despite a working Stripe card on file. Maps directly to the four subscriptions-core bugs disclosed in April 2026 (stale dates cache, HPOS to postmeta sync gap, wcs_create_subscription state discard, same-gateway switch). Customers churn invisibly.
 * **Ghost subscriptions** - active subs whose next payment was supposed to fire but WordPress never scheduled the renewal event. Silent revenue loss.
+* **Mass on-hold cascade** - 20 or more subs sharing the same product transitioning to on-hold within an hour. Symptom of a product-edit cascade or faulty bulk operation that takes out a whole product line at once.
 * **Stuck on-hold** - subs whose latest Stripe renewal actually captured successfully but the status never flipped back to active. Customer paid, your store shows them as delinquent.
-* **Repeated payment failures** - 2+ failed scheduled payment attempts in the last 30 days. Often a gateway blip that a single retry fixes.
+* **Repeated payment failures** - 2 or more failed scheduled payment attempts in the last 30 days. Often a gateway blip that a single retry fixes.
+* **Total drift** - stored subscription total no longer matches the line items. Flagged for manual review (drift causes are too varied to safely auto-correct).
 
 = What it does about them =
 
@@ -30,21 +33,22 @@ Every detected problem gets:
 2. A preview modal showing exactly which fields will change before you commit
 3. A one-click fix that WordPress handles for you
 4. A journal entry you can undo at any time
-5. An explicit warning if reverting the fix cannot undo something that already ran (e.g. a re-scheduled payment already charged)
+5. An explicit warning if reverting cannot undo something that already ran (e.g. a re-scheduled payment already charged the customer)
 
 All fixes are state-guarded: if the subscription changed between detection and when you click Fix, the plugin aborts and asks you to re-scan. You never get surprised.
 
 = Dashboard + alerts =
 
-* **Traffic-light dashboard** - three counters (Healthy / At risk / Broken) you can glance at in 5 seconds. Click any counter to drill into the affected subs.
+* **Calm-clinical dashboard** - "X of Y healthy" stat plus two action counters (At risk / Broken). Click any counter, search by sub number, customer name, or email, and filter by rule chip.
+* **Bulk fix** - "Fix all N matches" across one rule or every visible row. Each fix lands as its own reversible journal entry.
 * **Daily background scan** - Action Scheduler runs the scan automatically. A WP-Cron watchdog catches the rare case when AS stops firing.
 * **Email digest** - when something new breaks between scans, you get a plain-text summary email.
-* **Bulk fix** - "Fix all N ghost subs" across the whole store in one click (all reversible atomically).
-* **Fix history** - every applied fix, with Revert on each. Configurable retention (30-365 days or forever).
+* **Fix history** - every applied fix, with Revert on each. Configurable retention (30 to 365 days, or forever).
+* **Per-rule on/off** - any of the six rules can be disabled in Settings if it's noisy in your store.
 
 = Modern design system =
 
-Self-hosted typography (Switzer, Instrument Serif, JetBrains Mono), OKLCH colour tokens, full responsive + print stylesheets, WCAG 2.1 AA contrast, `prefers-reduced-motion` respected. Scoped to Doctor Subs - never leaks into the rest of WP admin.
+Self-hosted typography (Switzer, Source Serif 4, JetBrains Mono), OKLCH colour tokens, full responsive + print stylesheets, WCAG 2.1 AA contrast, `prefers-reduced-motion` respected. Scoped to Doctor Subs - never leaks into the rest of WP admin.
 
 = Translations =
 
@@ -72,7 +76,7 @@ Ships in 20 major languages: French, Spanish, German, Italian, Portuguese (BR + 
 
 1. WooCommerce > Doctor Subs
 2. Click **Scan my subscriptions**
-3. Review the traffic-light counters, click into the broken bucket, preview a fix, commit
+3. Review the X-of-Y healthy stat and the two action counters, click into the broken bucket, preview a fix, commit
 
 == Frequently Asked Questions ==
 
@@ -82,15 +86,19 @@ No. The plugin never mutates your data without an explicit Fix click. Every chan
 
 = What happens if I revert a fix after the payment already ran? =
 
-The modal explicitly tells you: the re-scheduled payment has already charged the customer, reverting only removes the fix from your history. If a refund is needed, handle it in the related WooCommerce order.
+The revert confirm explicitly tells you: the re-scheduled payment has already charged the customer, reverting will undo the status change but will NOT refund. If a refund is needed, handle it in the related WooCommerce order.
+
+= Does it really detect the silent "manual renewal" bug? =
+
+Yes. The Manual-renewal drift rule looks for active subs whose `_requires_manual_renewal` flag is set despite a working Stripe customer/source meta on file. It clears the flag in both the orders table and postmeta (belt-and-braces against the HPOS sync gap), re-stamps `next_payment` if past-due, and schedules a fresh renewal so WCS bills automatically again.
 
 = Is this a replacement for dunning management? =
 
-No. Doctor Subs fixes structural issues (missing AS events, stuck-on-hold statuses). It does not handle card declines, SCA prompts, or retry strategy. For those, use your gateway's built-in dunning or a dedicated plugin.
+No. Doctor Subs fixes structural issues (missing AS events, stuck-on-hold statuses, manual-renewal flag drift, line-item total drift). It does not handle card declines, SCA prompts, or retry strategy. For those, use your gateway's built-in dunning or a dedicated plugin.
 
 = Which gateways does it support? =
 
-v2.0: Stripe fully supported for all three rules. PayPal, Authorize.net, Square, and WooPayments variants land in v1.1.
+v2.1: Stripe fully supported across all rules that need a gateway signal (stuck on-hold, manual-renewal drift). The remaining rules are gateway-agnostic. PayPal, Authorize.net, Square, and WooPayments variants land in a future release.
 
 = Will it work on stores with 10,000+ subscriptions? =
 
@@ -98,59 +106,90 @@ Yes. The scanner uses a shared pre-built index so every rule is O(1) per sub (no
 
 = Can I extend it with my own rules? =
 
-Yes. Implement `DR_Subs_Rule_Interface` and register on the `dr_subs_register_rules` action. See the three built-in rules under `includes/rules/` for examples.
+Yes. Implement `DR_Subs_Rule_Interface` and register on the `dr_subs_register_rules` action. See the six built-in rules under `includes/rules/` for examples.
 
 = Is HPOS supported? =
 
-Required. Doctor Subs v2 declares High-Performance Order Storage compatibility and requires WooCommerce 9.0+.
+Required. Doctor Subs declares High-Performance Order Storage compatibility and requires WooCommerce 9.0 or higher.
 
 == Screenshots ==
 
-1. Traffic-light dashboard with three counters and the Needs attention table
-2. Fix preview modal showing the named diff and plain-English narrative
-3. Fix history with individual + batch entries and per-entry Revert
-4. Settings page (alerts, retention, telemetry opt-in)
-5. First-run landing page with three-rule explainer
-6. Executed-payment warning in the revert modal
+1. Calm dashboard with the X-of-Y healthy stat, two action counters, search, rule chips, and the Needs attention table
+2. Fix preview modal with the plain-English narrative, named diff, and "you can undo this" reassurance
+3. Fix history with per-entry Revert buttons and an escalated confirm when the renewal payment has already executed
+4. Settings page with per-rule on/off toggles plus full plain-English descriptions of what each rule detects and fixes
+5. Bulk-fix confirm modal: lists per-rule counts, warns about scheduled renewal payments, primary button reflects the exact count
+6. Mass on-hold cascade detection: one rule, multiple affected rows, a single bulk fix recovers the whole cascade
 
 == Changelog ==
 
+= 2.1.0 =
+
+Major detection + UX expansion. Six rules now ship; design language tightened.
+
+**New rules (3):**
+
+* **Manual-renewal drift** (Stripe-only): detects active subs silently flipped to manual renewal despite a Stripe customer/source on file. Direct response to the four April 2026 subscriptions-core bug disclosures. Fix clears the flag in HPOS + postmeta, re-stamps next_payment if past-due, and schedules a fresh renewal.
+* **Mass on-hold cascade**: detects 20 or more on-hold transitions for the same product within a 1-hour window. Backed by a new `dr_subs_status_transitions` log written by an observer on every subscription status change. Fix reactivates each cascade member; bulk-fix recovers the whole cascade in one click.
+* **Total drift** (flag-only): detects subs whose stored total no longer matches the sum of line items + tax + shipping + fees by more than $0.50, ignoring subs modified in the last 7 days. Surfaces the discrepancy and links to the sub for manual review.
+
+**Dashboard:**
+
+* Healthy counter relocated as an "X of Y healthy" stat above the action counters; can no longer be mistaken for a clickable filter.
+* Search bar matches sub number, customer name, and billing email. Debounced, ESC clears.
+* Rule chip filters above the table; bucket counter and rule chip are now mutually exclusive (clicking one clears the other).
+* Reason column strips inline HTML so emphasis tags never render literally.
+* Issue column header moved to screen-reader-only; the rule pill carries the label.
+
+**Bulk + revert:**
+
+* Bulk-fix button beside the active rule chip OR in "All rules" mode: groups visible rows by rule, posts one batch per rule, surfaces a styled confirm modal listing the per-rule counts and a renewal-payment warning. Total Drift opts out (manual-only).
+* Revert confirm now opens a styled in-plugin modal instead of `window.confirm()`. When the journal entry's AS action has already executed, the modal escalates to a danger-styled button and the explicit "this will NOT refund" warning.
+
+**Settings:**
+
+* New "Detection rules" section listing all six rules with toggle, plain-English Detects/Fix descriptions, and bucket tag. Disabled rules skip detection on every scan.
+* Plain-English summaries on dashboard rule chips and table pills via `DR_Subs_Rule_Catalog`.
+
+**Fix history:**
+
+* Plain-English summary per row ("Rescheduled the missed renewal payment", "Reactivated as part of a mass-hold cascade recovery", etc.) instead of the raw `key: value` after-state dump.
+* All canonical rule ids now render correct labels (legacy short ids fall back).
+
+**Schema + scanner:**
+
+* Schema bumped to 2.1.0; new `dr_subs_status_transitions` table with `sub_id`, `from_status`, `to_status`, `product_id`, `variation_id`, `transitioned_at`. Pruned daily on a 30-day TTL.
+* Scanner now walks `active`, `on-hold`, and `pending-cancel` statuses (was `active` only). Mass-hold + Stuck-on-hold rules now reach their target subs.
+* Manual_renewal_drift registered before Ghost_sub so it claims primary-rule on the same broken state with the right fix. Ghost_sub now skips manual-renewal subs entirely.
+
+**Design + accessibility:**
+
+* Display typeface swapped from Instrument Serif to Source Serif 4 (less editorial-romantic, calmer italic).
+* Counter numerals dropped from 62px display serif to 32px Switzer 500: a 28-broken count no longer reads like a panic-amplifier.
+* Dashboard hint copy de-imperative-d ("needs you now" -> "since last scan").
+* All em dashes / en dashes / minus signs replaced with plain hyphens across PHP, JS, CSS, and views.
+* Modal focus on open lands on the dialog itself (tabindex=-1) so the sub-id link no longer reads as "selected".
+* New `.btn-danger` token using the existing terracotta `--broken` for genuinely destructive actions.
+
+**Internal:**
+
+* New `DR_Subs_Rule_Catalog` central source-of-truth for per-rule label, summary, detect, fix, bucket, and journal_summary copy.
+* New `dev/` directory with `seed-test-data.php` and `wipe-test-data.php` (excluded from the production zip via build script + CI workflow).
+
 = 2.0.0-alpha.1 =
 
-Major rewrite. Single breaking change moment: every PHP class renamed from WCST_* to DR_Subs_*; legacy class_alias shims ship for the three most-likely-extended public classes. Detailed notes:
+Major rewrite. Single breaking change moment: every PHP class renamed from WCST_* to DR_Subs_*; legacy class_alias shims ship for the three most-likely-extended public classes.
 
-**New:**
-
-* Traffic-light dashboard (Healthy / At risk / Broken) with per-bucket drill-down
+* Traffic-light dashboard with per-bucket drill-down
 * Three deterministic detection rules: Ghost Sub, On-Hold with Paid Renewal (Stripe), Repeated Payment Failures
 * Daily background scanner via Action Scheduler + WP-Cron watchdog
 * One-click fixes with state-guarded apply and reversible Fix journal
 * Fix preview modal with named diff and executed-payment warning
-* Bulk "Fix all N ghost subs" action
 * Email digest alerts (off by default; configurable recipient)
 * Settings page with retention controls and anonymous telemetry opt-in
 * 20 language translations via Potomatic
-* Self-hosted typography (Switzer, Instrument Serif, JetBrains Mono) - no external asset fetches
-* Full responsive + print + reduced-motion support
+* Self-hosted typography, no external asset fetches
 * HPOS baseline (WC 9.0+)
-
-**Changed:**
-
-* All PHP classes: WCST_* -> DR_Subs_*. class_alias shims for DR_Subs_Plugin, DR_Subs_Admin, DR_Subs_Ajax_Handler.
-* All hook/filter/nonce prefixes: wcst_ -> dr_subs_
-* WooCommerce minimum version: 9.0 (was 9.8.5)
-* The "Doctor Subs" link on the subscription row now opens the dashboard instead of an auto-analyze flow.
-
-**Fixed:**
-
-* Double spl_autoload_register registration in the main plugin file
-* args LIKE '%sub_id%' false-positive where sub ID 1 matched sub IDs 11, 111, 123 etc.
-* Month-is-30-days billing math that flagged every February as "skipped cycle" on monthly subs
-* set_time_limit(30) masking slow analyzer code in v1's AJAX path
-
-**Removed:**
-
-* The v1 3-step analyzer UI (Anatomy / Expected / Timeline tabs). The existing v1 analyzer classes stay in includes/analyzers/ as reference but are no longer wired. Future releases may surface them behind a Per-sub "Investigate" drill-down.
 
 = 1.2.4 =
 
@@ -166,9 +205,13 @@ Major rewrite. Single breaking change moment: every PHP class renamed from WCST_
 
 == Upgrade Notice ==
 
+= 2.1.0 =
+
+Adds three new detection rules (manual-renewal drift, mass on-hold cascade, total drift), bulk-fix for any visible row set, and a styled revert confirm with executed-payment warnings. Schema migrates automatically on first admin page load. No breaking API changes for third-party rules.
+
 = 2.0.0-alpha.1 =
 
-Major rewrite. Breaking class rename: WCST_* to DR_Subs_*. class_alias shims keep WCST_Plugin / WCST_Admin / WCST_Ajax_Handler working. All other identifiers (hooks, filters, nonces) follow the new prefix without shims. Backup before upgrading if you have custom integrations.
+Major rewrite. Breaking class rename: WCST_* to DR_Subs_*. class_alias shims keep WCST_Plugin / WCST_Admin / WCST_Ajax_Handler working. Backup before upgrading if you have custom integrations.
 
 = 1.2.4 =
 

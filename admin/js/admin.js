@@ -78,52 +78,284 @@
 		} );
 	}
 
+	// Combined-filter state. Bucket counters, rule chips, and search box
+	// all read/write this and call applyTableFilter().
+	var FILTER_STATE = {
+		bucket: 'all',
+		rule:   'all',
+		search: '',
+	};
+
 	function applyFilter( filter ) {
-		var active = $( '.counter.active' );
-		var current = active ? active.getAttribute( 'data-dr-subs-filter' ) : 'all';
 		// Toggle off if clicking the already-active one.
-		var next = ( current === filter ) ? 'all' : filter;
+		var next = ( FILTER_STATE.bucket === filter ) ? 'all' : filter;
+		FILTER_STATE.bucket = next;
+
+		// Bucket and rule are mutually exclusive - picking a bucket
+		// clears the rule chip selection (and vice versa). Two
+		// independent narrowings on a 50-row table got confusing.
+		if ( next !== 'all' ) {
+			FILTER_STATE.rule = 'all';
+			syncRuleChipUI();
+		}
 
 		$$( '.counter' ).forEach( function ( c ) {
 			var isActive = c.getAttribute( 'data-dr-subs-filter' ) === next;
 			c.classList.toggle( 'active', isActive );
+			if ( c.hasAttribute( 'data-dr-subs-filter' ) ) {
+				c.setAttribute( 'aria-pressed', isActive ? 'true' : 'false' );
+			}
+		} );
+
+		applyTableFilter();
+	}
+
+	function syncRuleChipUI() {
+		$$( '[data-dr-subs-rule-chip]' ).forEach( function ( c ) {
+			var isActive = c.getAttribute( 'data-dr-subs-rule-chip' ) === FILTER_STATE.rule;
+			c.classList.toggle( 'active', isActive );
 			c.setAttribute( 'aria-pressed', isActive ? 'true' : 'false' );
 		} );
+	}
 
-		// Filter rows by data-bucket or data-rule. We use data-sub-id on rows
-		// but bucket info comes from the row classes or data attrs.
-		var rows = $$( '[data-dr-subs-row]' );
+	function syncBucketUI() {
+		$$( '.counter' ).forEach( function ( c ) {
+			var isActive = c.getAttribute( 'data-dr-subs-filter' ) === FILTER_STATE.bucket;
+			c.classList.toggle( 'active', isActive );
+			if ( c.hasAttribute( 'data-dr-subs-filter' ) ) {
+				c.setAttribute( 'aria-pressed', isActive ? 'true' : 'false' );
+			}
+		} );
+	}
+
+	function wireRuleChips() {
+		$$( '[data-dr-subs-rule-chip]' ).forEach( function ( chip ) {
+			chip.addEventListener( 'click', function () {
+				var rid = chip.getAttribute( 'data-dr-subs-rule-chip' ) || 'all';
+				FILTER_STATE.rule = rid;
+				// Bucket and rule are mutually exclusive - see applyFilter.
+				if ( rid !== 'all' ) {
+					FILTER_STATE.bucket = 'all';
+					syncBucketUI();
+				}
+				syncRuleChipUI();
+				applyTableFilter();
+			} );
+		} );
+	}
+
+	function wireSearch() {
+		var input = $( '[data-dr-subs-search]' );
+		if ( ! input ) return;
+		var clear = $( '[data-dr-subs-search-clear]' );
+
+		var run = debounce( function () {
+			FILTER_STATE.search = ( input.value || '' ).trim().toLowerCase();
+			if ( clear ) clear.hidden = FILTER_STATE.search === '';
+			applyTableFilter();
+		}, 180 );
+
+		input.addEventListener( 'input', run );
+		input.addEventListener( 'keydown', function ( e ) {
+			if ( e.key === 'Escape' && input.value ) {
+				input.value = '';
+				FILTER_STATE.search = '';
+				if ( clear ) clear.hidden = true;
+				applyTableFilter();
+			}
+		} );
+		if ( clear ) {
+			clear.addEventListener( 'click', function () {
+				input.value = '';
+				FILTER_STATE.search = '';
+				clear.hidden = true;
+				applyTableFilter();
+				input.focus();
+			} );
+		}
+	}
+
+	function applyTableFilter() {
+		var rows    = $$( '[data-dr-subs-row]' );
+		var bucket  = FILTER_STATE.bucket;
+		var rule    = FILTER_STATE.rule;
+		var search  = FILTER_STATE.search;
+
+		var visible = 0;
 		rows.forEach( function ( row ) {
-			var rule = row.getAttribute( 'data-rule' );
-			// Map rule → bucket for visibility:
-			//   ghost → broken, onhold → varies, repfail → risk
-			// In the real PHP we'll emit data-bucket directly. Fallback:
-			var bucket = row.getAttribute( 'data-bucket' ) || rule;
-			var show =
-				next === 'all' ||
-				bucket === next ||
-				( next === 'broken' && rule === 'ghost' ) ||
-				( next === 'risk' && ( rule === 'repfail' || rule === 'onhold' ) );
+			var rb = row.getAttribute( 'data-bucket' ) || '';
+			var rr = row.getAttribute( 'data-rule' )   || '';
+			var rc = row.getAttribute( 'data-customer' ) || '';
+			var re = row.getAttribute( 'data-email' )    || '';
+			var rs = row.getAttribute( 'data-sub-id' )   || '';
+
+			var bucketOk = bucket === 'all' || rb === bucket;
+			var ruleOk   = rule   === 'all' || rr === rule;
+			var searchOk = search === ''
+				|| rc.indexOf( search ) !== -1
+				|| re.indexOf( search ) !== -1
+				|| rs.indexOf( search.replace( /^#/, '' ) ) !== -1;
+
+			var show = bucketOk && ruleOk && searchOk;
 			row.style.display = show ? '' : 'none';
+			if ( show ) visible++;
 		} );
 
-		// Update "showing" meta copy.
+		// Toggle JS-only "no matches" row when everything got filtered out.
+		var emptyRow = $( '[data-dr-subs-empty]' );
+		if ( emptyRow ) {
+			emptyRow.hidden = ( visible > 0 );
+		}
+
+		// Update "showing/filtering" meta copy.
 		var metaEl = $( '.table-head .meta' );
 		if ( metaEl ) {
-			if ( next === 'all' ) {
+			if ( bucket === 'all' && rule === 'all' && search === '' ) {
 				metaEl.textContent = ( ajax.strings && ajax.strings.showingAll ) || 'showing all broken and at-risk';
 			} else {
-				var visible = rows.filter( function ( r ) { return r.style.display !== 'none'; } ).length;
-				var tpl = ( ajax.strings && ajax.strings.filtering ) || 'filtering to %d %s';
-				metaEl.textContent = tpl.replace( '%d', visible ).replace( '%s', next );
+				var filtering = ajax.strings && ajax.strings.filtering;
+				var tpl;
+				if ( filtering && typeof filtering === 'object' && bucket !== 'all' && filtering[ bucket ] ) {
+					tpl = filtering[ bucket ];
+				} else if ( typeof filtering === 'string' ) {
+					tpl = filtering;
+				} else {
+					tpl = 'showing %d of %d';
+				}
+				metaEl.textContent = tpl
+					.replace( /%1\$d/g, visible )
+					.replace( /%2\$s/g, bucket === 'all' ? 'matching' : bucket )
+					.replace( '%d', visible )
+					.replace( '%s', bucket === 'all' ? 'matching' : bucket );
 			}
 		}
 
-		// Show/hide the clear filter button.
+		// Show/hide the bucket-counter clear button.
 		var clear = $( '.table-head .clear' );
 		if ( clear ) {
-			clear.style.display = next === 'all' ? 'none' : '';
+			clear.style.display = bucket === 'all' ? 'none' : '';
 		}
+
+		// Bulk-fix button: visible when there are bulk-fixable visible rows.
+		// Counts rows whose rule is NOT in BULK_DISABLED_RULES (total_drift
+		// is flag-only). Works for both single-rule chip and All rules.
+		var bulkBtn = $( '[data-dr-subs-bulk-fix]' );
+		if ( bulkBtn ) {
+			var fixable = rows.filter( function ( r ) {
+				return r.style.display !== 'none' &&
+					BULK_DISABLED_RULES.indexOf( r.getAttribute( 'data-rule' ) ) === -1;
+			} );
+			var fixableCount = fixable.length;
+			if ( fixableCount > 0 ) {
+				var activeChipEl = $( '[data-dr-subs-rule-chip].active' );
+				var labelTxt;
+				if ( rule === 'all' ) {
+					labelTxt = 'Fix all ' + fixableCount + ' matches';
+				} else {
+					var chipLabel = activeChipEl ? ( activeChipEl.textContent || '' ).trim() : '';
+					labelTxt = ( 'Fix all ' + fixableCount + ' ' + chipLabel ).replace( /\s+/g, ' ' );
+				}
+				bulkBtn.textContent = labelTxt;
+				bulkBtn.setAttribute( 'data-rule-id', rule );
+				bulkBtn.hidden = false;
+			} else {
+				bulkBtn.hidden = true;
+			}
+		}
+	}
+
+	// Rules that should never be bulk-fixed (apply_fix throws). Mirrors
+	// the data-bulk-disabled='1' attribute on the chip.
+	var BULK_DISABLED_RULES = [ 'total_drift' ];
+
+	function wireBulkFix() {
+		var bulkBtn = $( '[data-dr-subs-bulk-fix]' );
+		if ( ! bulkBtn ) return;
+
+		bulkBtn.addEventListener( 'click', function () {
+			// Group visible, fixable rows by rule_id. The bulk_fix endpoint
+			// is per-rule, so we sequence one POST per rule when "All
+			// rules" is selected.
+			var byRule = {};
+			$$( '[data-dr-subs-row]' ).forEach( function ( r ) {
+				if ( r.style.display === 'none' ) return;
+				var rid = r.getAttribute( 'data-rule' );
+				var sid = r.getAttribute( 'data-sub-id' );
+				if ( ! rid || ! sid ) return;
+				if ( BULK_DISABLED_RULES.indexOf( rid ) !== -1 ) return;
+				( byRule[ rid ] = byRule[ rid ] || [] ).push( sid );
+			} );
+
+			var totalCount = Object.keys( byRule ).reduce( function ( n, k ) {
+				return n + byRule[ k ].length;
+			}, 0 );
+			if ( totalCount === 0 ) return;
+
+			var ruleSummary = Object.keys( byRule ).map( function ( rid ) {
+				return byRule[ rid ].length + ' ' + rid.replace( /_/g, ' ' );
+			} ).join( ', ' );
+
+			openConfirmModal( {
+				title: 'Apply ' + totalCount + ' fix' + ( totalCount === 1 ? '' : 'es' ) + '?',
+				body: 'Doctor Subs will run the per-rule fix on each subscription: ' + ruleSummary + '. Each can be reverted individually from Fix history.',
+				warning: 'Some fixes schedule a renewal payment. The customer may be charged within minutes.',
+				primaryLabel: 'Apply ' + totalCount + ' fix' + ( totalCount === 1 ? '' : 'es' ),
+				dangerous: false,
+			} ).then( function ( confirmed ) {
+				if ( ! confirmed ) return;
+				doBulkFix( bulkBtn, byRule );
+			} );
+		} );
+	}
+
+	function doBulkFix( bulkBtn, byRule ) {
+			bulkBtn.disabled = true;
+			bulkBtn.classList.add( 'is-busy' );
+
+			var ruleIds = Object.keys( byRule );
+			var allOk   = true;
+			var errors  = [];
+
+			function postOne( ruleId ) {
+				var body = new URLSearchParams();
+				body.set( 'action', 'dr_subs_bulk_fix' );
+				body.set( '_ajax_nonce', ajax.nonce || '' );
+				body.set( 'rule_id', ruleId );
+				byRule[ ruleId ].forEach( function ( id ) { body.append( 'sub_ids[]', id ); } );
+				return fetch( ajax.ajaxUrl, {
+					method: 'POST',
+					credentials: 'same-origin',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+					body: body,
+				} ).then( function ( r ) { return r.json(); } )
+					.then( function ( res ) {
+						if ( ! res || ! res.success ) {
+							allOk = false;
+							errors.push( ruleId + ': ' + ( ( res && res.data && res.data.message ) || 'failed' ) );
+						}
+					} )
+					.catch( function ( err ) {
+						allOk = false;
+						errors.push( ruleId + ': ' + err.message );
+					} );
+			}
+
+			// Sequence the per-rule POSTs (parallel would be fine too, but
+			// scanner concurrency lock prefers serial).
+			var chain = Promise.resolve();
+			ruleIds.forEach( function ( rid ) {
+				chain = chain.then( function () { return postOne( rid ); } );
+			} );
+			chain.then( function () {
+				bulkBtn.disabled = false;
+				bulkBtn.classList.remove( 'is-busy' );
+				if ( allOk ) {
+					window.location.reload();
+				} else {
+					alert( 'Some bulk fixes failed:\n' + errors.join( '\n' ) );
+					window.location.reload();
+				}
+			} );
 	}
 
 	/* ============================================================
@@ -134,8 +366,12 @@
 		// Row click opens modal.
 		$$( '[data-dr-subs-row]' ).forEach( function ( row ) {
 			row.addEventListener( 'click', function ( e ) {
-				// Don't open if the click was on the Fix button itself - let it bubble up to the button handler.
+				// Don't open if the click was on the Fix button or the
+				// sub-id link - let those handle themselves.
 				if ( e.target.closest( '[data-dr-subs-fix]' ) ) {
+					return;
+				}
+				if ( e.target.closest( '[data-dr-subs-row-link]' ) ) {
 					return;
 				}
 				openFixModal( row.getAttribute( 'data-sub-id' ) );
@@ -217,6 +453,81 @@
 		}
 	}
 
+	/**
+	 * Generic styled-modal confirm. Replaces window.confirm() so destructive
+	 * actions (bulk-fix, revert with executed payment) stay inside the
+	 * plugin's design language. Returns a Promise<bool>.
+	 */
+	function openConfirmModal( opts ) {
+		opts = opts || {};
+		LAST_FOCUS = document.activeElement;
+		return new Promise( function ( resolve ) {
+			var mount = $( '[data-dr-subs-modal-mount]' ) || ensureModalMount();
+			var title = opts.title || 'Confirm';
+			var body = opts.body || '';
+			var warning = opts.warning || '';
+			var primaryLabel = opts.primaryLabel || 'Confirm';
+			var primaryClass = opts.dangerous ? 'btn btn-primary btn-danger' : 'btn btn-primary';
+
+			var html = '<div class="ds-root" data-dr-subs-modal-layer>'
+				+ '<div class="modal-backdrop" data-dr-subs-confirm-backdrop tabindex="-1"></div>'
+				+ '<div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="dr-subs-confirm-title" data-dr-subs-confirm-modal>'
+				+   '<div class="modal-head"><span class="customer" id="dr-subs-confirm-title">' + escapeHtml( title ) + '</span></div>'
+				+   '<div class="modal-body">'
+				+     '<p class="narrative">' + escapeHtml( body ) + '</p>'
+				+     ( warning
+					? '<div class="executed-warning" role="note">'
+						+ '<span class="icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><circle cx="12" cy="16" r="0.8" fill="currentColor"/></svg></span>'
+						+ '<span class="body">' + escapeHtml( warning ) + '</span>'
+						+ '</div>'
+					: '' )
+				+   '</div>'
+				+   '<div class="modal-foot">'
+				+     '<button type="button" class="btn btn-ghost" data-dr-subs-confirm-cancel>Cancel</button>'
+				+     '<button type="button" class="' + primaryClass + '" data-dr-subs-confirm-ok>' + escapeHtml( primaryLabel ) + '</button>'
+				+   '</div>'
+				+ '</div>'
+				+ '</div>';
+
+			mount.innerHTML = html;
+			ACTIVE_MODAL = $( '[data-dr-subs-confirm-modal]', mount );
+			document.body.style.overflow = 'hidden';
+
+			function done( v ) {
+				cleanup();
+				resolve( v );
+			}
+			function cleanup() {
+				mount.innerHTML = '';
+				document.body.style.overflow = '';
+				ACTIVE_MODAL = null;
+				if ( LAST_FOCUS && LAST_FOCUS.focus ) LAST_FOCUS.focus();
+				document.removeEventListener( 'keydown', onKey );
+			}
+			function onKey( e ) {
+				if ( e.key === 'Escape' ) done( false );
+				if ( e.key === 'Enter' ) done( true );
+			}
+
+			$( '[data-dr-subs-confirm-backdrop]' ).addEventListener( 'click', function () { done( false ); } );
+			$( '[data-dr-subs-confirm-cancel]' ).addEventListener( 'click', function () { done( false ); } );
+			$( '[data-dr-subs-confirm-ok]' ).addEventListener( 'click', function () { done( true ); } );
+			document.addEventListener( 'keydown', onKey );
+			trapFocus( ACTIVE_MODAL );
+			var ok = $( '[data-dr-subs-confirm-ok]', ACTIVE_MODAL );
+			if ( ok ) ok.focus();
+		} );
+	}
+
+	function escapeHtml( s ) {
+		return String( s == null ? '' : s )
+			.replace( /&/g, '&amp;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /'/g, '&#39;' );
+	}
+
 	function applyFix( subId, applyBtn ) {
 		if ( ! subId || ! applyBtn ) return;
 
@@ -267,10 +578,14 @@
 	 * ============================================================ */
 
 	function trapFocus( modal ) {
-		var focusables = $$( FOCUSABLE, modal );
-		if ( focusables.length ) {
-			focusables[ 0 ].focus();
+		// Focus the dialog itself (tabindex=-1) so no inner link or button
+		// gets a visible focus ring on open. The first focusable in this
+		// design is the sub-id link, which made it look "selected" on the
+		// modal head. Users tab into controls naturally from here.
+		if ( ! modal.hasAttribute( 'tabindex' ) ) {
+			modal.setAttribute( 'tabindex', '-1' );
 		}
+		modal.focus( { preventScroll: true } );
 		modal.addEventListener( 'keydown', function ( e ) {
 			if ( e.key !== 'Tab' ) return;
 			var items = $$( FOCUSABLE, modal );
@@ -280,7 +595,7 @@
 			if ( e.shiftKey && document.activeElement === first ) {
 				e.preventDefault();
 				last.focus();
-			} else if ( ! e.shiftKey && document.activeElement === last ) {
+			} else if ( ! e.shiftKey && ( document.activeElement === last || document.activeElement === modal ) ) {
 				e.preventDefault();
 				first.focus();
 			}
@@ -366,33 +681,50 @@
 				e.preventDefault();
 				var entryId = btn.getAttribute( 'data-entry-id' );
 				if ( ! entryId ) return;
-				var confirmMsg = ( ajax.strings && ajax.strings.confirmRevert ) || 'Revert this fix? The subscription will return to its previous state.';
-				if ( ! window.confirm( confirmMsg ) ) return;
+				var executed = btn.getAttribute( 'data-executed' ) === '1';
 
-				var originalLabel = btn.textContent;
-				btn.disabled = true;
-				btn.textContent = ( ajax.strings && ajax.strings.reverting ) || 'Reverting…';
-
-				postForm( 'dr_subs_revert_fix', { entry_id: entryId } )
-					.then( function ( resp ) {
-						var data = {};
-						try { data = JSON.parse( resp ); } catch ( e ) { data = { success: false, message: resp }; }
-						if ( data.success ) {
-							window.location.reload();
-						} else {
-							btn.disabled = false;
-							btn.textContent = originalLabel;
-							alert( data.message || 'Could not revert.' );
-						}
-					} )
-					.catch( function ( err ) {
-						btn.disabled = false;
-						btn.textContent = originalLabel;
-						console.error( 'Doctor Subs: revert failed', err );
-					} );
+				openConfirmModal( {
+					title: 'Revert this fix?',
+					body: executed
+						? 'The renewal payment for this fix has already gone through. Reverting will undo the status change.'
+						: 'The subscription will return to its previous state.',
+					warning: executed
+						? 'This will NOT refund the customer. If a refund is needed, handle it in the WooCommerce order directly.'
+						: '',
+					primaryLabel: 'Revert',
+					dangerous: executed,
+				} ).then( function ( confirmed ) {
+					if ( ! confirmed ) return;
+					doRevert( btn, entryId );
+				} );
 			} );
 		} );
 	}
+
+	function doRevert( btn, entryId ) {
+		var originalLabel = btn.textContent;
+		btn.disabled = true;
+		btn.textContent = ( ajax.strings && ajax.strings.reverting ) || 'Reverting…';
+
+		postForm( 'dr_subs_revert_fix', { entry_id: entryId } )
+			.then( function ( resp ) {
+				var data = {};
+				try { data = JSON.parse( resp ); } catch ( e ) { data = { success: false, message: resp }; }
+				if ( data.success ) {
+					window.location.reload();
+				} else {
+					btn.disabled = false;
+					btn.textContent = originalLabel;
+					alert( data.message || 'Could not revert.' );
+				}
+			} )
+			.catch( function ( err ) {
+				btn.disabled = false;
+				btn.textContent = originalLabel;
+				console.error( 'Doctor Subs: revert failed', err );
+			} );
+	}
+
 
 	function filterHistory( filter ) {
 		$$( '[data-dr-subs-history-filter]' ).forEach( function ( b ) {
@@ -584,6 +916,9 @@
 
 	function init() {
 		wireCounters();
+		wireRuleChips();
+		wireSearch();
+		wireBulkFix();
 		wireRowsAndFixButtons();
 		wireRefresh();
 		wireScan();

@@ -176,6 +176,16 @@ class DR_Subs_Fix_Journal {
 		$success = ! empty( $result['success'] );
 		if ( $success ) {
 			self::mark_reverted( $entry_id );
+
+			/**
+			 * Fires after a fix is successfully reverted.
+			 *
+			 * @since 2.0.0
+			 * @param int    $entry_id
+			 * @param int    $sub_id
+			 * @param string $rule_id
+			 */
+			do_action( 'dr_subs_after_fix_revert', $entry_id, (int) $entry->sub_id, (string) $entry->rule_id );
 		}
 
 		return array_merge(
@@ -204,10 +214,16 @@ class DR_Subs_Fix_Journal {
 			$results[] = self::revert( (int) $row->entry_id );
 		}
 		return array(
-			'batch_id'       => $batch_id,
-			'count'          => count( $results ),
-			'success_count'  => count( array_filter( $results, static function ( $r ) { return ! empty( $r['success'] ); } ) ),
-			'results'        => $results,
+			'batch_id'      => $batch_id,
+			'count'         => count( $results ),
+			'success_count' => count(
+				array_filter(
+					$results,
+					static function ( $r ) {
+						return ! empty( $r['success'] ); }
+				)
+			),
+			'results'       => $results,
 		);
 	}
 

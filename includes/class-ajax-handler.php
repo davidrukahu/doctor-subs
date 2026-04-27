@@ -96,14 +96,17 @@ class DR_Subs_Ajax_Handler {
 
 		$sub           = function_exists( 'wcs_get_subscription' ) ? wcs_get_subscription( $sub_id ) : null;
 		$customer_name = $sub ? $sub->get_formatted_billing_full_name() : '';
+		$sub_edit_url  = ( $sub && method_exists( $sub, 'get_edit_order_url' ) ) ? $sub->get_edit_order_url() : '';
 
 		$vars = array(
 			'sub_id'           => $sub_id,
+			'sub_edit_url'     => $sub_edit_url,
 			'customer_name'    => $customer_name,
 			'rule_id'          => $rule->id(),
 			'narrative'        => (string) ( $preview['narrative'] ?? '' ),
 			'diff'             => (array) ( $preview['diff'] ?? array() ),
 			'already_executed' => ! empty( $preview['already_executed'] ),
+			'manual_only'      => ! empty( $preview['manual_only'] ),
 		);
 
 		$this->render_view( 'modal-fix-preview.php', $vars );
@@ -166,6 +169,11 @@ class DR_Subs_Ajax_Handler {
 			wp_send_json_error( array( 'message' => $t->getMessage() ), 500 );
 		}
 
+		// Refresh the sub's health row so the dashboard reflects the fix
+		// immediately instead of waiting for the next full scan.
+		$scanner = new DR_Subs_Health_Scanner();
+		$scanner->rescan_sub( $sub_id );
+
 		wp_send_json_success(
 			array(
 				'entry_id' => $entry_id,
@@ -186,10 +194,20 @@ class DR_Subs_Ajax_Handler {
 			wp_send_json_error( array( 'message' => __( 'Invalid journal entry.', 'doctor-subs' ) ), 400 );
 		}
 
+		// Capture sub_id before the revert in case the journal row is
+		// mutated or lost during the revert itself.
+		$entry  = DR_Subs_Fix_Journal::get( $entry_id );
+		$sub_id = $entry ? (int) $entry->sub_id : 0;
+
 		$result = DR_Subs_Fix_Journal::revert( $entry_id );
 
 		if ( empty( $result['success'] ) ) {
 			wp_send_json_error( $result, 500 );
+		}
+
+		if ( $sub_id > 0 ) {
+			$scanner = new DR_Subs_Health_Scanner();
+			$scanner->rescan_sub( $sub_id );
 		}
 
 		wp_send_json_success( $result );
@@ -235,7 +253,7 @@ class DR_Subs_Ajax_Handler {
 			? array_map( 'absint', wp_unslash( $_POST['sub_ids'] ) )
 			: array();
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
-		$sub_ids        = array_values( array_filter( $posted_sub_ids ) );
+		$sub_ids = array_values( array_filter( $posted_sub_ids ) );
 		if ( empty( $sub_ids ) ) {
 			$sub_ids = $this->collect_matching_sub_ids( $rule_id );
 		}
@@ -246,15 +264,16 @@ class DR_Subs_Ajax_Handler {
 		$context  = new DR_Subs_Scan_Context();
 		$batch_id = self::generate_batch_id();
 
-		$applied = 0;
-		$failed  = 0;
-		$errors  = array();
+		$applied  = 0;
+		$failed   = 0;
+		$errors   = array();
+		$affected = array();
 
 		foreach ( $sub_ids as $sub_id ) {
 			$matches = $rule->detect_batch( array( (int) $sub_id ), $context );
 			$match   = $matches[0] ?? null;
 			if ( ! $match ) {
-				$failed++;
+				++$failed;
 				$errors[] = array(
 					'sub_id'  => (int) $sub_id,
 					'message' => __( 'No longer matches rule; skipped.', 'doctor-subs' ),
@@ -265,14 +284,24 @@ class DR_Subs_Ajax_Handler {
 			try {
 				$payload = $rule->apply_fix( $match );
 				DR_Subs_Fix_Journal::record( (int) $sub_id, $rule_id, $payload, $batch_id );
-				$applied++;
+				++$applied;
+				$affected[] = (int) $sub_id;
 			} catch ( \Throwable $t ) {
-				$failed++;
+				++$failed;
 				$errors[] = array(
 					'sub_id'  => (int) $sub_id,
 					'message' => $t->getMessage(),
 				);
 				DR_Subs_Logger::error( 'bulk_fix entry failed: ' . $t->getMessage(), array( 'sub' => $sub_id ) );
+			}
+		}
+
+		// Refresh sub_health for every successfully-fixed sub so the
+		// dashboard reflects the new state without waiting for a scan.
+		if ( ! empty( $affected ) ) {
+			$scanner = new DR_Subs_Health_Scanner();
+			foreach ( $affected as $fixed_sub_id ) {
+				$scanner->rescan_sub( $fixed_sub_id );
 			}
 		}
 
@@ -309,7 +338,25 @@ class DR_Subs_Ajax_Handler {
 			wp_send_json_error( array( 'message' => __( 'Missing batch_id.', 'doctor-subs' ) ), 400 );
 		}
 
+		// Capture all sub_ids in the batch before reverting so we can
+		// rescan each afterwards regardless of per-entry revert success.
+		$entries = DR_Subs_Fix_Journal::get_batch( $batch_id );
+		$sub_ids = array();
+		foreach ( (array) $entries as $row ) {
+			if ( ! empty( $row->sub_id ) ) {
+				$sub_ids[] = (int) $row->sub_id;
+			}
+		}
+
 		$result = DR_Subs_Fix_Journal::revert_batch( $batch_id );
+
+		if ( ! empty( $sub_ids ) ) {
+			$scanner = new DR_Subs_Health_Scanner();
+			foreach ( array_unique( $sub_ids ) as $sid ) {
+				$scanner->rescan_sub( $sid );
+			}
+		}
+
 		wp_send_json_success( $result );
 	}
 
@@ -352,6 +399,18 @@ class DR_Subs_Ajax_Handler {
 		$defaults = DR_Subs_Migration::default_settings();
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- guard() verified nonce above.
+		// Build the rules map from POSTed checkboxes. Each catalog rule
+		// gets either true (checkbox present) or false. Unknown rule ids
+		// in POST are ignored.
+		$rules_map     = array();
+		$catalog_rules = class_exists( 'DR_Subs_Rule_Catalog' ) ? array_keys( DR_Subs_Rule_Catalog::all() ) : array();
+		$posted_rules  = isset( $_POST['rules'] ) && is_array( $_POST['rules'] )
+			? array_map( 'sanitize_text_field', wp_unslash( $_POST['rules'] ) )
+			: array();
+		foreach ( $catalog_rules as $rid ) {
+			$rules_map[ $rid ] = ! empty( $posted_rules[ $rid ] );
+		}
+
 		$settings = array(
 			'alerts_enabled'         => ! empty( $_POST['alerts_enabled'] ),
 			'alert_email'            => sanitize_email(
@@ -363,6 +422,7 @@ class DR_Subs_Ajax_Handler {
 				? (int) sanitize_text_field( wp_unslash( $_POST['journal_retention_days'] ) )
 				: (int) $defaults['journal_retention_days'],
 			'telemetry_enabled'      => ! empty( $_POST['telemetry_enabled'] ),
+			'rules'                  => $rules_map,
 		);
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 

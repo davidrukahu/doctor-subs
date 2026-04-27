@@ -88,6 +88,16 @@ class DR_Subs_Plugin {
 		if ( class_exists( 'DR_Subs_Alert_Dispatcher' ) ) {
 			DR_Subs_Alert_Dispatcher::register();
 		}
+
+		// Telemetry (opt-in; listens on dr_subs_after_fix_apply / revert / bulk).
+		if ( class_exists( 'DR_Subs_Telemetry' ) ) {
+			DR_Subs_Telemetry::register();
+		}
+
+		// Status transition log (feeds the Mass Hold cascade rule).
+		if ( class_exists( 'DR_Subs_Status_Transition_Log' ) ) {
+			DR_Subs_Status_Transition_Log::register();
+		}
 	}
 
 	/**
@@ -105,6 +115,12 @@ class DR_Subs_Plugin {
 	 * `init` callback.
 	 */
 	public function init() {
+		// Pick up new schema (e.g. dr_subs_status_transitions in 2.1.0)
+		// after an in-place upgrade where the activation hook didn't run.
+		if ( class_exists( 'DR_Subs_Migration' ) ) {
+			DR_Subs_Migration::maybe_upgrade();
+		}
+
 		/**
 		 * Fires after Doctor Subs boots on every request.
 		 *
@@ -141,6 +157,9 @@ class DR_Subs_Plugin {
 		if ( class_exists( 'DR_Subs_Fix_Journal' ) ) {
 			DR_Subs_Fix_Journal::schedule_cleanup();
 		}
+		if ( class_exists( 'DR_Subs_Status_Transition_Log' ) ) {
+			DR_Subs_Status_Transition_Log::schedule_prune();
+		}
 
 		// Make sure permalinks pick up our page route.
 		flush_rewrite_rules();
@@ -157,6 +176,9 @@ class DR_Subs_Plugin {
 		}
 		if ( class_exists( 'DR_Subs_Fix_Journal' ) ) {
 			DR_Subs_Fix_Journal::unschedule_cleanup();
+		}
+		if ( class_exists( 'DR_Subs_Status_Transition_Log' ) ) {
+			DR_Subs_Status_Transition_Log::unschedule_prune();
 		}
 
 		flush_rewrite_rules();

@@ -199,7 +199,7 @@ class DR_Subs_Alert_Dispatcher {
 	 * @return string
 	 */
 	private static function entry_line( int $sub_id ): string {
-		$customer = '';
+		$customer   = '';
 		$rule_label = '';
 
 		if ( function_exists( 'wcs_get_subscription' ) ) {

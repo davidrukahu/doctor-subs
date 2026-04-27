@@ -30,7 +30,7 @@ class DR_Subs_Migration {
 	 * activation hook re-runs dbDelta every time; only option backfills are
 	 * guarded by the version comparison.
 	 */
-	const SCHEMA_VERSION = '2.0.0';
+	const SCHEMA_VERSION = '2.1.0';
 
 	/**
 	 * Option name storing the currently installed schema version.
@@ -60,6 +60,26 @@ class DR_Subs_Migration {
 	}
 
 	/**
+	 * Boot-time schema check. Runs dbDelta if the installed version is
+	 * older than what this file ships, so an in-place plugin update
+	 * picks up new tables without requiring a deactivate/reactivate.
+	 *
+	 * Why: dbDelta is idempotent + cheap; running it once per upgrade
+	 * is much less footgun than telling merchants to toggle the plugin
+	 * off and on after a version bump.
+	 *
+	 * @since 2.1.0
+	 * @return void
+	 */
+	public static function maybe_upgrade(): void {
+		$installed = (string) get_option( self::VERSION_OPTION, '' );
+		if ( '' === $installed || version_compare( $installed, self::SCHEMA_VERSION, '<' ) ) {
+			self::create_tables();
+			update_option( self::VERSION_OPTION, self::SCHEMA_VERSION );
+		}
+	}
+
+	/**
 	 * Create / upgrade custom tables using dbDelta.
 	 *
 	 * dbDelta is idempotent: it diffs the schema against the live tables and
@@ -76,8 +96,9 @@ class DR_Subs_Migration {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$health_table  = self::sub_health_table();
-		$journal_table = self::fix_journal_table();
+		$health_table      = self::sub_health_table();
+		$journal_table     = self::fix_journal_table();
+		$transitions_table = self::status_transitions_table();
 
 		$health_sql = "CREATE TABLE {$health_table} (
 			sub_id BIGINT UNSIGNED NOT NULL,
@@ -110,8 +131,23 @@ class DR_Subs_Migration {
 			KEY status_idx (status)
 		) {$charset_collate};";
 
+		$transitions_sql = "CREATE TABLE {$transitions_table} (
+			transition_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+			sub_id BIGINT UNSIGNED NOT NULL,
+			from_status VARCHAR(20) NOT NULL,
+			to_status VARCHAR(20) NOT NULL,
+			product_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+			variation_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+			transitioned_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY  (transition_id),
+			KEY to_status_time (to_status, transitioned_at),
+			KEY product_to_time (product_id, to_status, transitioned_at),
+			KEY sub_time (sub_id, transitioned_at)
+		) {$charset_collate};";
+
 		dbDelta( $health_sql );
 		dbDelta( $journal_sql );
+		dbDelta( $transitions_sql );
 	}
 
 	/**
@@ -154,6 +190,17 @@ class DR_Subs_Migration {
 			'alert_email'            => get_option( 'admin_email', '' ),
 			'journal_retention_days' => 180,
 			'telemetry_enabled'      => false,
+			// All detection rules enabled by default. Settings page lets
+			// merchants disable individual rules; missing entries fall
+			// back to true via DR_Subs_Rule_Catalog::enabled_map().
+			'rules'                  => array(
+				'manual_renewal_drift' => true,
+				'ghost_sub'            => true,
+				'mass_hold'            => true,
+				'onhold_paid'          => true,
+				'repeated_failures'    => true,
+				'total_drift'          => true,
+			),
 		);
 	}
 
@@ -180,6 +227,21 @@ class DR_Subs_Migration {
 	}
 
 	/**
+	 * Fully-qualified status_transitions table name.
+	 *
+	 * Stores observed sub status changes so the Mass Hold cascade rule can
+	 * detect spikes (>=N transitions to on-hold within a short window
+	 * sharing the same product). Append-only; pruned on a TTL.
+	 *
+	 * @since 2.1.0
+	 * @return string
+	 */
+	public static function status_transitions_table(): string {
+		global $wpdb;
+		return $wpdb->prefix . 'dr_subs_status_transitions';
+	}
+
+	/**
 	 * Drop custom tables. Called from uninstall.php only when the merchant
 	 * sets `DR_SUBS_UNINSTALL_PURGE` in wp-config.php. Normal uninstall keeps
 	 * the tables so a reinstall can still revert historical fixes.
@@ -189,11 +251,13 @@ class DR_Subs_Migration {
 	 */
 	public static function drop_tables(): void {
 		global $wpdb;
-		$health  = self::sub_health_table();
-		$journal = self::fix_journal_table();
+		$health      = self::sub_health_table();
+		$journal     = self::fix_journal_table();
+		$transitions = self::status_transitions_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- intentional schema change on uninstall.
 		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $health ) );
 		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $journal ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $transitions ) );
 		// phpcs:enable
 		delete_option( self::VERSION_OPTION );
 		delete_option( self::SETTINGS_OPTION );

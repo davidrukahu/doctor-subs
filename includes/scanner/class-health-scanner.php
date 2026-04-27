@@ -165,6 +165,21 @@ class DR_Subs_Health_Scanner {
 			DR_Subs_Rules_Registry::bootstrap();
 			$rules = DR_Subs_Rules_Registry::all();
 
+			// Gate by settings: merchants can disable individual rules.
+			// Catalog-defined rules default to enabled when missing from
+			// settings; rules outside the catalog (third-party) always
+			// run unless explicitly opted out.
+			if ( class_exists( 'DR_Subs_Rule_Catalog' ) ) {
+				$enabled = DR_Subs_Rule_Catalog::enabled_map();
+				$rules   = array_filter(
+					$rules,
+					static function ( $rule ) use ( $enabled ) {
+						$rid = $rule->id();
+						return ! array_key_exists( $rid, $enabled ) || (bool) $enabled[ $rid ];
+					}
+				);
+			}
+
 			// Snapshot which subs are currently 'broken' so we can compute
 			// newly_broken_sub_ids (used by the alert dispatcher).
 			$previously_broken = $this->fetch_previously_broken_sub_ids();
@@ -173,10 +188,15 @@ class DR_Subs_Health_Scanner {
 			$batch_size = defined( 'DR_SUBS_SCAN_BATCH_SIZE' ) ? (int) DR_SUBS_SCAN_BATCH_SIZE : 100;
 			$page       = 1;
 
+			// Non-terminal statuses. on-hold needed for onhold_paid +
+			// mass_hold rules; pending-cancel kept so a sub still in its
+			// dunning window can match too. Cancelled/expired/trash skip.
+			$statuses = array( 'active', 'on-hold', 'pending-cancel' );
+
 			while ( $page <= self::PAGE_CAP ) {
 				$subs = wcs_get_subscriptions(
 					array(
-						'subscription_status'    => 'active',
+						'subscription_status'    => $statuses,
 						'subscriptions_per_page' => $batch_size,
 						'paged'                  => $page,
 					)
@@ -202,15 +222,15 @@ class DR_Subs_Health_Scanner {
 						DR_Subs_Logger::error(
 							"Rule {$rule_id} detect_batch failed",
 							array(
-								'error'     => $t->getMessage(),
-								'rule_id'   => $rule_id,
-								'batch'     => $sub_ids,
+								'error'   => $t->getMessage(),
+								'rule_id' => $rule_id,
+								'batch'   => $sub_ids,
 							)
 						);
 						continue;
 					}
 					foreach ( $matches as $match ) {
-						$match->narration                  = DR_Subs_Narrator::for_match( $rule, $match );
+						$match->narration                   = DR_Subs_Narrator::for_match( $rule, $match );
 						$matches_by_sub[ $match->sub_id ][] = $match;
 					}
 				}
@@ -220,14 +240,14 @@ class DR_Subs_Health_Scanner {
 				foreach ( $sub_ids as $sub_id ) {
 					$matches = $matches_by_sub[ $sub_id ] ?? array();
 					$bucket  = $this->upsert_health_row( $sub_id, $matches );
-					$summary[ 'healthy' === $bucket ? 'healthy' : ( 'risk' === $bucket ? 'at_risk' : 'broken' ) ]++;
+					++$summary[ 'healthy' === $bucket ? 'healthy' : ( 'risk' === $bucket ? 'at_risk' : 'broken' ) ];
 					if ( 'broken' === $bucket ) {
 						$currently_broken[] = $sub_id;
 					}
 				}
 
 				$summary['total_processed'] += count( $subs );
-				$page++;
+				++$page;
 			}
 
 			// Find newly-broken subs (in currently_broken but not in
@@ -264,6 +284,34 @@ class DR_Subs_Health_Scanner {
 	 * @param array $matches  Zero or more DR_Subs_Rule_Match.
 	 * @return string  Final bucket ('healthy'|'risk'|'broken').
 	 */
+	/**
+	 * Re-run every rule against a single subscription and refresh its
+	 * sub_health row. Called after apply/revert so the dashboard reflects
+	 * the new state without waiting for the next full scan.
+	 *
+	 * @param int $sub_id
+	 * @return string Final bucket ('healthy'|'risk'|'broken').
+	 */
+	public function rescan_sub( int $sub_id ): string {
+		if ( $sub_id <= 0 ) {
+			return 'healthy';
+		}
+
+		DR_Subs_Rules_Registry::bootstrap();
+		$rules   = DR_Subs_Rules_Registry::all();
+		$context = new DR_Subs_Scan_Context();
+		$matches = array();
+
+		foreach ( $rules as $rule ) {
+			$rule_matches = $rule->detect_batch( array( $sub_id ), $context );
+			if ( ! empty( $rule_matches ) ) {
+				$matches = array_merge( $matches, $rule_matches );
+			}
+		}
+
+		return $this->upsert_health_row( $sub_id, $matches );
+	}
+
 	private function upsert_health_row( int $sub_id, array $matches ): string {
 		global $wpdb;
 		$table = DR_Subs_Migration::sub_health_table();
