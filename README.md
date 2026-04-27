@@ -127,8 +127,6 @@ Tagging `vX.Y.Z` on `main` triggers `.github/workflows/release.yml`:
 2. Drafts a GitHub Release with the zip attached
 3. On stable tags only (no alpha/beta/rc), deploys to WP.org SVN trunk + `tags/X.Y.Z` via [10up/action-wordpress-plugin-deploy](https://github.com/10up/action-wordpress-plugin-deploy)
 
-Required secrets: `SVN_USERNAME`, `SVN_PASSWORD` (set via `gh secret set`).
-
 ## License
 
 GPLv2 or later. See [LICENSE](LICENSE).
