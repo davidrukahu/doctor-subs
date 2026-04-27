@@ -114,12 +114,11 @@ Required. Doctor Subs declares High-Performance Order Storage compatibility and 
 
 == Screenshots ==
 
-1. Calm dashboard with the X-of-Y healthy stat, two action counters, search, rule chips, and the Needs attention table
-2. Fix preview modal with the plain-English narrative, named diff, and "you can undo this" reassurance
-3. Fix history with per-entry Revert buttons and an escalated confirm when the renewal payment has already executed
-4. Settings page with per-rule on/off toggles plus full plain-English descriptions of what each rule detects and fixes
-5. Bulk-fix confirm modal: lists per-rule counts, warns about scheduled renewal payments, primary button reflects the exact count
-6. Mass on-hold cascade detection: one rule, multiple affected rows, a single bulk fix recovers the whole cascade
+1. Dashboard: X-of-Y healthy stat, At risk + Broken counters, search, rule chips, and the Needs attention table with the "Fix all" CTA next to the active filter
+2. Fix preview modal: plain-English narrative, named diff (before -> after), and the "you can undo this" reassurance line
+3. Fix history: per-rule filter chips along the top, plain-English summary per row, individual Revert buttons
+4. Settings: alerts toggle + email recipient, fix-history retention selector, anonymous telemetry opt-in
+5. Detection rules: six rule cards with on/off toggles plus Detects + Fix descriptions for every rule
 
 == Changelog ==
 
