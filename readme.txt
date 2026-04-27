@@ -8,56 +8,32 @@ Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Find and fix broken WooCommerce subscriptions: ghost subs, mass on-hold cascades, manual-renewal drift, total drift, stuck on-hold, and repeated payment failures. One-click reversible fixes.
+Spot the broken WooCommerce subscriptions you didn't know about, and fix them with one click you can undo.
 
 == Description ==
 
-Doctor Subs is a focused diagnostic tool for WooCommerce Subscriptions. It runs a daily background scan across every active and on-hold subscription on your store, classifies each one as healthy / at risk / broken, and gives you a one-click preview + fix + undo for the six most common renewal failure patterns - including the silent manual-renewal-flag bugs that quietly stop auto-renewals.
+You don't always find out a renewal is broken until a customer emails you. Doctor Subs watches your subscriptions in the background and tells you when something is silently wrong, before you hear about it.
 
-Built for solo, non-technical store owners with 20 to 500 active subscriptions. No log-reading, no WP-CLI, no support tickets.
+For each problem, you get a plain-English explanation, a preview of exactly what the fix will change, and one button to apply it. Every fix is logged and can be undone. If a fix already triggered a real payment, the undo screen says so explicitly.
 
-= What it detects =
+Built for store owners who run between 20 and 500 active subscriptions and don't want to read logs or write code.
 
-* **Manual-renewal drift** - active subs silently flipped to "manual renewal" despite a working Stripe card on file. Maps directly to the four subscriptions-core bugs disclosed in April 2026 (stale dates cache, HPOS to postmeta sync gap, wcs_create_subscription state discard, same-gateway switch). Customers churn invisibly.
-* **Ghost subscriptions** - active subs whose next payment was supposed to fire but WordPress never scheduled the renewal event. Silent revenue loss.
-* **Mass on-hold cascade** - 20 or more subs sharing the same product transitioning to on-hold within an hour. Symptom of a product-edit cascade or faulty bulk operation that takes out a whole product line at once.
-* **Stuck on-hold** - subs whose latest Stripe renewal actually captured successfully but the status never flipped back to active. Customer paid, your store shows them as delinquent.
-* **Repeated payment failures** - 2 or more failed scheduled payment attempts in the last 30 days. Often a gateway blip that a single retry fixes.
-* **Total drift** - stored subscription total no longer matches the line items. Flagged for manual review (drift causes are too varied to safely auto-correct).
+= What it spots =
 
-= What it does about them =
+* Subscriptions silently flipped to "manual renewal" by recent WooCommerce bugs, so auto-billing has quietly stopped.
+* Active subscriptions with no next payment scheduled - the next charge will never happen.
+* A wave of subscriptions all going on hold at once after a product change.
+* Customers who paid in Stripe but whose subscription is still showing on hold.
+* Subscriptions with a couple of recent failed payments - usually a gateway blip a single retry fixes.
+* Subscription totals that no longer match their line items.
 
-Every detected problem gets:
+= What it doesn't do =
 
-1. A plain-English explanation of what happened (no jargon)
-2. A preview modal showing exactly which fields will change before you commit
-3. A one-click fix that WordPress handles for you
-4. A journal entry you can undo at any time
-5. An explicit warning if reverting cannot undo something that already ran (e.g. a re-scheduled payment already charged the customer)
+* It doesn't change anything without you clicking. There's no auto-fix.
+* It doesn't replace dunning, retries, or refunds. For card declines and refunds, use your gateway.
+* It doesn't send your customer data anywhere.
 
-All fixes are state-guarded: if the subscription changed between detection and when you click Fix, the plugin aborts and asks you to re-scan. You never get surprised.
-
-= Dashboard + alerts =
-
-* **Calm-clinical dashboard** - "X of Y healthy" stat plus two action counters (At risk / Broken). Click any counter, search by sub number, customer name, or email, and filter by rule chip.
-* **Bulk fix** - "Fix all N matches" across one rule or every visible row. Each fix lands as its own reversible journal entry.
-* **Daily background scan** - Action Scheduler runs the scan automatically. A WP-Cron watchdog catches the rare case when AS stops firing.
-* **Email digest** - when something new breaks between scans, you get a plain-text summary email.
-* **Fix history** - every applied fix, with Revert on each. Configurable retention (30 to 365 days, or forever).
-* **Per-rule on/off** - any of the six rules can be disabled in Settings if it's noisy in your store.
-
-= Modern design system =
-
-Self-hosted typography (Switzer, Source Serif 4, JetBrains Mono), OKLCH colour tokens, full responsive + print stylesheets, WCAG 2.1 AA contrast, `prefers-reduced-motion` respected. Scoped to Doctor Subs - never leaks into the rest of WP admin.
-
-= Translations =
-
-Ships in 20 major languages: French, Spanish, German, Italian, Portuguese (BR + PT), Dutch, Polish, Russian, Japanese, Chinese (Simplified + Traditional), Korean, Arabic, Turkish, Swedish, Norwegian, Danish, Finnish, Czech.
-
-= Privacy =
-
-* Zero external asset fetches at runtime. Fonts, CSS, JS all bundled.
-* No data leaves your site unless you explicitly opt in to anonymous fix telemetry (off by default; rule name + timestamp only, no customer data).
+If you've ever found out about a broken renewal from a customer instead of from your store, this is for you.
 
 == Installation ==
 
