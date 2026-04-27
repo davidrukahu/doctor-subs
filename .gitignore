@@ -103,5 +103,13 @@ dev-debug.log
 # tasks/ 
 .claude/
 .gstack/
+.taskmaster/
+.impeccable.md
 wp-org/
 screenshots/
+
+# Internal planning + design exploration (kept locally, not in public repo)
+design-brief/
+TODOS.md
+v2-STATUS.md
+_review.md
