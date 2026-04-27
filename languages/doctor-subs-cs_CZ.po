@@ -1,0 +1,1834 @@
+# Copyright (C) 2026 DavidR
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Doctor Subs 2.0.0-alpha.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/doctor-subs\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-04-23T07:15:40+00:00\n"
+"PO-Revision-Date: 2026-04-23 07:35+0000\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: doctor-subs\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Language: cs-CZ\n"
+
+#: doctor-subs.php
+#: admin/views/partials/plugin-header.php:46
+#: includes/class-admin.php:59
+#: includes/class-admin.php:60
+#: includes/class-admin.php:172
+#. Plugin Name of the plugin
+msgid "Doctor Subs"
+msgstr "Doctor Subs"
+
+#: doctor-subs.php
+#. Plugin URI of the plugin
+msgid "https://github.com/davidrukahu/doctor-subs"
+msgstr "https://github.com/davidrukahu/doctor-subs"
+
+#: doctor-subs.php
+#. Description of the plugin
+msgid ""
+"Find and fix broken WooCommerce subscriptions. Detects ghost subs, "
+"stuck-on-hold renewals, and repeated payment failures, with one-click "
+"reversible fixes."
+msgstr ""
+"Najděte a opravte nefunkční předplatné WooCommerce. Detekuje ghost subs, "
+"uvízlé obnovy ve stavu pozastavení a opakované neúspěšné platby, s jedním "
+"kliknutím na obrátitelné opravy."
+
+#: doctor-subs.php
+#. Author of the plugin
+msgid "DavidR"
+msgstr "DavidR"
+
+#: doctor-subs.php
+#. Author URI of the plugin
+msgid "https://github.com/davidrukahu"
+msgstr "https://github.com/davidrukahu"
+
+#: admin/views/dashboard.php:24
+msgid "2 hours ago"
+msgstr "Před 2 hodinami"
+
+#: admin/views/dashboard.php:36
+#: admin/views/fix-history.php:25
+#: admin/views/modal-fix-preview.php:34
+#: includes/rules/class-rule-ghost-sub.php:62
+msgid "Ghost"
+msgstr "Ghost"
+
+#: admin/views/dashboard.php:37
+#: admin/views/first-run.php:155
+#: admin/views/fix-history.php:26
+#: admin/views/modal-fix-preview.php:35
+#: includes/rules/class-rule-on-hold-paid.php:59
+msgid "Stuck on-hold"
+msgstr "Uvízlé ve stavu pozastavení"
+
+#: admin/views/dashboard.php:38
+#: admin/views/fix-history.php:27
+#: admin/views/modal-fix-preview.php:36
+#: includes/rules/class-rule-repeated-failures.php:70
+msgid "Repeated fails"
+msgstr "Opakované neúspěšné platby"
+
+#: admin/views/dashboard.php:72
+msgid "The last scan didn&rsquo;t complete. Nothing was changed."
+msgstr "Poslední skenování nebylo dokončeno. Nic nebylo změněno."
+
+#: admin/views/dashboard.php:74
+msgid "Try again"
+msgstr "Zkusit znovu"
+
+#: admin/views/dashboard.php:77
+msgid "View logs"
+msgstr "Zobrazit protokoly"
+
+#: admin/views/dashboard.php:84
+msgid "Subscription health counts"
+msgstr "Počty stavu předplatného"
+
+#: admin/views/dashboard.php:89
+msgid "Healthy"
+msgstr "Zdravé"
+
+#: admin/views/dashboard.php:90
+msgid "no problems"
+msgstr "žádné problémy"
+
+#: admin/views/dashboard.php:93
+msgid "At risk"
+msgstr "Ohrožené"
+
+#: admin/views/dashboard.php:94
+msgid "might need attention"
+msgstr "mohou potřebovat pozornost"
+
+#: admin/views/dashboard.php:97
+msgid "Broken"
+msgstr "Nefunkční"
+
+#: admin/views/dashboard.php:98
+msgid "needs you now"
+msgstr "potřebují vás nyní"
+
+#: admin/views/dashboard.php:130
+msgid "All clear"
+msgstr "Vše je v pořádku"
+
+#: admin/views/dashboard.php:132
+msgid "Everything looks good."
+msgstr "Vše vypadá v pořádku."
+
+#: admin/views/dashboard.php:136
+#. translators: %s: relative time
+#, php-format
+msgid "We&rsquo;ll keep watching. Last checked %s."
+msgstr "Budeme dál sledovat. Naposledy kontrolováno %s."
+
+#: admin/views/dashboard.php:147
+msgid "Needs attention"
+msgstr "Vyžaduje pozornost"
+
+#: admin/views/dashboard.php:151
+#: includes/class-admin.php:115
+msgid "showing all broken and at-risk"
+msgstr "zobrazuji všechny poškozené a ohrožené"
+
+#: admin/views/dashboard.php:155
+#. translators: %d: number of broken subs filtered
+#, php-format
+msgid "filtering to %d broken"
+msgid_plural "filtering to %d broken"
+msgstr[0] "filtrování na %d poškozených"
+msgstr[1] "filtrování na %d poškozené"
+msgstr[2] "filtrování na %d poškozených"
+
+#: admin/views/dashboard.php:161
+#. translators: %d: number of at-risk subs filtered
+#, php-format
+msgid "filtering to %d at-risk"
+msgid_plural "filtering to %d at-risk"
+msgstr[0] "filtrování na %d ohrožených"
+msgstr[1] "filtrování na %d ohroženého"
+msgstr[2] "filtrování na %d ohrožených"
+
+#: admin/views/dashboard.php:170
+msgid "clear filter"
+msgstr "vymazat filtr"
+
+#: admin/views/dashboard.php:179
+msgid "Rule indicator"
+msgstr "Indikátor pravidla"
+
+#: admin/views/dashboard.php:180
+msgid "Customer"
+msgstr "Zákazník"
+
+#: admin/views/dashboard.php:181
+msgid "Subscription"
+msgstr "Subscription"
+
+#: admin/views/dashboard.php:182
+msgid "Issue"
+msgstr "Problém"
+
+#: admin/views/dashboard.php:183
+msgid "Reason"
+msgstr "Důvod"
+
+#: admin/views/dashboard.php:184
+msgid "Actions"
+msgstr "Akce"
+
+#: admin/views/dashboard.php:222
+msgid "Fix"
+msgstr "Opravit"
+
+#: admin/views/dashboard.php:230
+msgid "No subscriptions match this filter."
+msgstr "Žádné Subscription neodpovídají tomuto filtru."
+
+#: admin/views/first-run.php:42
+msgid "First visit"
+msgstr "První návštěva"
+
+#: admin/views/first-run.php:50
+#. translators: %s: italic accent phrase "for problems"
+#, php-format
+msgid "Let&rsquo;s check your subscriptions %s."
+msgstr "Podívejme se na vaše Subscription %s."
+
+#: admin/views/first-run.php:51
+msgid "for problems"
+msgstr "problémy"
+
+#: admin/views/first-run.php:59
+msgid ""
+"We&rsquo;ll scan your active subscriptions for three common renewal "
+"failures. Takes about 30 seconds. Runs entirely on your server - nothing "
+"sent anywhere."
+msgstr ""
+"Prohledáme vaše aktivní Subscription na tři běžné chyby při obnově. Trvá to "
+"asi 30 sekund. Probíhá zcela na vašem serveru – nic se nikam neodesílá."
+
+#: admin/views/first-run.php:64
+msgid "Scan my subscriptions"
+msgstr "Prohledat mé Subscription"
+
+#: admin/views/first-run.php:73
+msgid "or"
+msgstr "nebo"
+
+#: admin/views/first-run.php:74
+msgid "configure settings first"
+msgstr "nejprve nastavte konfiguraci"
+
+#: admin/views/first-run.php:80
+msgid "Scanning"
+msgstr "Skenování"
+
+#: admin/views/first-run.php:83
+msgid "Scanning your subscriptions"
+msgstr "Skenování vašich Subscription"
+
+#: admin/views/first-run.php:91
+#. translators: 1: total active subs, 2: seconds remaining
+#, php-format
+msgid ""
+"Checking <span class=\"mono tnum\">%1$d</span> active subs - about <span "
+"class=\"mono tnum\">%2$d</span> seconds left."
+msgstr ""
+"Kontrola <span class=\"mono tnum\">%1$d</span> aktivních Subscription - "
+"zbývá asi <span class=\"mono tnum\">%2$d</span> sekund."
+
+#: admin/views/first-run.php:102
+msgid "Scan progress"
+msgstr "Průběh skenování"
+
+#: admin/views/first-run.php:109
+#. translators: %s: sub_id being scanned right now
+#, php-format
+msgid "checking sub_%s"
+msgstr "kontrola sub_%s"
+
+#: admin/views/first-run.php:113
+#: admin/views/modal-fix-preview.php:129
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: admin/views/first-run.php:120
+msgid "Nothing to scan yet"
+msgstr "Ještě není co skenovat"
+
+#: admin/views/first-run.php:127
+#. translators: %s: italic muted phrase "to scan yet"
+#, php-format
+msgid "You don&rsquo;t have any active subscriptions %s."
+msgstr "Nemáte žádné aktivní Subscription %s."
+
+#: admin/views/first-run.php:128
+msgid "to scan yet"
+msgstr "k skenování"
+
+#: admin/views/first-run.php:136
+msgid ""
+"Doctor Subs will start watching once you do. You can leave this tab open - "
+"or come back when your first customer subscribes."
+msgstr ""
+"Doctor Subs začne sledovat, jakmile začnete vy. Můžete tuto záložku nechat "
+"otevřenou nebo se vrátit, až se váš první zákazník přihlásí k odběru."
+
+#: admin/views/first-run.php:144
+msgid "What this detects"
+msgstr "Co toto detekuje"
+
+#: admin/views/first-run.php:149
+msgid "Ghost subscriptions"
+msgstr "Ghost Subscription"
+
+#: admin/views/first-run.php:150
+msgid ""
+"Active subscriptions that won&rsquo;t renew because the payment "
+"didn&rsquo;t get scheduled."
+msgstr "Aktivní Subscription, které se neobnoví, protože platba nebyla naplánována."
+
+#: admin/views/first-run.php:156
+msgid "Payment went through, but the subscription never switched back to active."
+msgstr "Platba proběhla, ale Subscription se nikdy nevrátila do aktivního stavu."
+
+#: admin/views/first-run.php:161
+msgid "Repeated payment failures"
+msgstr "Opakované selhání plateb"
+
+#: admin/views/first-run.php:162
+msgid "Something has been failing to process a payment for a while."
+msgstr "Něco delší dobu neúspěšně zpracovává platbu."
+
+#: admin/views/fix-history.php:44
+#: admin/views/fix-history.php:58
+#: admin/views/partials/plugin-header.php:29
+msgid "Fix history"
+msgstr "Opravit historii"
+
+#: admin/views/fix-history.php:48
+msgid "Nothing here yet"
+msgstr "Zatím zde nic není"
+
+#: admin/views/fix-history.php:49
+msgid "No fixes applied."
+msgstr "Nebyla provedena žádná oprava."
+
+#: admin/views/fix-history.php:51
+msgid ""
+"When you apply a fix from the dashboard, it&rsquo;ll show up here so you "
+"can undo it. Fixes stay revertible for 180 days by default - change that in "
+"Settings."
+msgstr ""
+"Když použijete opravu z panelu, zobrazí se zde, abyste ji mohli vrátit "
+"zpět. Opravy zůstávají vratné po dobu 180 dní ve výchozím nastavení – "
+"změňte to v Nastavení."
+
+#: admin/views/fix-history.php:63
+#. translators: %d: total number of fix entries
+#, php-format
+msgid "%d fix · showing most recent first"
+msgid_plural "%d fixes · showing most recent first"
+msgstr[0] "%d oprav · zobrazeno od nejnovějších"
+msgstr[1] "%d oprava · zobrazeno od nejnovějších"
+msgstr[2] "%d oprav · zobrazeno od nejnovějších"
+
+#: admin/views/fix-history.php:70
+msgid "Filter fixes by rule"
+msgstr "Filtrovat opravy podle pravidla"
+
+#: admin/views/fix-history.php:75
+msgid "All"
+msgstr "Vše"
+
+#: admin/views/fix-history.php:116
+#. translators: %d: number of subs in batch
+#, php-format
+msgid "Fixed %d subscription in one batch"
+msgid_plural "Fixed %d subscriptions in one batch"
+msgstr[0] "Opraveno %d Subscription v jedné dávce"
+msgstr[1] "Opraveno %d Subscription v jedné dávce"
+msgstr[2] "Opraveno %d Subscription v jedné dávce"
+
+#: admin/views/fix-history.php:137
+msgid "batch id"
+msgstr "ID dávky"
+
+#: admin/views/fix-history.php:158
+msgid "Reverted"
+msgstr "Vráceno zpět"
+
+#: admin/views/fix-history.php:172
+#. translators: %s: when the revert happened, e.g. "1h ago"
+#, php-format
+msgid "Reverted %s"
+msgstr "Vráceno zpět %s"
+
+#: admin/views/fix-history.php:177
+msgid "Too old to revert"
+msgstr "Příliš staré na vrácení"
+
+#: admin/views/fix-history.php:187
+#. translators: %d: number of subs in batch
+#, php-format
+msgid "Revert all %d"
+msgstr "Vrátit vše %d"
+
+#: admin/views/fix-history.php:191
+msgid "Revert"
+msgstr "Vrátit zpět"
+
+#: admin/views/modal-fix-preview.php:70
+msgid "What will change"
+msgstr "Co se změní"
+
+#: admin/views/modal-fix-preview.php:87
+#: includes/rules/class-rule-repeated-failures.php:146
+#: includes/rules/class-rule-repeated-failures.php:147
+msgid "unchanged"
+msgstr "beze změny"
+
+#: admin/views/modal-fix-preview.php:95
+msgid "You can undo this from Fix history at any time."
+msgstr "Tuto akci můžete kdykoli vrátit v historii oprav."
+
+#: admin/views/modal-fix-preview.php:115
+msgid "Heads up:"
+msgstr "Pozor:"
+
+#: admin/views/modal-fix-preview.php:117
+msgid ""
+"the payment we re-scheduled already went through. Reverting this fix will "
+"not refund the customer - it only removes the fix from your history. If a "
+"refund is needed, handle it in the WooCommerce order directly."
+msgstr ""
+"platba, kterou jsme přeplánovali, již proběhla. Vrácení této opravy nevrátí "
+"zákazníkovi peníze – pouze odstraní opravu z vaší historie. Pokud je "
+"potřeba vrácení peněz, vyřiďte to přímo v objednávce WooCommerce."
+
+#: admin/views/modal-fix-preview.php:132
+msgid "Fix subscription"
+msgstr "Opravit Subscription"
+
+#: admin/views/partials/plugin-header.php:25
+msgid "Dashboard"
+msgstr "Panel"
+
+#: admin/views/partials/plugin-header.php:33
+#: admin/views/settings.php:53
+msgid "Settings"
+msgstr "Nastavení"
+
+#: admin/views/partials/plugin-header.php:47
+msgid "Find and fix broken WooCommerce subscriptions."
+msgstr "Najděte a opravte nefunkční WooCommerce předplatné."
+
+#: admin/views/partials/plugin-header.php:56
+#. translators: %s: relative time, e.g. "2 hours ago"
+#, php-format
+msgid "Last scanned %s"
+msgstr "Naposledy skenováno %s"
+
+#: admin/views/partials/plugin-header.php:62
+msgid "Keyboard shortcut: R"
+msgstr "Klávesová zkratka: R"
+
+#: admin/views/partials/plugin-header.php:69
+msgid "Refresh now"
+msgstr "Obnovit nyní"
+
+#: admin/views/partials/plugin-header.php:69
+msgid "Refresh"
+msgstr "Obnovit"
+
+#: admin/views/partials/plugin-header.php:77
+msgid "Doctor Subs sections"
+msgstr "Sekce Doctor Subs"
+
+#: admin/views/settings.php:34
+msgid "Forever"
+msgstr "Navždy"
+
+#: admin/views/settings.php:37
+msgid "365 days"
+msgstr "365 dní"
+
+#: admin/views/settings.php:40
+#. translators: %d: number of days
+#, php-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d den"
+msgstr[1] "%d dny"
+msgstr[2] "%d dní"
+
+#: admin/views/settings.php:57
+msgid "Alerts"
+msgstr "Upozornění"
+
+#: admin/views/settings.php:59
+msgid ""
+"When something breaks between scans, we&rsquo;ll email you a daily digest. "
+"Off by default."
+msgstr ""
+"Když něco mezi skeny selže, zašleme vám denní souhrn e-mailem. Ve výchozím "
+"nastavení vypnuto."
+
+#: admin/views/settings.php:64
+msgid "Email alerts"
+msgstr "E-mailová upozornění"
+
+#: admin/views/settings.php:75
+#: admin/views/settings.php:76
+#: admin/views/settings.php:171
+#: admin/views/settings.php:172
+msgid "On"
+msgstr "Zapnuto"
+
+#: admin/views/settings.php:75
+#: admin/views/settings.php:76
+#: admin/views/settings.php:171
+#: admin/views/settings.php:172
+msgid "Off"
+msgstr "Vypnuto"
+
+#: admin/views/settings.php:80
+msgid ""
+"When new broken subscriptions appear, you&rsquo;ll get a daily summary "
+"email."
+msgstr "Když se objeví nová nefunkční předplatná, dostanete denní souhrnný e-mail."
+
+#: admin/views/settings.php:87
+msgid "Send to"
+msgstr "Odeslat na"
+
+#: admin/views/settings.php:97
+msgid "Defaults to your WordPress admin email."
+msgstr "Výchozí e-mail administrátora WordPressu."
+
+#: admin/views/settings.php:110
+msgid "Fix history retention"
+msgstr "Uchovávání historie oprav"
+
+#: admin/views/settings.php:112
+msgid "Older entries get pruned automatically. Recent entries stay revertible."
+msgstr ""
+"Starší položky jsou automaticky odstraňovány. Novější položky zůstávají "
+"vratné."
+
+#: admin/views/settings.php:118
+msgid "Keep fixes for"
+msgstr "Uchovávat opravy po dobu"
+
+#: admin/views/settings.php:121
+msgid "More about retention"
+msgstr "Více o retenci"
+
+#: admin/views/settings.php:123
+msgid ""
+"Fixes older than this stay in your history for reference, but the Revert "
+"button is removed. They are not deleted from the database unless you prune "
+"manually."
+msgstr ""
+"Opravy starší než tyto zůstávají ve vaší historii pro referenci, ale "
+"tlačítko Vrátit je odstraněno. Nebyly smazány z databáze, pokud je ručně "
+"neodstraníte."
+
+#: admin/views/settings.php:137
+msgid "Older fixes stay in your history but can&rsquo;t be reverted anymore."
+msgstr "Starší opravy zůstávají ve vaší historii, ale již je nelze vrátit zpět."
+
+#: admin/views/settings.php:145
+msgid "Help us improve"
+msgstr "Pomozte nám zlepšit"
+
+#: admin/views/settings.php:147
+msgid ""
+"Anonymous telemetry helps us know which fixes are actually used. We only "
+"send the rule name and a timestamp when a fix is applied. Nothing else - no "
+"customer data, no subscription details, no identifying information."
+msgstr ""
+"Anonymní telemetrie nám pomáhá vědět, které opravy se skutečně používají. "
+"Posíláme pouze název pravidla a časové razítko, kdy byla oprava použita. "
+"Nic dalšího – žádná data zákazníka, žádné detaily předplatného, žádné "
+"identifikační informace."
+
+#: admin/views/settings.php:153
+msgid "Send anonymous fix stats"
+msgstr "Odesílat anonymní statistiky oprav"
+
+#: admin/views/settings.php:156
+msgid "What exactly gets sent"
+msgstr "Co přesně je odesíláno"
+
+#: admin/views/settings.php:158
+msgid ""
+"Three fields only: (1) the rule name (e.g. ghost_sub), (2) an anonymous "
+"install hash, (3) a timestamp. We never see your store URL, customer data, "
+"subscription details, or store name."
+msgstr ""
+"Pouze tři pole: (1) název pravidla (např. ghost_sub), (2) anonymní hash "
+"instalace, (3) časové razítko. Nikdy nevidíme URL vašeho obchodu, data "
+"zákazníků, detaily předplatného ani název obchodu."
+
+#: admin/views/settings.php:176
+msgid "Off by default. Turn it on if you want to help us build the plugin better."
+msgstr ""
+"Ve výchozím nastavení vypnuto. Zapněte, pokud chcete pomoci s vylepšením "
+"pluginu."
+
+#: admin/views/settings.php:184
+msgid "Save changes"
+msgstr "Uložit změny"
+
+#: admin/views/settings.php:187
+msgid "Discard"
+msgstr "Zahodit"
+
+#: admin/views/settings.php:190
+#: includes/class-admin.php:123
+msgid "Saved."
+msgstr "Uloženo."
+
+#: admin/views/settings.php:195
+#. translators: %s: relative time
+#, php-format
+msgid "Last saved %s."
+msgstr "Naposledy uloženo %s."
+
+#: doctor-subs.php:74
+msgid "Doctor Subs requires WooCommerce to be installed and activated."
+msgstr "Doctor Subs vyžaduje, aby byl WooCommerce nainstalován a aktivován."
+
+#: doctor-subs.php:110
+msgid ""
+"Doctor Subs requires WooCommerce Subscriptions to be installed and "
+"activated."
+msgstr ""
+"Doctor Subs vyžaduje, aby byl nainstalován a aktivován WooCommerce "
+"Subscriptions."
+
+#: includes/alerts/class-alert-dispatcher.php:147
+#. translators: %d: number of affected subscriptions.
+#, php-format
+msgid "Doctor Subs: %d subscription needs attention"
+msgid_plural "Doctor Subs: %d subscriptions need attention"
+msgstr[0] "Doctor Subs: %d předplatné vyžaduje pozornost"
+msgstr[1] "Doctor Subs: %d předplatná vyžadují pozornost"
+msgstr[2] "Doctor Subs: %d předplatných vyžaduje pozornost"
+
+#: includes/alerts/class-alert-dispatcher.php:169
+#. translators: 1: site name, 2: count
+#, php-format
+msgid ""
+"%2$d subscription on %1$s started showing problems between the last scan "
+"and this one."
+msgid_plural ""
+"%2$d subscriptions on %1$s started showing problems between the last scan "
+"and this one."
+msgstr[0] ""
+"%2$d předplatné na %1$s začalo vykazovat problémy mezi posledním a tímto "
+"skenem."
+msgstr[1] ""
+"%2$d předplatná na %1$s začala vykazovat problémy mezi posledním a tímto "
+"skenem."
+msgstr[2] ""
+"%2$d předplatných na %1$s začalo vykazovat problémy mezi posledním a tímto "
+"skenem."
+
+#: includes/alerts/class-alert-dispatcher.php:186
+msgid "Open Doctor Subs:"
+msgstr "Otevřít Doctor Subs:"
+
+#: includes/alerts/class-alert-dispatcher.php:189
+msgid ""
+"You received this because email alerts are on in Doctor Subs. Change "
+"settings:"
+msgstr ""
+"Toto jste obdrželi, protože jsou v Doctor Subs zapnuty e-mailové "
+"upozornění. Změňte nastavení:"
+
+#: includes/alerts/class-alert-dispatcher.php:231
+#. translators: 1: customer name, 2: sub ID, 3: rule label
+#, php-format
+msgid "- %1$s (#%2$d) - %3$s"
+msgstr "- %1$s (#%2$d) - %3$s"
+
+#: includes/alerts/class-alert-dispatcher.php:232
+msgid "(no name)"
+msgstr "(bez názvu)"
+
+#: includes/alerts/class-alert-dispatcher.php:234
+msgid "Issue detected"
+msgstr "Zjištěn problém"
+
+#: includes/analyzers/class-discrepancy-detector.php:55
+#: includes/analyzers/class-expected-behavior.php:64
+#: includes/analyzers/class-skipped-cycle-detector.php:63
+#: includes/analyzers/class-subscription-anatomy.php:61
+#: includes/analyzers/class-timeline-builder.php:75
+msgid "Subscription not found."
+msgstr "Subscription nenalezena."
+
+#: includes/analyzers/class-discrepancy-detector.php:109
+#. translators: %d: number of days overdue
+#, php-format
+msgid "Payment is %d days overdue"
+msgstr "Platba má zpoždění o %d dní"
+
+#: includes/analyzers/class-discrepancy-detector.php:115
+msgid "Check payment method and retry payment or contact customer."
+msgstr ""
+"Zkontrolujte platební metodu a zkuste platbu znovu nebo kontaktujte "
+"zákazníka."
+
+#: includes/analyzers/class-discrepancy-detector.php:126
+#. translators: %d: number of days until payment is due
+#, php-format
+msgid "Payment due in %d days"
+msgstr "Platba je splatná za %d dní"
+
+#: includes/analyzers/class-discrepancy-detector.php:131
+msgid "Monitor payment processing and ensure payment method is valid."
+msgstr "Sledujte zpracování platby a ujistěte se, že platební metoda je platná."
+
+#: includes/analyzers/class-discrepancy-detector.php:147
+msgid "Payment interval differs from expected schedule"
+msgstr "Platební interval se liší od očekávaného plánu"
+
+#: includes/analyzers/class-discrepancy-detector.php:153
+msgid "Review subscription schedule and payment processing."
+msgstr "Zkontrolujte plán Subscription a zpracování platby."
+
+#: includes/analyzers/class-discrepancy-detector.php:208
+msgid "No renewal action scheduled for next payment"
+msgstr "Pro další platbu není naplánována žádná akce obnovy"
+
+#: includes/analyzers/class-discrepancy-detector.php:213
+msgid "Manually schedule renewal action or check Action Scheduler configuration."
+msgstr ""
+"Naplánujte obnovovací akci ručně nebo zkontrolujte konfiguraci Action "
+"Scheduler."
+
+#: includes/analyzers/class-discrepancy-detector.php:238
+#. translators: %d: number of failed actions
+#, php-format
+msgid "%d failed actions detected"
+msgstr "Zjištěno %d neúspěšných akcí"
+
+#: includes/analyzers/class-discrepancy-detector.php:243
+msgid "Review failed actions in Action Scheduler and resolve underlying issues."
+msgstr "Zkontrolujte neúspěšné akce v Action Scheduler a vyřešte základní problémy."
+
+#: includes/analyzers/class-discrepancy-detector.php:269
+#. translators: %s: subscription status
+#, php-format
+msgid "Subscription in unexpected status: %s"
+msgstr "Subscription ve neočekávaném stavu: %s"
+
+#: includes/analyzers/class-discrepancy-detector.php:274
+msgid "Review subscription status and take appropriate action."
+msgstr "Zkontrolujte stav Subscription a proveďte příslušné kroky."
+
+#: includes/analyzers/class-discrepancy-detector.php:289
+#. translators: 1: subscription status, 2: number of days
+#, php-format
+msgid "Subscription stuck in %1$s status for %2$d days"
+msgstr "Subscription uvízla ve stavu %1$s po dobu %2$d dní"
+
+#: includes/analyzers/class-discrepancy-detector.php:295
+msgid "Investigate why subscription is stuck and take corrective action."
+msgstr "Prozkoumejte, proč Subscription uvízla, a proveďte nápravná opatření."
+
+#: includes/analyzers/class-discrepancy-detector.php:321
+msgid "No payment token found for subscription"
+msgstr "Pro Subscription nebyl nalezen žádný platební token"
+
+#: includes/analyzers/class-discrepancy-detector.php:326
+msgid "Check payment method configuration and ensure tokenization is working."
+msgstr ""
+"Zkontrolujte konfiguraci platební metody a ujistěte se, že tokenizace "
+"funguje."
+
+#: includes/analyzers/class-discrepancy-detector.php:341
+msgid "Payment method has expired"
+msgstr "Platební metoda vypršela"
+
+#: includes/analyzers/class-discrepancy-detector.php:346
+msgid "Contact customer to update payment method."
+msgstr "Kontaktujte zákazníka pro aktualizaci platební metody."
+
+#: includes/analyzers/class-discrepancy-detector.php:354
+#. translators: %d: number of days until payment method expires
+#, php-format
+msgid "Payment method expires in %d days"
+msgstr "Platnost platební metody vyprší za %d dní"
+
+#: includes/analyzers/class-discrepancy-detector.php:359
+msgid "Notify customer to update payment method before expiry."
+msgstr ""
+"Upozorněte zákazníka na aktualizaci platební metody před vypršením "
+"platnosti."
+
+#: includes/analyzers/class-discrepancy-detector.php:397
+msgid "Renewal reminder emails are disabled"
+msgstr "E-maily s připomenutím obnovení jsou zakázány"
+
+#: includes/analyzers/class-discrepancy-detector.php:401
+msgid "Enable renewal reminder emails to improve customer experience."
+msgstr "Povolte e-maily s připomenutím obnovení pro zlepšení zákaznické zkušenosti."
+
+#: includes/analyzers/class-discrepancy-detector.php:412
+msgid "Payment failed emails are disabled"
+msgstr "E-maily o neúspěšné platbě jsou zakázány"
+
+#: includes/analyzers/class-discrepancy-detector.php:416
+msgid "Enable payment failed emails to notify customers of payment issues."
+msgstr ""
+"Povolte e-maily o neúspěšné platbě, aby byli zákazníci informováni o "
+"problémech s platbou."
+
+#: includes/analyzers/class-discrepancy-detector.php:440
+msgid "Subscription requires manual renewal"
+msgstr "Subscription vyžaduje ruční obnovení"
+
+#: includes/analyzers/class-discrepancy-detector.php:444
+msgid "Monitor subscription and process payments manually."
+msgstr "Sledujte Subscription a zpracovávejte platby ručně."
+
+#: includes/analyzers/class-discrepancy-detector.php:456
+#. translators: %d: number of retry attempts
+#, php-format
+msgid "High payment retry count: %d attempts"
+msgstr "Vysoký počet pokusů o opětovnou platbu: %d pokusů"
+
+#: includes/analyzers/class-discrepancy-detector.php:460
+msgid "Contact customer to resolve payment method issues."
+msgstr "Kontaktujte zákazníka pro vyřešení problémů s platební metodou."
+
+#: includes/analyzers/class-discrepancy-detector.php:486
+msgid "Subscription contains non-subscription product"
+msgstr "Subscription obsahuje produkt, který není Subscription"
+
+#: includes/analyzers/class-discrepancy-detector.php:491
+msgid "Review subscription products and ensure all are subscription products."
+msgstr ""
+"Zkontrolujte produkty v Subscription a ujistěte se, že všechny jsou "
+"produkty Subscription."
+
+#: includes/analyzers/class-discrepancy-detector.php:516
+msgid "No Stripe customer ID found"
+msgstr "Nebyl nalezen Stripe ID zákazníka"
+
+#: includes/analyzers/class-discrepancy-detector.php:520
+msgid "Check Stripe integration and customer creation process."
+msgstr "Zkontrolujte integraci Stripe a proces vytváření zákazníka."
+
+#: includes/analyzers/class-discrepancy-detector.php:587
+msgid ""
+"Stripe payment method detachment detected - likely caused by cloned/staging "
+"site"
+msgstr ""
+"Zjištěno odpojení platební metody Stripe – pravděpodobně způsobeno "
+"klonovanou/testovací stránkou"
+
+#: includes/analyzers/class-discrepancy-detector.php:595
+msgid ""
+"This is a known issue when cloning sites with WooCommerce Subscriptions. "
+"Update to WooCommerce Stripe Gateway 7.x+ which includes fixes. If already "
+"updated, re-attach the payment method to the Stripe customer or contact "
+"Stripe support."
+msgstr ""
+"Toto je známý problém při klonování stránek s WooCommerce Subscriptions. "
+"Aktualizujte na WooCommerce Stripe Gateway 7.x+ které obsahuje opravy. "
+"Pokud již máte aktualizaci, znovu připojte platební metodu ke Stripe "
+"zákazníkovi nebo kontaktujte podporu Stripe."
+
+#: includes/analyzers/class-discrepancy-detector.php:636
+#. translators: %d: number of failed renewals
+#, php-format
+msgid "Potential payment method detachment: %d failed renewal(s) with Stripe errors"
+msgstr "Možné odpojení platební metody: %d neúspěšné obnovení s chybami Stripe"
+
+#: includes/analyzers/class-discrepancy-detector.php:645
+msgid ""
+"Review failed renewal orders for Stripe payment method errors. This may "
+"indicate a detached payment method issue from cloned/staging sites."
+msgstr ""
+"Zkontrolujte objednávky s neúspěšným obnovením kvůli chybám platební metody "
+"Stripe. Může to znamenat problém s odpojenou platební metodou z "
+"klonovaných/testovacích stránek."
+
+#: includes/analyzers/class-discrepancy-detector.php:671
+msgid ""
+"WooCommerce Subscriptions duplicate site detected - payment methods may be "
+"detached"
+msgstr ""
+"Zjištěna duplikovaná stránka WooCommerce Subscriptions – platební metody "
+"mohou být odpojeny"
+
+#: includes/analyzers/class-discrepancy-detector.php:676
+msgid ""
+"Ensure WooCommerce Stripe Gateway 7.x+ is installed with fixes for cloned "
+"sites. Monitor subscription renewals closely."
+msgstr ""
+"Zajistěte, že WooCommerce Stripe Gateway 7.x+ je nainstalován s opravami "
+"pro klonované weby. Pečlivě sledujte obnovení předplatného."
+
+#: includes/analyzers/class-discrepancy-detector.php:693
+#. translators: %s: environment type
+#, php-format
+msgid ""
+"Running in %s environment with Stripe - ensure payment methods are properly "
+"configured"
+msgstr ""
+"Provoz v prostředí %s s Stripe – zajistěte správné nastavení platebních "
+"metod"
+
+#: includes/analyzers/class-discrepancy-detector.php:700
+msgid ""
+"Staging/development environments can cause payment method detachment "
+"issues. Ensure WooCommerce Stripe Gateway has proper safeguards enabled."
+msgstr ""
+"Prostředí pro testování/vývoj mohou způsobovat problémy s odpojením "
+"platebních metod. Zajistěte, že WooCommerce Stripe Gateway má povolené "
+"správné ochrany."
+
+#: includes/analyzers/class-discrepancy-detector.php:781
+#. translators: 1: error type, 2: count
+#, php-format
+msgid "Stripe renewal error detected: %1$s (%2$d occurrence(s))"
+msgstr "Zjištěna chyba obnovení Stripe: %1$s (%2$d výskyt(y))"
+
+#: includes/analyzers/class-discrepancy-detector.php:791
+msgid ""
+"Review failed renewal orders and contact customer to resolve payment method "
+"issues."
+msgstr ""
+"Zkontrolujte neúspěšné objednávky obnovení a kontaktujte zákazníka pro "
+"vyřešení problémů s platební metodou."
+
+#: includes/analyzers/class-discrepancy-detector.php:815
+msgid "No PayPal subscription ID found"
+msgstr "Nebyl nalezen žádný PayPal ID předplatného"
+
+#: includes/analyzers/class-discrepancy-detector.php:819
+msgid "Check PayPal integration and subscription creation process."
+msgstr "Zkontrolujte integraci PayPalu a proces vytváření předplatného."
+
+#: includes/analyzers/class-expected-behavior.php:34
+#: includes/analyzers/class-expected-behavior.php:45
+msgid "unknown"
+msgstr "neznámý"
+
+#: includes/analyzers/class-expected-behavior.php:58
+#: includes/analyzers/class-skipped-cycle-detector.php:57
+#: includes/analyzers/class-subscription-anatomy.php:55
+#: includes/analyzers/class-timeline-builder.php:69
+msgid "WooCommerce Subscriptions is not active or properly loaded."
+msgstr "WooCommerce Subscriptions není aktivní nebo správně načtený."
+
+#: includes/analyzers/class-expected-behavior.php:126
+msgid "Payment method not found or WooCommerce not available."
+msgstr "Platební metoda nebyla nalezena nebo WooCommerce není dostupný."
+
+#: includes/analyzers/class-expected-behavior.php:135
+msgid "Payment gateway not found."
+msgstr "Platební brána nebyla nalezena."
+
+#: includes/analyzers/class-expected-behavior.php:178
+msgid "Manual renewals require customer action to complete payments."
+msgstr "Manuální obnovení vyžaduje akci zákazníka k dokončení plateb."
+
+#: includes/analyzers/class-expected-behavior.php:179
+msgid "Customer must manually renew the subscription."
+msgstr "Zákazník musí předplatné manuálně obnovit."
+
+#: includes/analyzers/class-expected-behavior.php:189
+msgid "Renewals are handled by WordPress Action Scheduler."
+msgstr "Obnovení jsou zpracovávána pomocí WordPress Action Scheduler."
+
+#: includes/analyzers/class-expected-behavior.php:196
+#. translators: %s: next payment date
+#, php-format
+msgid "Automated renewal scheduled for %s"
+msgstr "Automatické obnovení naplánováno na %s"
+
+#: includes/analyzers/class-expected-behavior.php:209
+msgid "Renewals are controlled by the payment gateway."
+msgstr "Obnovení jsou řízena platební bránou."
+
+#: includes/analyzers/class-expected-behavior.php:210
+msgid "Gateway will notify site when payment is processed."
+msgstr "Brána oznámí stránce, když je platba zpracována."
+
+#: includes/analyzers/class-expected-behavior.php:254
+msgid "No further automatic actions expected."
+msgstr "Žádné další automatické akce nejsou očekávány."
+
+#: includes/analyzers/class-expected-behavior.php:273
+msgid "No parent order found for this subscription."
+msgstr "Pro toto předplatné nebyla nalezena žádná nadřazená objednávka."
+
+#: includes/analyzers/class-expected-behavior.php:300
+msgid "No subscription switches detected."
+msgstr "Nebyla zjištěna žádná změna předplatného."
+
+#: includes/analyzers/class-expected-behavior.php:308
+msgid "This subscription has been modified through subscription switching."
+msgstr "Toto subscription bylo upraveno prostřednictvím přepnutí subscription."
+
+#: includes/analyzers/class-expected-behavior.php:310
+msgid "Switch logs should contain detailed information about the changes."
+msgstr "Záznamy přepnutí by měly obsahovat podrobné informace o změnách."
+
+#: includes/analyzers/class-expected-behavior.php:311
+msgid "Prorated amounts should be calculated based on timing and pricing."
+msgstr "Poměrné částky by měly být vypočítány na základě časování a cen."
+
+#: includes/analyzers/class-expected-behavior.php:312
+msgid "New billing schedule should reflect the switched product configuration."
+msgstr "Nový plán fakturace by měl odrážet konfiguraci přepnutého produktu."
+
+#: includes/analyzers/class-expected-behavior.php:411
+msgid "WordPress cron triggers Action Scheduler"
+msgstr "WordPress cron spouští Action Scheduler"
+
+#: includes/analyzers/class-expected-behavior.php:412
+msgid "Action Scheduler executes scheduled renewal action"
+msgstr "Action Scheduler provádí naplánovanou akci obnovení"
+
+#: includes/analyzers/class-expected-behavior.php:413
+#: includes/analyzers/class-expected-behavior.php:439
+msgid "New renewal order is created"
+msgstr "Vytváří se nová objednávka obnovení"
+
+#: includes/analyzers/class-expected-behavior.php:414
+msgid "Payment is processed via the payment gateway"
+msgstr "Platba je zpracována přes platební bránu"
+
+#: includes/analyzers/class-expected-behavior.php:415
+msgid "Subscription dates are updated"
+msgstr "Data subscription jsou aktualizována"
+
+#: includes/analyzers/class-expected-behavior.php:416
+msgid "Next renewal action is scheduled"
+msgstr "Další akce obnovení je naplánována"
+
+#: includes/analyzers/class-expected-behavior.php:419
+msgid "WordPress cron must be functioning"
+msgstr "WordPress cron musí být funkční"
+
+#: includes/analyzers/class-expected-behavior.php:420
+msgid "Action Scheduler must be operational"
+msgstr "Action Scheduler musí být v provozu"
+
+#: includes/analyzers/class-expected-behavior.php:421
+msgid "Payment gateway must be available"
+msgstr "Platební brána musí být dostupná"
+
+#: includes/analyzers/class-expected-behavior.php:436
+msgid "Payment gateway processes payment on their schedule"
+msgstr "Platební brána zpracovává platbu podle svého harmonogramu"
+
+#: includes/analyzers/class-expected-behavior.php:437
+msgid "Gateway sends webhook notification to your site"
+msgstr "Brána odesílá webhook oznámení na váš web"
+
+#: includes/analyzers/class-expected-behavior.php:438
+msgid "Site receives and processes webhook"
+msgstr "Web přijímá a zpracovává webhook"
+
+#: includes/analyzers/class-expected-behavior.php:440
+msgid "Subscription is updated with new payment information"
+msgstr "Subscription je aktualizováno o nové platební informace"
+
+#: includes/analyzers/class-expected-behavior.php:443
+msgid "Gateway subscription must be active"
+msgstr "Gateway subscription musí být aktivní"
+
+#: includes/analyzers/class-expected-behavior.php:444
+msgid "Webhook endpoint must be accessible"
+msgstr "Webhook endpoint musí být přístupný"
+
+#: includes/analyzers/class-expected-behavior.php:445
+msgid "Webhook authentication must be valid"
+msgstr "Webhook autentizace musí být platná"
+
+#: includes/analyzers/class-expected-behavior.php:446
+msgid "Site must be able to receive external requests"
+msgstr "Web musí být schopen přijímat externí požadavky"
+
+#: includes/analyzers/class-expected-behavior.php:461
+msgid "Subscription is active and should process renewals automatically."
+msgstr "Subscription je aktivní a měla by automaticky zpracovávat obnovení."
+
+#: includes/analyzers/class-expected-behavior.php:462
+msgid "Subscription is suspended and will not process renewals until reactivated."
+msgstr ""
+"Subscription je pozastaveno a nebude zpracovávat obnovení, dokud nebude "
+"znovu aktivováno."
+
+#: includes/analyzers/class-expected-behavior.php:463
+msgid "Subscription has been cancelled and will not renew."
+msgstr "Subscription bylo zrušeno a nebude obnovováno."
+
+#: includes/analyzers/class-expected-behavior.php:464
+msgid "Subscription has reached its natural end date."
+msgstr "Subscription dosáhlo svého přirozeného koncového data."
+
+#: includes/analyzers/class-expected-behavior.php:465
+msgid "Subscription is set to cancel at the end of the current billing period."
+msgstr ""
+"Subscription je nastaveno na zrušení na konci aktuálního fakturačního "
+"období."
+
+#: includes/analyzers/class-expected-behavior.php:466
+msgid "Subscription is awaiting initial payment or activation."
+msgstr "Subscription čeká na první platbu nebo aktivaci."
+
+#: includes/analyzers/class-expected-behavior.php:469
+msgid "Unknown status."
+msgstr "Neznámý stav."
+
+#: includes/analyzers/class-expected-behavior.php:507
+#. translators: %s: next payment date
+#, php-format
+msgid "Next renewal payment due: %s"
+msgstr "Další platba za obnovení je splatná: %s"
+
+#: includes/analyzers/class-expected-behavior.php:515
+#. translators: %s: end date
+#, php-format
+msgid "Subscription will expire on: %s"
+msgstr "Subscription vyprší dne: %s"
+
+#: includes/analyzers/class-expected-behavior.php:521
+msgid "Subscription will continue indefinitely until cancelled."
+msgstr "Subscription bude pokračovat neomezeně, dokud nebude zrušeno."
+
+#: includes/analyzers/class-expected-behavior.php:536
+msgid "No automatic renewals will occur while subscription is on hold."
+msgstr "Během pozastavení Subscription nedojde k žádným automatickým obnovením."
+
+#: includes/analyzers/class-expected-behavior.php:537
+msgid "Subscription must be reactivated to resume billing."
+msgstr "Subscription musí být znovu aktivováno pro obnovení fakturace."
+
+#: includes/analyzers/class-expected-behavior.php:538
+msgid "Customer access to subscription content may be restricted."
+msgstr "Přístup zákazníka k obsahu Subscription může být omezen."
+
+#: includes/analyzers/class-expected-behavior.php:556
+#. translators: %s: next payment date
+#, php-format
+msgid "Subscription will be cancelled after the next payment on: %s"
+msgstr "Subscription bude zrušeno po další platbě dne: %s"
+
+#: includes/analyzers/class-expected-behavior.php:559
+msgid "One final renewal payment will be processed."
+msgstr "Bude zpracována jedna poslední platba za obnovení."
+
+#: includes/analyzers/class-expected-behavior.php:560
+msgid "After final payment, status will change to cancelled."
+msgstr "Po poslední platbě se stav změní na zrušeno."
+
+#: includes/analyzers/class-expected-behavior.php:565
+msgid "Subscription will be cancelled immediately as no next payment is scheduled."
+msgstr ""
+"Subscription bude zrušeno okamžitě, protože není naplánována žádná další "
+"platba."
+
+#: includes/analyzers/class-expected-behavior.php:593
+msgid "Customer completes checkout with subscription product"
+msgstr "Zákazník dokončí nákup produktu Subscription"
+
+#: includes/analyzers/class-expected-behavior.php:594
+msgid "Parent order is created first"
+msgstr "Nejprve je vytvořena rodičovská objednávka"
+
+#: includes/analyzers/class-expected-behavior.php:595
+msgid "Subscription is created as a copy of the parent order"
+msgstr "Předplatné je vytvořeno jako kopie rodičovské objednávky"
+
+#: includes/analyzers/class-expected-behavior.php:596
+msgid "Future renewals are created as copies of the subscription"
+msgstr "Budoucí obnovení jsou vytvořena jako kopie předplatného"
+
+#: includes/analyzers/class-expected-behavior.php:615
+msgid "Currency matches"
+msgstr "Měna odpovídá"
+
+#: includes/analyzers/class-expected-behavior.php:617
+msgid "Currency does not match parent order"
+msgstr "Měna neodpovídá rodičovské objednávce"
+
+#: includes/analyzers/class-expected-behavior.php:621
+msgid "Customer ID matches"
+msgstr "ID zákazníka odpovídá"
+
+#: includes/analyzers/class-expected-behavior.php:623
+msgid "Customer ID does not match parent order"
+msgstr "ID zákazníka neodpovídá rodičovské objednávce"
+
+#: includes/analyzers/class-expected-behavior.php:628
+msgid "Payment method matches"
+msgstr "Způsob platby odpovídá"
+
+#: includes/analyzers/class-expected-behavior.php:630
+msgid "Payment method does not match parent order"
+msgstr "Způsob platby neodpovídá rodičovské objednávce"
+
+#: includes/analyzers/class-expected-behavior.php:637
+msgid ""
+"Some differences may be expected due to subscription switching, admin "
+"edits, or customizations."
+msgstr ""
+"Některé rozdíly lze očekávat kvůli přepínání předplatného, úpravám "
+"administrátorem nebo přizpůsobením."
+
+#: includes/analyzers/class-expected-behavior.php:652
+#: includes/analyzers/class-expected-behavior.php:733
+#: includes/analyzers/class-expected-behavior.php:757
+#: includes/analyzers/class-expected-behavior.php:781
+#: includes/analyzers/class-expected-behavior.php:805
+#: includes/analyzers/class-expected-behavior.php:829
+msgid "Mode could not be determined"
+msgstr "Režim nelze určit"
+
+#: includes/analyzers/class-expected-behavior.php:677
+#: includes/analyzers/class-expected-behavior.php:688
+msgid "Sandbox/Test Mode"
+msgstr "Sandbox/Testovací režim"
+
+#: includes/analyzers/class-expected-behavior.php:677
+#: includes/analyzers/class-expected-behavior.php:693
+msgid "Live/Production Mode"
+msgstr "Živý/Produkční režim"
+
+#: includes/analyzers/class-expected-behavior.php:741
+msgid "Stripe Test Mode"
+msgstr "Stripe testovací režim"
+
+#: includes/analyzers/class-expected-behavior.php:741
+msgid "Stripe Live Mode"
+msgstr "Stripe živý režim"
+
+#: includes/analyzers/class-expected-behavior.php:765
+msgid "PayPal Sandbox Mode"
+msgstr "PayPal sandbox režim"
+
+#: includes/analyzers/class-expected-behavior.php:765
+msgid "PayPal Live Mode"
+msgstr "PayPal živý režim"
+
+#: includes/analyzers/class-expected-behavior.php:789
+msgid "Square Sandbox Mode"
+msgstr "Square sandbox režim"
+
+#: includes/analyzers/class-expected-behavior.php:789
+msgid "Square Live Mode"
+msgstr "Square živý režim"
+
+#: includes/analyzers/class-expected-behavior.php:813
+msgid "Braintree Sandbox Mode"
+msgstr "Braintree sandbox režim"
+
+#: includes/analyzers/class-expected-behavior.php:813
+msgid "Braintree Live Mode"
+msgstr "Braintree živý režim"
+
+#: includes/analyzers/class-expected-behavior.php:837
+msgid "Authorize.net Test Mode"
+msgstr "Authorize.net Testovací režim"
+
+#: includes/analyzers/class-expected-behavior.php:837
+msgid "Authorize.net Live Mode"
+msgstr "Authorize.net Živý režim"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:133
+#. translators: %s: start date
+#, php-format
+msgid "No payments received since start date %s"
+msgstr "Žádné platby od data zahájení %s"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:142
+msgid "Check if payments are being processed correctly."
+msgstr "Zkontrolujte, zda jsou platby správně zpracovávány."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:182
+#. translators: 1: expected payment date, 2: actual next payment date
+#, php-format
+msgid "Payment cycle skipped — expected payment around %1$s, next payment was %2$s"
+msgstr ""
+"Platební cyklus přeskočen — očekávaná platba kolem %1$s, další platba byla "
+"%2$s"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:194
+msgid ""
+"Review what happened during this period and consider if payment should be "
+"collected."
+msgstr ""
+"Zkontrolujte, co se během tohoto období stalo, a zvažte, zda by měla být "
+"platba vybrána."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:224
+#. translators: 1: expected payment date, 2: current date
+#, php-format
+msgid "Payment overdue — expected payment around %1$s, now %2$s"
+msgstr "Platba po splatnosti — očekávaná platba kolem %1$s, nyní %2$s"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:235
+msgid "Check payment processing and customer status."
+msgstr "Zkontrolujte zpracování platby a stav zákazníka."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:282
+#. translators: %d: order ID
+#, php-format
+msgid "Manual payment completion detected for order #%d"
+msgstr "Detekováno ruční dokončení platby pro objednávku #%d"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:292
+msgid "Verify manual payment was properly recorded."
+msgstr "Ověřte, že ruční platba byla správně zaznamenána."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:303
+#. translators: %d: order ID
+#, php-format
+msgid "Order #%d marked complete without transaction ID"
+msgstr "Objednávka #%d označena jako dokončená bez ID transakce"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:312
+msgid "Verify payment was actually received and properly recorded."
+msgstr "Ověřte, že platba byla skutečně přijata a správně zaznamenána."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:343
+msgid "Subscription shows Expired but has a valid future next payment date"
+msgstr "Subscription ukazuje Stav Expired, ale má platné budoucí datum další platby"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:349
+msgid "Review subscription status and payment schedule for consistency."
+msgstr "Zkontrolujte stav Subscription a plán plateb pro konzistenci."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:363
+msgid "Subscription shows Active but has passed its end date"
+msgstr "Subscription ukazuje Stav Active, ale uplynulo jeho koncové datum"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:369
+msgid "Consider updating subscription status to reflect actual state."
+msgstr "Zvažte aktualizaci stavu Subscription, aby odrážel skutečný stav."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:408
+msgid "No scheduled subscription payment actions found"
+msgstr "Nebyly nalezeny žádné plánované akce Subscription plateb"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:413
+msgid "Check if subscription payments are properly scheduled."
+msgstr "Zkontrolujte, zda jsou platby Subscription správně naplánovány."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:434
+#. translators: %s: action hook name
+#, php-format
+msgid "Failed Action Scheduler event: %s"
+msgstr "Selhalo událost Action Scheduler: %s"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:444
+msgid "Review failed action and consider manual intervention."
+msgstr "Zkontrolujte neúspěšnou akci a zvažte manuální zásah."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:502
+#. translators: %d: year
+#, php-format
+msgid "No renewals found for year %d"
+msgstr "Pro rok %d nebyly nalezeny žádné obnovení"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:507
+msgid "Investigate why no renewals occurred during this period."
+msgstr "Prozkoumejte, proč během tohoto období nedošlo k žádným obnovením."
+
+#: includes/analyzers/class-subscription-anatomy.php:235
+msgid "Action Scheduler tables not found."
+msgstr "Tabulky Action Scheduler nebyly nalezeny."
+
+#: includes/analyzers/class-subscription-anatomy.php:375
+msgid "Payment gateway not found or not available."
+msgstr "Platební brána nebyla nalezena nebo není dostupná."
+
+#: includes/analyzers/class-subscription-anatomy.php:378
+msgid "Payment gateway is disabled or not available."
+msgstr "Platební brána je deaktivována nebo není dostupná."
+
+#: includes/analyzers/class-subscription-anatomy.php:384
+msgid ""
+"Subscription is set to manual renewal but payment gateway supports "
+"automatic renewals."
+msgstr ""
+"Subscription je nastavena na ruční obnovení, ale platební brána podporuje "
+"automatická obnovení."
+
+#: includes/analyzers/class-subscription-anatomy.php:390
+msgid "Payment token appears to be invalid or expired."
+msgstr "Platební token je neplatný nebo vypršel."
+
+#: includes/analyzers/class-subscription-anatomy.php:431
+msgid "Token not found or invalid."
+msgstr "Token nebyl nalezen nebo je neplatný."
+
+#: includes/analyzers/class-timeline-builder.php:144
+msgid "Subscription created"
+msgstr "Subscription vytvořena"
+
+#: includes/analyzers/class-timeline-builder.php:145
+msgid "Subscription started"
+msgstr "Subscription zahájena"
+
+#: includes/analyzers/class-timeline-builder.php:146
+msgid "Trial period ended"
+msgstr "Zkušební období skončilo"
+
+#: includes/analyzers/class-timeline-builder.php:147
+msgid "Last payment processed"
+msgstr "Poslední platba zpracována"
+
+#: includes/analyzers/class-timeline-builder.php:148
+msgid "Next payment scheduled"
+msgstr "Další platba naplánována"
+
+#: includes/analyzers/class-timeline-builder.php:149
+msgid "Subscription cancelled"
+msgstr "Subscription zrušena"
+
+#: includes/analyzers/class-timeline-builder.php:150
+msgid "Subscription ended"
+msgstr "Subscription ukončena"
+
+#: includes/analyzers/class-timeline-builder.php:266
+#. translators: 1: order type, 2: order ID
+#, php-format
+msgid "%1$s order #%2$d created"
+msgstr "%1$s objednávka #%2$d vytvořena"
+
+#: includes/analyzers/class-timeline-builder.php:272
+#. translators: 1: order type, 2: order ID, 3: order total
+#, php-format
+msgid "%1$s order #%2$d created with total %3$s"
+msgstr "%1$s objednávka #%2$d vytvořena s celkovou částkou %3$s"
+
+#: includes/analyzers/class-timeline-builder.php:296
+#. translators: %d: order ID
+#, php-format
+msgid "Payment completed for order #%d"
+msgstr "Platba dokončena za objednávku #%d"
+
+#: includes/analyzers/class-timeline-builder.php:301
+#. translators: 1: order ID, 2: payment amount
+#, php-format
+msgid "Payment of %2$s completed for order #%1$d"
+msgstr "Platba %2$s dokončena za objednávku #%1$d"
+
+#: includes/analyzers/class-timeline-builder.php:332
+#. translators: %d: order ID
+#, php-format
+msgid "Order #%d note"
+msgstr "Poznámka k objednávce #%d"
+
+#: includes/analyzers/class-timeline-builder.php:612
+msgid "Scheduled subscription payment"
+msgstr "Naplánovaná platba za Subscription"
+
+#: includes/analyzers/class-timeline-builder.php:613
+msgid "Scheduled subscription expiration"
+msgstr "Naplánované vypršení Subscription"
+
+#: includes/analyzers/class-timeline-builder.php:614
+msgid "Scheduled trial end"
+msgstr "Naplánovaný konec zkušební doby"
+
+#: includes/analyzers/class-timeline-builder.php:615
+msgid "End of prepaid term"
+msgstr "Konec předplaceného období"
+
+#: includes/analyzers/class-timeline-builder.php:635
+#. translators: 1: hook name, 2: action status, 3: action arguments
+#, php-format
+msgid "Action: %1$s | Status: %2$s | Args: %3$s"
+msgstr "Akce: %1$s | Stav: %2$s | Parametry: %3$s"
+
+#: includes/analyzers/class-timeline-builder.php:695
+msgid "Failed Scheduled Action"
+msgstr "Neúspěšná naplánovaná akce"
+
+#: includes/analyzers/class-timeline-builder.php:698
+#. translators: 1: action hook, 2: timestamp
+#, php-format
+msgid "Scheduled action \"%1$s\" failed at %2$s"
+msgstr "Naplánovaná akce „%1$s“ selhala v %2$s"
+
+#: includes/class-admin.php:116
+#, php-format
+msgid "filtering to %1$d %2$s"
+msgstr "filtrování na %1$d %2$s"
+
+#: includes/class-admin.php:117
+msgid "Could not load the fix preview. Try again in a moment."
+msgstr "Nebylo možné načíst náhled opravy. Zkuste to za okamžik znovu."
+
+#: includes/class-admin.php:118
+msgid "Applying…"
+msgstr "Aplikuji…"
+
+#: includes/class-admin.php:119
+msgid "Something went wrong - nothing was changed."
+msgstr "Něco se pokazilo – nic nebylo změněno."
+
+#: includes/class-admin.php:120
+msgid "Reverting…"
+msgstr "Vrácení zpět…"
+
+#: includes/class-admin.php:121
+msgid "Revert this fix? The subscription will return to its previous state."
+msgstr "Vrátit tuto opravu? Subscription se vrátí do předchozího stavu."
+
+#: includes/class-admin.php:122
+msgid "Saving…"
+msgstr "Ukládám…"
+
+#: includes/class-admin.php:124
+msgid "Could not save. Check your connection and try again."
+msgstr "Nelze uložit. Zkontrolujte své připojení a zkuste to znovu."
+
+#: includes/class-admin.php:141
+msgid "Open"
+msgstr "Otevřít"
+
+#: includes/class-admin.php:291
+#: includes/class-ajax-handler.php:383
+msgid "You do not have permission to do this."
+msgstr "Nemáte oprávnění to provést."
+
+#: includes/class-admin.php:517
+msgid "never"
+msgstr "nikdy"
+
+#: includes/class-admin.php:565
+msgid "just now"
+msgstr "právě teď"
+
+#: includes/class-admin.php:570
+#. translators: %d: minutes
+#, php-format
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "před %d minutou"
+msgstr[1] "před %d minutami"
+msgstr[2] "před %d minutami"
+
+#: includes/class-admin.php:575
+#. translators: %d: hours
+#, php-format
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] "před %d hodinami"
+msgstr[1] "před %d hodinou"
+msgstr[2] "před %d hodinami"
+
+#: includes/class-admin.php:580
+#. translators: %d: days
+#, php-format
+msgid "%d day ago"
+msgid_plural "%d days ago"
+msgstr[0] "před %d dny"
+msgstr[1] "před %d dnem"
+msgstr[2] "před %d dny"
+
+#: includes/class-admin.php:582
+msgid "M j"
+msgstr "M j"
+
+#: includes/class-ajax-handler.php:75
+#: includes/class-ajax-handler.php:122
+msgid "Invalid subscription ID."
+msgstr "Neplatné ID Subscription."
+
+#: includes/class-ajax-handler.php:81
+msgid "No matching rule found for this subscription."
+msgstr "Nebylo nalezeno žádné odpovídající pravidlo pro tuto Subscription."
+
+#: includes/class-ajax-handler.php:89
+msgid ""
+"This subscription no longer matches the rule (state changed since scan). "
+"Re-scan and try again."
+msgstr ""
+"Tato Subscription již neodpovídá pravidlu (stav se od skenování změnil). "
+"Znovu naskenujte a zkuste to znovu."
+
+#: includes/class-ajax-handler.php:128
+msgid "No matching rule for this subscription."
+msgstr "Pro tuto Subscription není žádné odpovídající pravidlo."
+
+#: includes/class-ajax-handler.php:136
+msgid "State changed since scan. Re-scan and try again."
+msgstr "Stav se od skenování změnil. Znovu naskenujte a zkuste to znovu."
+
+#: includes/class-ajax-handler.php:172
+msgid "Fix applied."
+msgstr "Oprava provedena."
+
+#: includes/class-ajax-handler.php:186
+msgid "Invalid journal entry."
+msgstr "Neplatný záznam v deníku."
+
+#: includes/class-ajax-handler.php:222
+msgid "Missing rule_id."
+msgstr "Chybí rule_id."
+
+#: includes/class-ajax-handler.php:228
+msgid "Unknown rule."
+msgstr "Neznámé pravidlo."
+
+#: includes/class-ajax-handler.php:240
+msgid "No matching subscriptions to fix."
+msgstr "Nebyly nalezeny žádné odpovídající Subscriptions k opravě."
+
+#: includes/class-ajax-handler.php:257
+msgid "No longer matches rule; skipped."
+msgstr "Již neodpovídá pravidlu; přeskočeno."
+
+#: includes/class-ajax-handler.php:306
+msgid "Missing batch_id."
+msgstr "Chybí batch_id."
+
+#: includes/class-ajax-handler.php:361
+msgid "Enter a valid email address."
+msgstr "Zadejte platnou e-mailovou adresu."
+
+#: includes/collectors/class-subscription-data.php:67
+#: includes/collectors/class-subscription-data.php:136
+#. translators: %d: subscription ID
+#, php-format
+msgid "Subscription #%d"
+msgstr "Subscription #%d"
+
+#: includes/journal/class-fix-journal.php:140
+msgid "Journal entry not found."
+msgstr "Záznam v deníku nenalezen."
+
+#: includes/journal/class-fix-journal.php:147
+msgid "Already reverted."
+msgstr "Již vráceno zpět."
+
+#: includes/journal/class-fix-journal.php:159
+#. translators: %s: rule_id
+#, php-format
+msgid "Rule \"%s\" is not registered; cannot revert."
+msgstr "Pravidlo \"%s\" není registrováno; nelze vrátit zpět."
+
+#: includes/journal/class-fix-journal.php:172
+msgid "Revert raised an error; nothing was changed."
+msgstr "Vrácení zpět vyvolalo chybu; nic nebylo změněno."
+
+#: includes/narrator/class-narrator.php:88
+#: includes/narrator/class-narrator.php:92
+#: includes/narrator/class-narrator.php:98
+#: includes/rules/class-rule-ghost-sub.php:279
+#: includes/rules/class-rule-on-hold-paid.php:276
+#: includes/rules/class-rule-repeated-failures.php:274
+msgid "This customer"
+msgstr "Tento zákazník"
+
+#: includes/rules/class-rule-ghost-sub.php:130
+msgid "Next payment"
+msgstr "Další platba"
+
+#: includes/rules/class-rule-ghost-sub.php:131
+msgid "— (not scheduled)"
+msgstr "— (nenaplánováno)"
+
+#: includes/rules/class-rule-ghost-sub.php:132
+msgid "(UTC)"
+msgstr "(UTC)"
+
+#: includes/rules/class-rule-ghost-sub.php:136
+msgid "AS event"
+msgstr "AS událost"
+
+#: includes/rules/class-rule-ghost-sub.php:137
+msgid "missing"
+msgstr "chybí"
+
+#: includes/rules/class-rule-ghost-sub.php:142
+#: includes/rules/class-rule-on-hold-paid.php:139
+#: includes/rules/class-rule-repeated-failures.php:145
+msgid "Sub status"
+msgstr "Stav předplatného"
+
+#: includes/rules/class-rule-ghost-sub.php:143
+#: includes/rules/class-rule-ghost-sub.php:144
+#: includes/rules/class-rule-on-hold-paid.php:141
+msgid "active"
+msgstr "aktivní"
+
+#: includes/rules/class-rule-ghost-sub.php:291
+#, php-format
+msgid ""
+"%1$s's subscription was supposed to renew <em>today</em>. WordPress didn't "
+"schedule the payment event, so nothing was charged."
+msgstr ""
+"%1$s měl/a předplatné, které se mělo obnovit <em>dnes</em>. WordPress "
+"nezaplánoval událost platby, takže nic nebylo strženo."
+
+#: includes/rules/class-rule-ghost-sub.php:296
+#, php-format
+msgid ""
+"%1$s's subscription was supposed to renew on <em>%2$s</em> (%3$d days ago). "
+"WordPress didn't schedule the payment event, so nothing was charged."
+msgstr ""
+"%1$s měl/a předplatné, které se mělo obnovit <em>%2$s</em> (před %3$d dny). "
+"WordPress nezaplánoval událost platby, takže nic nebylo strženo."
+
+#: includes/rules/class-rule-ghost-sub.php:301
+#, php-format
+msgid ""
+"%1$s's subscription was supposed to renew on <em>%2$s</em>, about %3$d days "
+"ago. WordPress didn't schedule the payment event, so %1$s hasn't been "
+"billed for any cycles since."
+msgstr ""
+"%1$s měl/a předplatné, které se mělo obnovit <em>%2$s</em>, asi před %3$d "
+"dny. WordPress nezaplánoval událost platby, takže %1$s nebylo účtováno "
+"žádných cyklů od té doby."
+
+#: includes/rules/class-rule-ghost-sub.php:306
+#, php-format
+msgid ""
+"%1$s's subscription was supposed to renew on <em>%2$s</em>, over a month "
+"ago. WordPress didn't schedule the payment event, so %1$s hasn't been "
+"billed for any cycles since."
+msgstr ""
+"%1$s měl/a předplatné, které se mělo obnovit <em>%2$s</em>, před více než "
+"měsícem. WordPress nezaplánoval událost platby, takže %1$s nebylo účtováno "
+"žádných cyklů od té doby."
+
+#: includes/rules/class-rule-on-hold-paid.php:140
+msgid "on-hold"
+msgstr "pozastaveno"
+
+#: includes/rules/class-rule-on-hold-paid.php:145
+#. translators: %d: renewal order id
+#, php-format
+msgid "Renewal #%d"
+msgstr "Obnovení #%d"
+
+#: includes/rules/class-rule-on-hold-paid.php:191
+#. translators: used as a note on the order when Doctor Subs flips it.
+msgid ""
+"Doctor Subs: marked complete after matching Stripe charge capture on "
+"on-hold subscription."
+msgstr ""
+"Doctor Subs: označeno jako dokončené po spárování se zachycením platby "
+"Stripe u pozastaveného předplatného."
+
+#: includes/rules/class-rule-on-hold-paid.php:198
+#. translators: order note on the subscription when Doctor Subs activates it.
+msgid "Doctor Subs: flipped to active after matching Stripe-paid renewal."
+msgstr ""
+"Doctor Subs: přepnuto na aktivní po spárování obnovení zaplaceného přes "
+"Stripe."
+
+#: includes/rules/class-rule-on-hold-paid.php:245
+#: includes/rules/class-rule-on-hold-paid.php:256
+msgid "Doctor Subs: reverted status change."
+msgstr "Doctor Subs: vrácena změna stavu."
+
+#: includes/rules/class-rule-on-hold-paid.php:285
+#. translators: 1: first name, 2: amount, 3: date
+#, php-format
+msgid ""
+"%1$s's last renewal payment went through in Stripe on <em>%3$s</em> - they "
+"were charged %2$s. But the subscription status stayed \"on-hold\" instead "
+"of switching back to active."
+msgstr ""
+"%1$s provedl/a poslední obnovovací platbu v Stripe dne <em>%3$s</em> - bylo "
+"mu/ji účtováno %2$s. Ale stav předplatného zůstal „pozastaveno“ místo "
+"přepnutí zpět na aktivní."
+
+#: includes/rules/class-rule-on-hold-paid.php:294
+#. translators: %s: first name
+#, php-format
+msgid ""
+"%s's last renewal payment went through in Stripe, but the subscription "
+"stayed on-hold instead of flipping back to active."
+msgstr ""
+"%s provedl/a poslední obnovovací platbu v Stripe, ale předplatné zůstalo "
+"pozastaveno místo přepnutí zpět na aktivní."
+
+#: includes/rules/class-rule-repeated-failures.php:139
+msgid "Retry payment"
+msgstr "Znovu zkusit platbu"
+
+#: includes/rules/class-rule-repeated-failures.php:140
+#. translators: %d: count
+#, php-format
+msgid "%d failed attempt"
+msgid_plural "%d failed attempts"
+msgstr[0] "%d neúspěšných pokusů"
+msgstr[1] "%d neúspěšný pokus"
+msgstr[2] "%d neúspěšných pokusů"
+
+#: includes/rules/class-rule-repeated-failures.php:141
+#. translators: %s: time
+#, php-format
+msgid "one retry at %s (UTC)"
+msgstr "jedno opakování v %s (UTC)"
+
+#: includes/rules/class-rule-repeated-failures.php:283
+#. translators: 1: first name, 2: count, 3: window days
+#, php-format
+msgid ""
+"Something has been failing to process %1$s's renewal for a while - %2$d "
+"failed attempts in the last %3$d days. Worth looking at the card on file or "
+"the gateway log."
+msgstr ""
+"Obnova předplatného %1$s nějakou dobu selhává – %2$d neúspěšných pokusů za "
+"posledních %3$d dní. Stojí za to zkontrolovat kartu v souboru nebo protokol "
+"brány."
+
+#: includes/rules/class-rule-repeated-failures.php:292
+#. translators: 1: first name, 2: count, 3: window days
+#, php-format
+msgid ""
+"%1$s's renewal has failed %2$d times in the last %3$d days. Often a gateway "
+"blip that clears on retry, but worth another look if this retry fails too."
+msgstr ""
+"Obnova předplatného %1$s selhala %2$d krát za posledních %3$d dní. Často "
+"jde o krátký výpadek brány, který se vyřeší při opakování, ale stojí za to "
+"se na to znovu podívat, pokud toto opakování také selže."
+
+#: includes/utilities/class-security.php:32
+msgid "Security check failed. Please refresh the page and try again."
+msgstr "Kontrola bezpečnosti selhala. Prosím, obnovte stránku a zkuste to znovu."
+
+#: includes/utilities/class-security.php:45
+msgid "You do not have permission to perform this action."
+msgstr "Nemáte oprávnění k provedení této akce."
+
+#: includes/utilities/class-security.php:61
+msgid "Invalid subscription ID provided."
+msgstr "Bylo zadáno neplatné ID Subscription."
+
+#: includes/utilities/class-security.php:114
+#. translators: 1: action name, 2: time window in seconds
+#, php-format
+msgid "Rate limit exceeded for %1$s. Please wait %2$d seconds before trying again."
+msgstr ""
+"Limit rychlosti pro %1$s byl překročen. Prosím, počkejte %2$d sekund před "
+"dalším pokusem."
