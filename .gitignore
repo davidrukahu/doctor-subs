@@ -113,3 +113,11 @@ design-brief/
 TODOS.md
 v2-STATUS.md
 _review.md
+
+# Local-only tooling (kept locally, not in public repo)
+dev/
+scripts/
+.cursor/
+.env.example
+config/dictionaries/
+phpcs.xml
