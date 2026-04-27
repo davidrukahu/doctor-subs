@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Doctor Subs - Missing Surfaces Draft</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- Same token system as the approved surfaces -->
+<link rel="stylesheet" href="./tokens.css">
+
+<style>
+/* Preview page chrome only - not part of the plugin */
+:root { color-scheme: light; }
+html, body { margin: 0; background: oklch(95% 0.008 200); font-family: 'Switzer', system-ui, sans-serif; color: oklch(18% 0.015 210); }
+.pv-header { position: sticky; top: 0; z-index: 50; background: oklch(99% 0.004 200); border-bottom: 1px solid oklch(92% 0.008 200); padding: 18px 32px; display: flex; align-items: center; gap: 24px; }
+.pv-header .title { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; }
+.pv-header .meta { font-size: 12px; color: oklch(55% 0.01 210); }
+.pv-header .toc { display: flex; gap: 14px; margin-left: auto; flex-wrap: wrap; }
+.pv-header .toc a { font-size: 12px; color: oklch(38% 0.012 210); text-decoration: none; border-bottom: 1px dotted oklch(72% 0.008 210); padding-bottom: 1px; }
+.pv-header .toc a:hover { color: oklch(28% 0.05 195); border-bottom-color: oklch(48% 0.06 195); }
+.pv-section { padding: 48px 32px 24px; }
+.pv-label { font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(55% 0.01 210); margin-bottom: 10px; }
+.pv-title { font-family: 'Instrument Serif', serif; font-size: 28px; letter-spacing: -0.015em; margin-bottom: 4px; }
+.pv-desc { font-size: 14px; color: oklch(38% 0.012 210); max-width: 640px; margin-bottom: 24px; }
+.pv-frame { border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px oklch(18% 0.015 210 / 0.08), 0 16px 40px oklch(18% 0.015 210 / 0.06); border: 1px solid oklch(92% 0.008 200); background: oklch(99% 0.004 200); position: relative; }
+hr.sep { border: 0; border-top: 1px solid oklch(87% 0.01 200); margin: 56px 0 0; }
+
+/* ---- Fix preview modal (Surface 3) ---- */
+.modal-scene { position: relative; min-height: 720px; background: var(--bg-0); padding: 28px 44px; }
+.modal-scene .behind { opacity: 0.35; filter: blur(0.5px); pointer-events: none; }
+.modal-backdrop { position: absolute; inset: 0; background: oklch(18% 0.015 210 / 0.42); backdrop-filter: blur(4px); }
+.modal { position: absolute; top: 72px; left: 50%; transform: translateX(-50%); width: 560px; background: var(--bg-0); box-shadow: 0 2px 8px oklch(18% 0.015 210 / 0.08), 0 20px 56px oklch(18% 0.015 210 / 0.18); border: 1px solid var(--line-0); border-radius: var(--r-lg); overflow: hidden; }
+.modal-head { padding: 20px 28px 14px; border-bottom: 1px solid var(--line-0); display: flex; align-items: baseline; gap: 14px; }
+.modal-head .sub { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-2); }
+.modal-head .name { font-size: 15.5px; font-weight: 500; color: var(--ink-0); }
+.modal-head .rule { margin-left: auto; }
+.modal-body { padding: 24px 28px; }
+.modal-body .narrative { font-size: 14.5px; color: var(--ink-0); line-height: 1.6; margin: 0 0 28px; max-width: 500px; }
+.modal-body .narrative em { color: var(--accent-ink); font-style: italic; font-family: 'Instrument Serif', serif; font-size: 15.5px; }
+.modal-body .section-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 12px; }
+.diff { border: 1px solid var(--line-0); border-radius: var(--r-md); background: var(--bg-1); }
+.diff-row { display: grid; grid-template-columns: 110px 1fr 18px 1fr; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--line-0); font-size: 13.5px; align-items: baseline; }
+.diff-row:last-child { border-bottom: 0; }
+.diff-row .field { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.diff-row .before { color: var(--ink-2); text-decoration: line-through; text-decoration-color: oklch(72% 0.008 210); font-family: var(--font-mono); font-size: 12.5px; }
+.diff-row .arrow { color: var(--ink-3); text-align: center; }
+.diff-row .after { color: var(--ink-0); font-family: var(--font-mono); font-size: 12.5px; font-weight: 500; }
+.diff-row .after.emph { color: oklch(32% 0.06 160); }
+.modal-body .revert-note { margin-top: 18px; font-size: 12.5px; color: var(--ink-2); padding-left: 16px; border-left: 1px solid var(--line-1); }
+.modal-foot { padding: 18px 28px; background: var(--bg-1); display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--line-0); }
+
+/* ---- Fix history page (Surface 4) ---- */
+.history-scene { padding: 28px 44px 60px; background: var(--bg-0); }
+.history-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 28px; }
+.history-head h1 { font-family: var(--font-display); font-size: 30px; letter-spacing: -0.015em; font-weight: 400; margin: 0; }
+.history-head .meta { font-size: 12px; color: var(--ink-2); }
+.history-filters { display: flex; gap: 18px; font-size: 12.5px; padding-bottom: 16px; border-bottom: 1px solid var(--line-0); margin-bottom: 4px; }
+.history-filters .filter { color: var(--ink-2); padding: 4px 0; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.history-filters .filter.active { color: var(--ink-0); border-bottom-color: var(--accent); font-weight: 500; }
+.history-filters .count { color: var(--ink-3); margin-left: 6px; font-variant-numeric: tabular-nums; }
+.entry { display: grid; grid-template-columns: 140px 1fr 120px auto; gap: 24px; align-items: baseline; padding: 18px 4px; border-bottom: 1px solid var(--line-0); }
+.entry .when { color: var(--ink-2); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.entry .who { display: flex; align-items: baseline; gap: 10px; }
+.entry .who .name { font-size: 14.5px; font-weight: 500; }
+.entry .who .sub { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); }
+.entry .rule { font-size: 12.5px; }
+.entry .summary { color: var(--ink-1); font-size: 13.5px; margin-top: 6px; grid-column: 2 / 3; line-height: 1.5; max-width: 560px; }
+.entry.reverted .when, .entry.reverted .who .name, .entry.reverted .summary { color: var(--ink-2); }
+.entry.reverted .status { font-size: 11.5px; color: var(--ink-2); }
+.entry .action { justify-self: end; }
+.entry.batch { background: var(--bg-1); padding: 18px 16px; border-radius: 4px; grid-template-columns: 140px 1fr auto; border-bottom: 1px solid var(--line-0); }
+.entry.batch .batch-head { font-size: 14px; font-weight: 500; }
+.entry.batch .batch-meta { font-size: 12.5px; color: var(--ink-2); margin-top: 4px; }
+.history-empty { padding: 80px 0; max-width: 480px; }
+.history-empty h2 { font-family: var(--font-display); font-size: 28px; letter-spacing: -0.015em; font-weight: 400; margin: 0 0 10px; }
+.history-empty p { color: var(--ink-1); font-size: 14px; }
+
+/* ---- Settings page (Surface 5) ---- */
+.settings-scene { padding: 28px 44px 60px; background: var(--bg-0); max-width: 720px; }
+.settings-scene h1 { font-family: var(--font-display); font-size: 30px; letter-spacing: -0.015em; font-weight: 400; margin: 0 0 36px; }
+.settings-group { padding: 28px 0; border-top: 1px solid var(--line-0); }
+.settings-group:first-of-type { border-top: 0; padding-top: 0; }
+.settings-group h2 { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-1); margin: 0 0 10px; }
+.settings-group .blurb { color: var(--ink-1); font-size: 14px; max-width: 520px; margin-bottom: 22px; line-height: 1.55; }
+.field { display: grid; grid-template-columns: 180px 1fr; gap: 24px; padding: 14px 0; align-items: baseline; }
+.field .label { font-size: 13.5px; font-weight: 500; }
+.field .helper { font-size: 12.5px; color: var(--ink-2); margin-top: 6px; max-width: 420px; line-height: 1.5; }
+.field input[type="email"], .field select { font-family: var(--font-body); font-size: 14px; padding: 9px 12px; border: 1px solid var(--line-1); border-radius: var(--r-md); background: var(--bg-0); color: var(--ink-0); width: 280px; }
+.field input[type="email"]:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 2px; border-color: transparent; }
+.toggle { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle .track { width: 34px; height: 20px; border-radius: 12px; background: oklch(87% 0.01 200); position: relative; transition: background 140ms ease; }
+.toggle .track::after { content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: oklch(99% 0.004 200); transition: transform 140ms ease; box-shadow: 0 1px 2px oklch(18% 0.015 210 / 0.15); }
+.toggle input:checked + .track { background: var(--accent); }
+.toggle input:checked + .track::after { transform: translateX(14px); }
+.settings-foot { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line-0); display: flex; align-items: center; gap: 14px; }
+.settings-foot .status { color: var(--ink-2); font-size: 12.5px; margin-left: 10px; }
+
+/* ---- Warning variant for the "already-executed" revert UX (unresolved concern) ---- */
+.warn-note { margin: 18px 0; padding: 12px 16px; background: oklch(95% 0.022 25); border-radius: var(--r-md); font-size: 13px; color: oklch(36% 0.08 25); max-width: 720px; }
+</style>
+
+</head>
+<body>
+
+<div class="pv-header">
+  <div>
+    <div class="title">Doctor Subs - Missing Surfaces Draft</div>
+    <div class="meta">3 surfaces using the established token system · design-brief/missing-surfaces.html</div>
+  </div>
+  <nav class="toc">
+    <a href="#modal-ghost">Fix modal (Ghost)</a>
+    <a href="#modal-onhold">Fix modal (On-hold)</a>
+    <a href="#history">Fix history</a>
+    <a href="#history-empty">Fix history (empty)</a>
+    <a href="#settings">Settings</a>
+  </nav>
+</div>
+
+<!-- =================== Fix preview modal - Ghost sub =================== -->
+<section class="pv-section" id="modal-ghost">
+  <div class="pv-label">Surface 3 · Fix preview modal</div>
+  <div class="pv-title">Ghost sub - Sarah Mendez (#4812)</div>
+  <div class="pv-desc">The highest-trust moment in the product. Narrative explains what happened in plain English. Diff shows exactly which fields change. Two buttons, no tricks.</div>
+  <div class="pv-frame ds-root">
+    <div class="modal-scene">
+      <div class="behind">
+        <!-- Dimmed dashboard silhouette so the modal feels grounded -->
+        <div style="display:flex;padding:22px 0;border-bottom:1px solid var(--line-0);">
+          <div style="flex:1;padding:0 16px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-bottom:10px">HEALTHY</div><div style="font-size:62px;font-family:'Instrument Serif',serif;letter-spacing:-.03em;line-height:1">238</div></div>
+          <div style="flex:1;padding:0 16px;border-left:1px solid var(--line-0)"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-bottom:10px">AT RISK</div><div style="font-size:62px;font-family:'Instrument Serif',serif;letter-spacing:-.03em;line-height:1">3</div></div>
+          <div style="flex:1;padding:0 16px;border-left:1px solid var(--line-0)"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-bottom:10px">BROKEN</div><div style="font-size:62px;font-family:'Instrument Serif',serif;letter-spacing:-.03em;line-height:1">3</div></div>
+        </div>
+      </div>
+      <div class="modal-backdrop"></div>
+      <div class="modal">
+        <div class="modal-head">
+          <span class="sub">#4812</span>
+          <span class="name">Sarah Mendez</span>
+          <span class="rule"><span class="pill pill-broken">Ghost</span></span>
+        </div>
+        <div class="modal-body">
+          <p class="narrative">Sarah's monthly subscription was supposed to renew on <em>March 15 at 09:00</em>. WordPress didn't schedule the payment event, so nothing was charged. She hasn't been billed for April either.</p>
+
+          <div class="section-label">What will change</div>
+          <div class="diff">
+            <div class="diff-row">
+              <span class="field">Next payment</span>
+              <span class="before">- (not scheduled)</span>
+              <span class="arrow">→</span>
+              <span class="after emph">Apr 23 · 09:00 UTC</span>
+            </div>
+            <div class="diff-row">
+              <span class="field">AS event</span>
+              <span class="before">missing</span>
+              <span class="arrow">→</span>
+              <span class="after emph">woocommerce_scheduled_subscription_payment · id 1284921</span>
+            </div>
+            <div class="diff-row">
+              <span class="field">Sub status</span>
+              <span class="before">active</span>
+              <span class="arrow">→</span>
+              <span class="after">active <span style="color:var(--ink-3);font-family:var(--font-body);font-size:11.5px">(unchanged)</span></span>
+            </div>
+          </div>
+
+          <p class="revert-note">You can undo this from Fix history at any time.</p>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost">Cancel</button>
+          <button class="btn btn-primary">Fix subscription</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== Fix preview modal - On-hold with paid (the unresolved concern variant) =================== -->
+<section class="pv-section" id="modal-onhold">
+  <div class="pv-label">Surface 3 · Fix preview modal - variant with executed-payment warning</div>
+  <div class="pv-title">Stuck on-hold - Marcus Abernathy (#5104)</div>
+  <div class="pv-desc">Optional treatment for the unresolved concern flagged in eng review: when a re-enqueued AS action has already executed and charged the customer, the revert UX should explicitly say so. Shown here as an idea for future v1.1 consideration; current v1 ships silent no-op per your override. Mockup just for reference.</div>
+  <div class="pv-frame ds-root">
+    <div class="modal-scene">
+      <div class="modal-backdrop"></div>
+      <div class="modal">
+        <div class="modal-head">
+          <span class="sub">#5104</span>
+          <span class="name">Marcus Abernathy</span>
+          <span class="rule"><span class="pill pill-broken">On-hold</span></span>
+        </div>
+        <div class="modal-body">
+          <p class="narrative">Marcus's last renewal payment went through in Stripe on <em>April 8</em>. He was charged $29. But his subscription status stayed &ldquo;on hold&rdquo; instead of switching back to active.</p>
+
+          <div class="section-label">What will change</div>
+          <div class="diff">
+            <div class="diff-row">
+              <span class="field">Sub status</span>
+              <span class="before">on-hold</span>
+              <span class="arrow">→</span>
+              <span class="after emph">active</span>
+            </div>
+            <div class="diff-row">
+              <span class="field">Renewal #5105</span>
+              <span class="before">on-hold</span>
+              <span class="arrow">→</span>
+              <span class="after emph">completed</span>
+            </div>
+            <div class="diff-row">
+              <span class="field">Next payment</span>
+              <span class="before">May 8 · 09:00</span>
+              <span class="arrow">→</span>
+              <span class="after">May 8 · 09:00 <span style="color:var(--ink-3);font-family:var(--font-body);font-size:11.5px">(unchanged)</span></span>
+            </div>
+          </div>
+
+          <p class="revert-note">You can undo this from Fix history at any time. No payment will be taken.</p>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost">Cancel</button>
+          <button class="btn btn-primary">Fix subscription</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="warn-note" style="margin-top: 14px; background: oklch(95% 0.02 160); color: oklch(32% 0.06 160);"><strong>Resolved in v1.</strong> Earlier /plan-eng-review pushed this warning to v1.1; on reconsideration it ships in v1. When the plugin detects that a fix's scheduled action has already executed (i.e., the payment ran and charged the customer), the modal above renders an explicit warning block - see <code>$already_executed = true</code> branch in <code>v2-assets/admin/views/modal-fix-preview.php</code>. Reverting will never silently claim to undo a charge.</div>
+</section>
+
+<hr class="sep">
+
+<!-- =================== Fix history =================== -->
+<section class="pv-section" id="history">
+  <div class="pv-label">Surface 4 · Fix history</div>
+  <div class="pv-title">Default state</div>
+  <div class="pv-desc">Reverse-chrono list of applied fixes. Individual rows + one batch entry. Each row revertible until the retention window closes. Tabs (Dashboard · Fix history · Settings) sit in the plugin header above.</div>
+  <div class="pv-frame ds-root">
+    <div class="history-scene">
+      <div class="history-head">
+        <h1>Fix history</h1>
+        <div class="meta">14 fixes · showing most recent first</div>
+      </div>
+      <div class="history-filters">
+        <div class="filter active">All <span class="count">14</span></div>
+        <div class="filter">Ghost subs <span class="count">8</span></div>
+        <div class="filter">Stuck on-hold <span class="count">5</span></div>
+        <div class="filter">Repeated fails <span class="count">1</span></div>
+      </div>
+
+      <div class="entry">
+        <div class="when">12 minutes ago</div>
+        <div>
+          <div class="who"><span class="name">Sarah Mendez</span><span class="sub">#4812</span></div>
+          <div class="summary">Rescheduled next payment for Apr 23, 09:00 UTC. AS event id 1284921.</div>
+        </div>
+        <div class="rule"><span class="pill pill-broken">Ghost</span></div>
+        <div class="action"><button class="btn btn-ghost btn-sm">Revert</button></div>
+      </div>
+
+      <div class="entry reverted">
+        <div class="when">2 hours ago</div>
+        <div>
+          <div class="who"><span class="name">Marcus Abernathy</span><span class="sub">#5104</span></div>
+          <div class="summary">Flipped on-hold → active after matching renewal charge in Stripe (Apr 8, $29).</div>
+        </div>
+        <div class="rule"><span class="pill pill-quiet">Reverted</span></div>
+        <div class="action"><span class="status">Reverted 1h ago</span></div>
+      </div>
+
+      <div class="entry batch">
+        <div class="when">Yesterday · 16:40</div>
+        <div>
+          <div class="batch-head">Fixed 3 subscriptions in one batch</div>
+          <div class="batch-meta">
+            <span class="mono" style="color:var(--ink-2);font-size:12px">#6201</span>,
+            <span class="mono" style="color:var(--ink-2);font-size:12px">#6230</span>,
+            <span class="mono" style="color:var(--ink-2);font-size:12px">#6477</span>
+            · Ghost sub rule · batch id <span class="mono" style="font-size:12px">b_4f21</span>
+          </div>
+        </div>
+        <div class="action"><button class="btn btn-ghost btn-sm">Revert all 3</button></div>
+      </div>
+
+      <div class="entry">
+        <div class="when">3 days ago</div>
+        <div>
+          <div class="who"><span class="name">Anya Volkova</span><span class="sub">#3918</span></div>
+          <div class="summary">Retried failed scheduled payment. Gateway accepted the retry, sub is now active.</div>
+        </div>
+        <div class="rule"><span class="pill pill-risk">Repeated fails</span></div>
+        <div class="action"><button class="btn btn-ghost btn-sm">Revert</button></div>
+      </div>
+
+      <div class="entry">
+        <div class="when">Mar 28 · 11:02</div>
+        <div>
+          <div class="who"><span class="name">Jin-ho Park</span><span class="sub">#6230</span></div>
+          <div class="summary">Rescheduled next payment for Mar 29. Sub has renewed twice since (unreverted).</div>
+        </div>
+        <div class="rule"><span class="pill pill-broken">Ghost</span></div>
+        <div class="action"><span class="status" style="color:var(--ink-3)">Past retention window</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pv-section" id="history-empty">
+  <div class="pv-label">Surface 4 · Fix history</div>
+  <div class="pv-title">Empty state</div>
+  <div class="pv-desc">Fresh install, no fixes applied yet. Honest, short, no cheer.</div>
+  <div class="pv-frame ds-root">
+    <div class="history-scene">
+      <div class="history-head">
+        <h1>Fix history</h1>
+      </div>
+      <div class="history-empty">
+        <div style="font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin-bottom:14px">Nothing here yet</div>
+        <h2>No fixes applied.</h2>
+        <p>When you apply a fix from the dashboard, it'll show up here so you can undo it. Fixes stay revertible for 180 days by default - change that in Settings.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- =================== Settings =================== -->
+<section class="pv-section" id="settings">
+  <div class="pv-label">Surface 5 · Settings</div>
+  <div class="pv-title">Default</div>
+  <div class="pv-desc">Three grouped sections. No nested forms. Helper text lives next to each field. Save button inline with feedback.</div>
+  <div class="pv-frame ds-root">
+    <div class="settings-scene">
+      <h1>Settings</h1>
+
+      <div class="settings-group">
+        <h2>Alerts</h2>
+        <div class="blurb">When something breaks between scans, we'll email you a daily digest. Off by default.</div>
+        <div class="field">
+          <div class="label">Email alerts</div>
+          <div>
+            <label class="toggle">
+              <input type="checkbox" checked>
+              <span class="track"></span>
+              <span>On</span>
+            </label>
+            <div class="helper">When new broken subscriptions appear, you'll get a daily summary email.</div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="label">Send to</div>
+          <div>
+            <input type="email" value="david@mercato.shop">
+            <div class="helper">Defaults to your WordPress admin email.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h2>Fix history retention</h2>
+        <div class="blurb">Older entries get pruned automatically. Recent entries stay revertible.</div>
+        <div class="field">
+          <div class="label">Keep fixes for</div>
+          <div>
+            <select>
+              <option>30 days</option>
+              <option>90 days</option>
+              <option selected>180 days</option>
+              <option>365 days</option>
+              <option>Forever</option>
+            </select>
+            <div class="helper">Anything beyond this shows as &ldquo;past retention window&rdquo; and can't be reverted.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h2>Help us improve</h2>
+        <div class="blurb">Anonymous telemetry helps us know which fixes are actually used. We only send the rule name and a timestamp when a fix is applied. Nothing else - no customer data, no subscription details, no identifying information.</div>
+        <div class="field">
+          <div class="label">Send anonymous fix stats</div>
+          <div>
+            <label class="toggle">
+              <input type="checkbox">
+              <span class="track"></span>
+              <span>Off</span>
+            </label>
+            <div class="helper">Off by default. Turn it on if you want to help us build the plugin better.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-foot">
+        <button class="btn btn-primary">Save changes</button>
+        <button class="btn btn-ghost">Discard</button>
+        <span class="status">Last saved 3 days ago.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

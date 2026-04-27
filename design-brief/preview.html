@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Doctor Subs — Design Preview</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- tokens.css (inlined) -->
+<link rel="stylesheet" href="./tokens.css">
+
+<style>
+/* Preview chrome — exists only for this stacked-state review page */
+:root { color-scheme: light; }
+html, body { margin: 0; background: oklch(95% 0.008 200); font-family: 'Switzer', system-ui, sans-serif; color: oklch(18% 0.015 210); }
+.preview-header { position: sticky; top: 0; z-index: 50; background: oklch(99% 0.004 200); border-bottom: 1px solid oklch(92% 0.008 200); padding: 18px 32px; display: flex; align-items: center; gap: 28px; }
+.preview-header .title { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; }
+.preview-header .meta { font-size: 12px; color: oklch(55% 0.01 210); }
+.preview-header .toc { display: flex; gap: 16px; margin-left: auto; flex-wrap: wrap; }
+.preview-header .toc a { font-size: 12px; color: oklch(38% 0.012 210); text-decoration: none; border-bottom: 1px dotted oklch(72% 0.008 210); padding-bottom: 1px; }
+.preview-header .toc a:hover { color: oklch(28% 0.05 195); border-bottom-color: oklch(48% 0.06 195); }
+.preview-section { padding: 48px 32px 24px; }
+.preview-label { font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(55% 0.01 210); margin-bottom: 10px; }
+.preview-title { font-family: 'Instrument Serif', serif; font-size: 28px; letter-spacing: -0.015em; margin-bottom: 4px; }
+.preview-desc { font-size: 14px; color: oklch(38% 0.012 210); max-width: 640px; margin-bottom: 24px; }
+.preview-frame { border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px oklch(18% 0.015 210 / 0.08), 0 16px 40px oklch(18% 0.015 210 / 0.06); border: 1px solid oklch(92% 0.008 200); }
+.note { margin-top: 14px; padding: 12px 16px; background: oklch(95.5% 0.025 75); border-radius: 6px; font-size: 13px; color: oklch(32% 0.06 75); max-width: 720px; }
+hr.sep { border: 0; border-top: 1px solid oklch(87% 0.01 200); margin: 56px 0 0; }
+</style>
+
+<!-- React + Babel -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+</head>
+<body>
+
+<div class="preview-header">
+  <div>
+    <div class="title">Doctor Subs — Design Preview</div>
+    <div class="meta">5 approved states · design-brief/preview.html · all tokens from tokens.css</div>
+  </div>
+  <nav class="toc">
+    <a href="#firstrun-default">First-run</a>
+    <a href="#firstrun-scanning">Scanning</a>
+    <a href="#firstrun-zero">Zero subs</a>
+    <a href="#dashboard-mixed">Dashboard</a>
+    <a href="#dashboard-healthy">All healthy</a>
+    <a href="#dashboard-failed">Scan failed</a>
+  </nav>
+</div>
+
+<!-- =================== First-run states =================== -->
+
+<section class="preview-section" id="firstrun-default">
+  <div class="preview-label">Surface 1 · First-run</div>
+  <div class="preview-title">Default</div>
+  <div class="preview-desc">Very first visit to the plugin. No scan has run yet. Calm CTA + bulleted detect list. The moment that has to lower a panicking merchant's heart rate.</div>
+  <div class="preview-frame"><div id="mount-firstrun-default"></div></div>
+</section>
+
+<section class="preview-section" id="firstrun-scanning">
+  <div class="preview-label">Surface 1 · First-run</div>
+  <div class="preview-title">Scanning</div>
+  <div class="preview-desc">After the user clicks <em>Scan my subscriptions</em>. Deterministic progress bar with live <code>sub_id</code> being checked, not a spinner. Honest not performative.</div>
+  <div class="preview-frame"><div id="mount-firstrun-scanning"></div></div>
+</section>
+
+<section class="preview-section" id="firstrun-zero">
+  <div class="preview-label">Surface 1 · First-run</div>
+  <div class="preview-title">Zero active subscriptions</div>
+  <div class="preview-desc">Store has no active subs yet. Alternative copy, no CTA, doesn't pretend there's work to do.</div>
+  <div class="preview-frame"><div id="mount-firstrun-zero"></div></div>
+</section>
+
+<hr class="sep">
+
+<!-- =================== Dashboard states =================== -->
+
+<section class="preview-section" id="dashboard-mixed">
+  <div class="preview-label">Surface 2 · Dashboard</div>
+  <div class="preview-title">Default (mixed)</div>
+  <div class="preview-desc">The normal state after a scan. Three counter cards up top (click to filter), &ldquo;Needs attention&rdquo; table below. Terracotta for broken, warm amber for at-risk, muted green for healthy.</div>
+  <div class="preview-frame"><div id="mount-dashboard-mixed"></div></div>
+</section>
+
+<section class="preview-section" id="dashboard-healthy">
+  <div class="preview-label">Surface 2 · Dashboard</div>
+  <div class="preview-title">All healthy</div>
+  <div class="preview-desc">Zero broken, zero at-risk. Table is replaced by a quiet confirmation, no confetti, no emoji. The most calming state the product can produce.</div>
+  <div class="preview-frame"><div id="mount-dashboard-healthy"></div></div>
+</section>
+
+<section class="preview-section" id="dashboard-failed">
+  <div class="preview-label">Surface 2 · Dashboard</div>
+  <div class="preview-title">Scan failed</div>
+  <div class="preview-desc">Scanner crashed or timed out. Inline banner above the counters &mdash; calm tone, action available, nothing blocking the rest of the UI.</div>
+  <div class="preview-frame"><div id="mount-dashboard-failed"></div></div>
+  <div class="note"><strong>Known issue (flagged during design review):</strong> the banner uses <code>border-left: 2px solid</code>, which is on Anthropic's frontend-design skill's banned patterns list (&ldquo;side-stripe borders on cards/alerts&rdquo;). Acceptable on the counter selection state (precedent in Notion/Linear), debatable on the banner itself. Consider rewriting the banner to use a background tint with a leading icon instead when implementing the PHP template.</div>
+</section>
+
+<!-- =================== Scripts ==================== -->
+
+<script type="text/babel" data-type="module">
+
+/* ============== chrome.jsx inlined ============== */
+const { useState } = React;
+
+function Stethoscope({ size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+         aria-hidden="true" className="ds-mark">
+      <path d="M4 3v5a4 4 0 0 0 8 0V3" />
+      <path d="M4 3h2M10 3h2" />
+      <path d="M8 12v3a5 5 0 0 0 5 5h0a5 5 0 0 0 5-5v-1.5" />
+      <circle cx="18" cy="9" r="2.2" />
+    </svg>
+  );
+}
+
+function AdminSidebar() {
+  const items = [
+    { label: 'Overview', icon: '▤' },
+    { label: 'Orders', icon: '▢' },
+    { label: 'Products', icon: '▧' },
+    { label: 'Customers', icon: '◎' },
+    { label: 'Subscriptions', icon: '∞' },
+    { label: 'Doctor Subs', icon: '✚', active: true },
+    { label: 'Analytics', icon: '◨' },
+    { label: 'Settings', icon: '⚙' },
+  ];
+  return (
+    <aside style={{
+      width: 188, flex: '0 0 188px',
+      background: 'oklch(22% 0.012 210)', color: 'oklch(80% 0.008 210)',
+      fontSize: 12.5, padding: '14px 0', userSelect: 'none',
+    }}>
+      <div style={{ padding: '4px 16px 12px', fontSize: 10.5, letterSpacing: '0.12em',
+                    textTransform: 'uppercase', color: 'oklch(58% 0.01 210)' }}>Admin</div>
+      {items.map((it) => (
+        <div key={it.label} style={{
+          padding: '7px 16px',
+          display: 'flex', alignItems: 'center', gap: 10,
+          background: it.active ? 'oklch(30% 0.03 200)' : 'transparent',
+          color: it.active ? 'oklch(95% 0.008 200)' : 'oklch(78% 0.008 210)',
+          borderLeft: it.active ? '2px solid oklch(60% 0.07 195)' : '2px solid transparent',
+        }}>
+          <span style={{ width: 14, opacity: 0.7, textAlign: 'center', fontSize: 12 }}>{it.icon}</span>
+          <span>{it.label}</span>
+        </div>
+      ))}
+    </aside>
+  );
+}
+
+function AdminTopbar() {
+  return (
+    <div style={{
+      height: 34, background: 'oklch(16% 0.012 210)', color: 'oklch(75% 0.008 210)',
+      fontSize: 12, display: 'flex', alignItems: 'center', padding: '0 14px', gap: 16,
+      borderBottom: '1px solid oklch(10% 0.01 210)',
+    }}>
+      <span style={{ color: 'oklch(88% 0.01 210)', fontWeight: 500 }}>mercato · admin</span>
+      <span style={{ opacity: 0.6 }}>plugins</span>
+      <span style={{ opacity: 0.6 }}>updates (2)</span>
+      <span style={{ flex: 1 }} />
+      <span style={{ opacity: 0.6 }}>howdy, rita</span>
+    </div>
+  );
+}
+
+function AdminShell({ children, width = 1240, height = 820 }) {
+  return (
+    <div className="ds-root" style={{
+      width, height, background: 'var(--bg-0)',
+      display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      fontFamily: 'var(--font-body)',
+    }}>
+      <AdminTopbar />
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+        <AdminSidebar />
+        <main style={{ flex: 1, overflow: 'auto', background: 'var(--bg-0)' }}>
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function PluginHeader({ tab = 'dashboard', onTab, lastScanned = '2 hours ago', stale = false, showMeta = true }) {
+  const tabs = [
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'history', label: 'Fix history' },
+    { id: 'settings', label: 'Settings' },
+  ];
+  return (
+    <div style={{
+      padding: '28px 44px 0', borderBottom: '1px solid var(--line-0)', background: 'var(--bg-0)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Stethoscope size={26} />
+          <div>
+            <div style={{ fontSize: 19, fontWeight: 500, letterSpacing: '-0.012em' }}>Doctor Subs</div>
+            <div style={{ fontSize: 12, color: 'var(--ink-2)', marginTop: 2 }}>
+              Find and fix broken WooCommerce subscriptions.
+            </div>
+          </div>
+        </div>
+        {showMeta && (
+          <div style={{
+            fontSize: 12.5, color: stale ? 'oklch(45% 0.08 75)' : 'var(--ink-2)',
+            display: 'flex', alignItems: 'center', gap: 10, paddingTop: 8,
+          }}>
+            <span>Last scanned {lastScanned}</span>
+            <span style={{ color: 'var(--line-1)' }}>·</span>
+            <a href="#" style={{ display: 'inline-flex', alignItems: 'center', gap: 4,
+                                 color: 'var(--accent-ink)', textDecorationColor: 'oklch(82% 0.03 195)' }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12a9 9 0 1 1-3-6.7L21 8" /><path d="M21 3v5h-5" />
+              </svg>
+              {stale ? 'Refresh now' : 'Refresh'}
+            </a>
+          </div>
+        )}
+      </div>
+      <div style={{ display: 'flex', gap: 28, marginTop: 24 }}>
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => onTab && onTab(t.id)}
+            style={{
+              fontSize: 13.5, padding: '10px 0',
+              color: tab === t.id ? 'var(--ink-0)' : 'var(--ink-2)',
+              borderBottom: tab === t.id ? '2px solid var(--accent)' : '2px solid transparent',
+              fontWeight: tab === t.id ? 500 : 400, marginBottom: -1,
+            }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============== first-run.jsx inlined ============== */
+
+function DetectRow({ n, name, desc, last }) {
+  return (
+    <div style={{
+      display: 'grid', gridTemplateColumns: '48px 220px 1fr', gap: 24, padding: '20px 0',
+      borderBottom: last ? 'none' : '1px solid var(--line-0)', alignItems: 'baseline',
+    }}>
+      <span className="mono" style={{ fontSize: 11, color: 'var(--ink-3)' }}>{n}</span>
+      <span style={{ fontSize: 15.5, fontWeight: 500, letterSpacing: '-0.005em' }}>{name}</span>
+      <span style={{ fontSize: 14, color: 'var(--ink-1)', lineHeight: 1.55, maxWidth: 560 }}>{desc}</span>
+    </div>
+  );
+}
+
+function ScanningBlock({ n = 247, remaining = 18 }) {
+  const pct = ((n - (remaining * (n / 30))) / n) * 100;
+  return (
+    <>
+      <div style={{ fontSize: 11.5, letterSpacing: '0.12em', textTransform: 'uppercase',
+                    color: 'var(--ink-2)', marginBottom: 18 }}>Scanning</div>
+      <h1 className="display" style={{ fontSize: 48, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+        Scanning your subscriptions<span style={{ color: 'var(--accent-ink)' }}>…</span>
+      </h1>
+      <p style={{ marginTop: 18, fontSize: 15, color: 'var(--ink-1)' }}>
+        Checking <span className="mono tnum" style={{ color: 'var(--ink-0)' }}>{n}</span> active subs —
+        about <span className="mono tnum" style={{ color: 'var(--ink-0)' }}>{remaining}</span> seconds left.
+      </p>
+      <div style={{ marginTop: 34, maxWidth: 520 }}>
+        <div style={{ height: 2, background: 'var(--line-0)', position: 'relative', borderRadius: 2 }}>
+          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0,
+            width: `${Math.max(8, Math.min(96, pct))}%`,
+            background: 'var(--accent)', borderRadius: 2,
+            transition: 'width 400ms cubic-bezier(0.2, 0.8, 0.2, 1)' }} />
+        </div>
+        <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between',
+          fontSize: 12, color: 'var(--ink-2)' }}>
+          <span className="mono tnum">checking sub_00{(n - remaining * 8).toString().padStart(3, '0')}</span>
+          <a href="#" style={{ color: 'var(--ink-2)' }}>Cancel</a>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function FirstRun({ state = 'default' }) {
+  const isScanning = state === 'scanning';
+  const isZero = state === 'zero';
+  return (
+    <div>
+      <PluginHeader tab="dashboard" showMeta={false} />
+      <div style={{ padding: '84px 96px 72px', maxWidth: 880 }}>
+        {!isZero && !isScanning && (
+          <>
+            <div style={{ fontSize: 11.5, letterSpacing: '0.12em', textTransform: 'uppercase',
+                          color: 'var(--ink-2)', marginBottom: 18 }}>First visit</div>
+            <h1 className="display" style={{ fontSize: 'var(--t-hero)', lineHeight: 1.05,
+              letterSpacing: '-0.02em', maxWidth: 720, color: 'var(--ink-0)' }}>
+              Let&rsquo;s check your subscriptions <span className="ital" style={{ color: 'var(--accent-ink)' }}>for problems</span>.
+            </h1>
+            <p style={{ marginTop: 22, fontSize: 16, color: 'var(--ink-1)', maxWidth: 560, lineHeight: 1.6 }}>
+              We&rsquo;ll scan your active subscriptions for three common renewal failures.
+              Takes about 30 seconds. Runs entirely on your server &mdash; nothing sent anywhere.
+            </p>
+            <div style={{ marginTop: 36, display: 'flex', alignItems: 'center', gap: 20 }}>
+              <button className="btn btn-primary" style={{ padding: '12px 20px', fontSize: 14 }}>
+                Scan my subscriptions
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+              <a href="#" style={{ fontSize: 13.5, color: 'var(--ink-1)' }}>
+                <span className="ital display" style={{ fontSize: 16 }}>or</span> configure settings first
+              </a>
+            </div>
+          </>
+        )}
+        {isScanning && <ScanningBlock n={247} remaining={18} />}
+        {isZero && (
+          <>
+            <div style={{ fontSize: 11.5, letterSpacing: '0.12em', textTransform: 'uppercase',
+                          color: 'var(--ink-2)', marginBottom: 18 }}>Nothing to scan yet</div>
+            <h1 className="display" style={{ fontSize: 44, lineHeight: 1.1, maxWidth: 640, letterSpacing: '-0.02em' }}>
+              You don&rsquo;t have any active subscriptions <span className="ital" style={{ color: 'var(--ink-2)' }}>to scan yet</span>.
+            </h1>
+            <p style={{ marginTop: 20, fontSize: 15, color: 'var(--ink-1)', maxWidth: 520 }}>
+              Doctor Subs will start watching once you do. You can leave this tab open &mdash;
+              or come back when your first customer subscribes.
+            </p>
+          </>
+        )}
+        <div style={{ marginTop: 72, borderTop: '1px solid var(--line-0)', paddingTop: 40 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 24 }}>
+            <span className="mono" style={{ fontSize: 11, color: 'var(--ink-3)' }}>03</span>
+            <h2 style={{ fontSize: 13, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-1)' }}>
+              What this detects
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 0 }}>
+            <DetectRow n="01" name="Ghost subscriptions" desc="Active subscriptions that won't renew because the payment didn't get scheduled." />
+            <DetectRow n="02" name="Stuck on-hold" desc="Payment went through, but the subscription never switched back to active." />
+            <DetectRow n="03" name="Repeated payment failures" desc="Something has been failing to process a payment for a while." last />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============== dashboard.jsx inlined ============== */
+
+const SUBS = [
+  { id: 4812, name: 'Sarah Mendez', rule: 'ghost', reason: 'Next payment didn’t get rescheduled after the March 15 renewal.', bucket: 'broken', amount: '$29.00', since: 'Mar 15' },
+  { id: 5104, name: 'Marcus Abernathy', rule: 'onhold', reason: 'Charged $29 in Stripe on Apr 8 but subscription stayed on-hold.', bucket: 'broken', amount: '$29.00', since: 'Apr 8' },
+  { id: 3918, name: 'Anya Volkova', rule: 'repfail', reason: '4 failed renewal attempts since Mar 22 — looks like a gateway issue.', bucket: 'broken', amount: '$49.00', since: 'Mar 22' },
+  { id: 6230, name: 'Jin-ho Park', rule: 'ghost', reason: 'Renewal event for Apr 19 missing from the scheduler.', bucket: 'risk', amount: '$15.00', since: 'Apr 19' },
+  { id: 6477, name: 'Beatrice Owoyemi', rule: 'repfail', reason: '2 failed attempts in the last 36 hours — card may be declining.', bucket: 'risk', amount: '$79.00', since: 'Apr 20' },
+  { id: 2201, name: 'Theo Lindqvist', rule: 'onhold', reason: 'Last payment succeeded Apr 12, status has been on-hold since.', bucket: 'risk', amount: '$12.00', since: 'Apr 12' },
+];
+
+const RULE_META = {
+  ghost:   { label: 'Ghost',         pill: 'pill-broken', dot: 'dot-broken' },
+  onhold:  { label: 'Stuck on-hold', pill: 'pill-risk',   dot: 'dot-risk' },
+  repfail: { label: 'Repeated fails', pill: 'pill-risk',  dot: 'dot-risk' },
+};
+
+function Counter({ label, n, state, active, onClick }) {
+  const color = state === 'healthy' ? 'var(--healthy)'
+              : state === 'risk'    ? 'var(--risk)'
+              : state === 'broken'  ? 'var(--broken)'
+              : 'var(--ink-3)';
+  return (
+    <button onClick={onClick}
+      style={{
+        textAlign: 'left',
+        padding: '22px 24px 22px 26px',
+        borderRadius: 0,
+        borderLeft: `2px solid ${active ? color : 'var(--line-1)'}`,
+        background: active ? 'var(--bg-1)' : 'transparent',
+        flex: 1, transition: 'background 160ms ease, border-color 160ms ease',
+        cursor: 'pointer', minWidth: 0,
+      }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        <span className={`dot dot-${state}`} />
+        <span style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase',
+                       color: 'var(--ink-2)', fontWeight: 500 }}>{label}</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+        <span className="display tnum" style={{
+          fontSize: 62, lineHeight: 1, letterSpacing: '-0.03em',
+          color: n === 0 && state !== 'healthy' ? 'var(--ink-3)' : 'var(--ink-0)',
+        }}>{n}</span>
+        <span style={{ fontSize: 12, color: 'var(--ink-2)' }}>
+          {state === 'healthy' && 'no problems'}
+          {state === 'risk' && 'might need attention'}
+          {state === 'broken' && 'needs you now'}
+        </span>
+      </div>
+    </button>
+  );
+}
+
+function Dashboard({ state = 'mixed', onRowClick }) {
+  const [filter, setFilter] = React.useState('all');
+  const counts = React.useMemo(() => {
+    if (state === 'healthy') return { healthy: 241, risk: 0, broken: 0 };
+    return { healthy: 238, risk: 3, broken: 3 };
+  }, [state]);
+  const visible = React.useMemo(() => {
+    if (filter === 'broken') return SUBS.filter(s => s.bucket === 'broken');
+    if (filter === 'risk') return SUBS.filter(s => s.bucket === 'risk');
+    return SUBS;
+  }, [filter]);
+  const isRefreshing = state === 'refreshing';
+  const isFailed = state === 'failed';
+  const isHealthy = state === 'healthy';
+  return (
+    <div>
+      <PluginHeader tab="dashboard" lastScanned="2 hours ago" stale={false} />
+      <div style={{ padding: '28px 44px 60px' }}>
+        {isFailed && (
+          <div style={{
+            marginBottom: 24, padding: '14px 18px',
+            borderLeft: '2px solid var(--risk)',
+            background: 'var(--risk-weak)',
+            fontSize: 13.5, color: 'oklch(32% 0.06 75)',
+            display: 'flex', alignItems: 'center', gap: 16,
+          }}>
+            <span style={{ flex: 1 }}>The last scan didn&rsquo;t complete. Nothing was changed.</span>
+            <a href="#" style={{ color: 'inherit', fontWeight: 500 }}>Try again</a>
+            <span style={{ color: 'oklch(75% 0.04 75)' }}>·</span>
+            <a href="#" style={{ color: 'inherit' }}>View logs</a>
+          </div>
+        )}
+        <div style={{
+          display: 'flex', border: '1px solid var(--line-0)', borderRadius: 0, background: 'var(--bg-0)',
+          opacity: isRefreshing ? 0.55 : 1, transition: 'opacity 200ms ease',
+        }}>
+          <Counter label="Healthy" n={counts.healthy} state="healthy"
+                   active={filter === 'healthy'}
+                   onClick={() => setFilter(filter === 'healthy' ? 'all' : 'healthy')} />
+          <div style={{ width: 1, background: 'var(--line-0)' }} />
+          <Counter label="At risk" n={counts.risk} state="risk"
+                   active={filter === 'risk'}
+                   onClick={() => setFilter(filter === 'risk' ? 'all' : 'risk')} />
+          <div style={{ width: 1, background: 'var(--line-0)' }} />
+          <Counter label="Broken" n={counts.broken} state="broken"
+                   active={filter === 'broken'}
+                   onClick={() => setFilter(filter === 'broken' ? 'all' : 'broken')} />
+        </div>
+        {isHealthy ? (
+          <div style={{ marginTop: 80, textAlign: 'left', maxWidth: 520 }}>
+            <div style={{ fontSize: 11.5, letterSpacing: '0.12em', textTransform: 'uppercase',
+                          color: 'var(--ink-2)', marginBottom: 14 }}>
+              <span className="dot dot-healthy" style={{ marginRight: 8, verticalAlign: 'middle' }} />
+              All clear
+            </div>
+            <h2 className="display" style={{ fontSize: 40, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+              Everything looks good.
+            </h2>
+            <p style={{ marginTop: 14, fontSize: 14.5, color: 'var(--ink-1)' }}>
+              We&rsquo;ll keep watching. Last checked 2 hours ago.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div style={{ marginTop: 44 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
+                  <h2 style={{ fontSize: 15, fontWeight: 500 }}>Needs attention</h2>
+                  <span style={{ fontSize: 12, color: 'var(--ink-2)' }}>
+                    {filter === 'all' && 'showing all broken and at-risk'}
+                    {filter === 'broken' && `filtering to ${SUBS.filter(s => s.bucket === 'broken').length} broken`}
+                    {filter === 'risk'   && `filtering to ${SUBS.filter(s => s.bucket === 'risk').length} at-risk`}
+                  </span>
+                </div>
+                {filter !== 'all' && (
+                  <button onClick={() => setFilter('all')} style={{ fontSize: 12, color: 'var(--ink-2)' }}>clear filter</button>
+                )}
+              </div>
+              <div style={{ border: '1px solid var(--line-0)', background: 'var(--bg-0)' }}>
+                <table className="ds-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: 40 }}></th>
+                      <th>Customer</th>
+                      <th>Subscription</th>
+                      <th>Issue</th>
+                      <th>Reason</th>
+                      <th style={{ textAlign: 'right' }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {visible.map(s => (
+                      <tr key={s.id} className="clickable">
+                        <td><span className={`dot ${RULE_META[s.rule].dot}`} /></td>
+                        <td style={{ fontWeight: 500 }}>{s.name}</td>
+                        <td>
+                          <span className="mono" style={{ color: 'var(--ink-1)' }}>#{s.id}</span>
+                          <span style={{ color: 'var(--ink-3)', marginLeft: 10, fontSize: 12 }}>{s.amount}</span>
+                        </td>
+                        <td><span className={`pill ${RULE_META[s.rule].pill}`}>{RULE_META[s.rule].label}</span></td>
+                        <td style={{ color: 'var(--ink-1)', maxWidth: 340 }}>
+                          <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {s.reason}
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <button className="btn btn-outline btn-sm">Fix</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============== mount ============== */
+
+const createRoot = ReactDOM.createRoot;
+createRoot(document.getElementById('mount-firstrun-default')).render(<AdminShell><FirstRun state="default" /></AdminShell>);
+createRoot(document.getElementById('mount-firstrun-scanning')).render(<AdminShell><FirstRun state="scanning" /></AdminShell>);
+createRoot(document.getElementById('mount-firstrun-zero')).render(<AdminShell><FirstRun state="zero" /></AdminShell>);
+createRoot(document.getElementById('mount-dashboard-mixed')).render(<AdminShell><Dashboard state="mixed" /></AdminShell>);
+createRoot(document.getElementById('mount-dashboard-healthy')).render(<AdminShell><Dashboard state="healthy" /></AdminShell>);
+createRoot(document.getElementById('mount-dashboard-failed')).render(<AdminShell><Dashboard state="failed" /></AdminShell>);
+</script>
+
+</body>
+</html>

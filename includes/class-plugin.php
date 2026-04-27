@@ -2,6 +2,9 @@
 /**
  * Main Plugin Class
  *
+ * Wires all v2 subsystems: admin UI, AJAX handlers, scanner + journal
+ * hooks, and the recurring Action Scheduler + WP-Cron schedules.
+ *
  * @package Dr_Subs
  * @since   1.0.0
  */
@@ -13,49 +16,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Main plugin class for WooCommerce Subscriptions Troubleshooter.
+ * Main plugin class.
  *
  * @since 1.0.0
  */
-class WCST_Plugin {
+class DR_Subs_Plugin {
 
 	/**
-	 * Plugin instance.
+	 * Singleton instance.
 	 *
-	 * @since 1.0.0
-	 * @var WCST_Plugin|null
+	 * @var DR_Subs_Plugin|null
 	 */
 	private static $instance = null;
 
 	/**
-	 * Admin instance.
+	 * Admin controller.
 	 *
-	 * @since 1.0.0
-	 * @var WCST_Admin
+	 * @var DR_Subs_Admin
 	 */
 	public $admin;
 
 	/**
-	 * AJAX handler instance.
+	 * AJAX handler.
 	 *
-	 * @since 1.0.0
-	 * @var WCST_Ajax_Handler
+	 * @var DR_Subs_Ajax_Handler
 	 */
 	public $ajax_handler;
 
 	/**
-	 * Logger instance.
+	 * Logger.
 	 *
-	 * @since 1.0.0
-	 * @var WCST_Logger
+	 * @var DR_Subs_Logger
 	 */
 	public $logger;
 
 	/**
 	 * Get plugin instance.
 	 *
-	 * @since 1.0.0
-	 * @return WCST_Plugin
+	 * @return DR_Subs_Plugin
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -66,8 +64,6 @@ class WCST_Plugin {
 
 	/**
 	 * Constructor.
-	 *
-	 * @since 1.0.0
 	 */
 	public function __construct() {
 		$this->init_hooks();
@@ -75,132 +71,148 @@ class WCST_Plugin {
 	}
 
 	/**
-	 * Initialize WordPress hooks.
-	 *
-	 * @since 1.0.0
+	 * Register WordPress hooks.
 	 */
 	private function init_hooks() {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 
-		// Add settings link to plugins page.
-		add_filter( 'plugin_action_links_' . WCST_PLUGIN_BASENAME, array( $this, 'add_settings_link' ) );
-	}
+		// Scanner hooks (both AS primary + WP-Cron watchdog).
+		add_action( DR_Subs_Health_Scanner::RECURRING_HOOK, array( 'DR_Subs_Health_Scanner', 'run_recurring' ) );
+		add_action( DR_Subs_Health_Scanner::WATCHDOG_HOOK, array( 'DR_Subs_Health_Scanner', 'run_watchdog' ) );
 
-	/**
-	 * Load plugin dependencies.
-	 *
-	 * @since 1.0.0
-	 */
-	private function load_dependencies() {
-		// Load admin class for admin interface.
-		if ( is_admin() ) {
-			$this->admin = new WCST_Admin();
+		// Journal cleanup hook.
+		add_action( DR_Subs_Fix_Journal::CLEANUP_HOOK, array( 'DR_Subs_Fix_Journal', 'run_cleanup' ) );
+
+		// Alert dispatcher (listens on dr_subs_after_scan).
+		if ( class_exists( 'DR_Subs_Alert_Dispatcher' ) ) {
+			DR_Subs_Alert_Dispatcher::register();
 		}
 
-		// Load AJAX handler.
-		$this->ajax_handler = new WCST_Ajax_Handler();
+		// Telemetry (opt-in; listens on dr_subs_after_fix_apply / revert / bulk).
+		if ( class_exists( 'DR_Subs_Telemetry' ) ) {
+			DR_Subs_Telemetry::register();
+		}
 
-		// Load logger.
-		$this->logger = new WCST_Logger();
+		// Status transition log (feeds the Mass Hold cascade rule).
+		if ( class_exists( 'DR_Subs_Status_Transition_Log' ) ) {
+			DR_Subs_Status_Transition_Log::register();
+		}
 	}
 
 	/**
-	 * Initialize plugin.
-	 *
-	 * @since 1.0.0
+	 * Instantiate subsystems.
+	 */
+	private function load_dependencies() {
+		if ( is_admin() ) {
+			$this->admin = new DR_Subs_Admin();
+		}
+		$this->ajax_handler = new DR_Subs_Ajax_Handler();
+		$this->logger       = new DR_Subs_Logger();
+	}
+
+	/**
+	 * `init` callback.
 	 */
 	public function init() {
-		// Fire action for extensions.
-		do_action( 'wcst_init' );
+		// Pick up new schema (e.g. dr_subs_status_transitions in 2.1.0)
+		// after an in-place upgrade where the activation hook didn't run.
+		if ( class_exists( 'DR_Subs_Migration' ) ) {
+			DR_Subs_Migration::maybe_upgrade();
+		}
+
+		/**
+		 * Fires after Doctor Subs boots on every request.
+		 *
+		 * @since 2.0.0
+		 */
+		do_action( 'dr_subs_init' );
 	}
 
 	/**
-	 * Admin initialization.
-	 *
-	 * @since 1.0.0
+	 * `admin_init` callback.
 	 */
 	public function admin_init() {
-		// Fire action for admin-specific initialization.
-		do_action( 'wcst_admin_init' );
-	}
-
-	/**
-	 * Add settings link to plugins page.
-	 *
-	 * @since 1.0.0
-	 * @param array $links Plugin action links.
-	 * @return array Modified plugin action links.
-	 */
-	public function add_settings_link( $links ) {
-		$settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=doctor-subs' ) ) . '">' .
-						esc_html__( 'Troubleshoot', 'doctor-subs' ) . '</a>';
-		array_unshift( $links, $settings_link );
-		return $links;
+		/**
+		 * Fires during admin_init after Doctor Subs boots.
+		 *
+		 * @since 2.0.0
+		 */
+		do_action( 'dr_subs_admin_init' );
 	}
 
 	/**
 	 * Plugin activation.
 	 *
-	 * @since 1.0.0
+	 * Runs AFTER DR_Subs_Migration::activate() because the
+	 * activation hook in doctor-subs.php calls migration first.
+	 *
+	 * @return void
 	 */
 	public static function activate() {
-		// Set default options.
-		self::set_default_options();
+		// Schedule recurring scanner + watchdog + journal cleanup.
+		if ( class_exists( 'DR_Subs_Health_Scanner' ) ) {
+			DR_Subs_Health_Scanner::schedule_recurring();
+		}
+		if ( class_exists( 'DR_Subs_Fix_Journal' ) ) {
+			DR_Subs_Fix_Journal::schedule_cleanup();
+		}
+		if ( class_exists( 'DR_Subs_Status_Transition_Log' ) ) {
+			DR_Subs_Status_Transition_Log::schedule_prune();
+		}
 
-		// Flush rewrite rules.
+		// Make sure permalinks pick up our page route.
 		flush_rewrite_rules();
 	}
 
 	/**
 	 * Plugin deactivation.
 	 *
-	 * @since 1.0.0
+	 * @return void
 	 */
 	public static function deactivate() {
-		// Cleanup if needed.
+		if ( class_exists( 'DR_Subs_Health_Scanner' ) ) {
+			DR_Subs_Health_Scanner::unschedule();
+		}
+		if ( class_exists( 'DR_Subs_Fix_Journal' ) ) {
+			DR_Subs_Fix_Journal::unschedule_cleanup();
+		}
+		if ( class_exists( 'DR_Subs_Status_Transition_Log' ) ) {
+			DR_Subs_Status_Transition_Log::unschedule_prune();
+		}
+
 		flush_rewrite_rules();
 	}
 
 	/**
-	 * Set default plugin options.
+	 * Get a plugin setting.
 	 *
-	 * @since 1.0.0
-	 */
-	private static function set_default_options() {
-		$default_options = array(
-			'enable_logging'     => true,
-			'log_retention_days' => 30,
-			'show_advanced_data' => false,
-		);
-
-		add_option( 'wcst_settings', $default_options );
-	}
-
-	/**
-	 * Get plugin option.
-	 *
-	 * @since 1.0.0
-	 * @param string $key    Option key.
-	 * @param mixed  $default Default value if option doesn't exist.
-	 * @return mixed Option value or default.
+	 * @param string $key     Setting key.
+	 * @param mixed  $default Default if unset.
+	 * @return mixed
 	 */
 	public static function get_option( $key, $default = null ) {
-		$options = get_option( 'wcst_settings', array() );
+		$options = get_option( 'dr_subs_settings', array() );
 		return isset( $options[ $key ] ) ? $options[ $key ] : $default;
 	}
 
 	/**
-	 * Update plugin option.
+	 * Update a plugin setting.
 	 *
-	 * @since 1.0.0
-	 * @param string $key   Option key.
-	 * @param mixed  $value Option value.
-	 * @return bool True if option was updated, false otherwise.
+	 * @param string $key   Setting key.
+	 * @param mixed  $value Value.
+	 * @return bool
 	 */
 	public static function update_option( $key, $value ) {
-		$options         = get_option( 'wcst_settings', array() );
+		$options         = get_option( 'dr_subs_settings', array() );
 		$options[ $key ] = $value;
-		return update_option( 'wcst_settings', $options );
+		return update_option( 'dr_subs_settings', $options );
 	}
 }
+
+/**
+ * Legacy v1 alias. Do not use in new code; DR_Subs_Plugin is canonical.
+ *
+ * @deprecated 2.0.0 Use DR_Subs_Plugin instead.
+ */
+class_alias( 'DR_Subs_Plugin', 'WCST_Plugin' );

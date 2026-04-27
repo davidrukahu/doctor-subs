@@ -1,6 +1,6 @@
 <?php
 /**
- * Doctor Subs - WooCommerce Subscription Troubleshooter
+ * Doctor Subs - WooCommerce Subscriptions diagnostic + one-click fix plugin.
  *
  * @package Dr_Subs
  */
@@ -10,15 +10,16 @@ declare( strict_types=1 );
 /**
  * Plugin Name: Doctor Subs
  * Plugin URI: https://github.com/davidrukahu/doctor-subs
- * Description: An intuitive WooCommerce Subscriptions troubleshooting tool that implements a simple 3-step diagnostic process.
- * Version: 1.2.4
+ * Description: Find and fix broken WooCommerce subscriptions. Detects ghost subs, stuck-on-hold renewals, and repeated payment failures, with one-click reversible fixes.
+ * Version: 2.1.0
  * Author: DavidR
  * Author URI: https://github.com/davidrukahu
  * Text Domain: doctor-subs
- * Requires at least: 5.0
- * Tested up to: 6.4
+ * Domain Path: /languages
+ * Requires at least: 6.4
+ * Tested up to: 6.9
  * Requires PHP: 7.4
- * WC requires at least: 9.8.5
+ * WC requires at least: 9.0
  * WC tested up to: 9.9.5
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -32,11 +33,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants.
-define( 'WCST_PLUGIN_FILE', __FILE__ );
-define( 'WCST_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'WCST_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'WCST_PLUGIN_VERSION', '1.2.4' );
-define( 'WCST_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'DR_SUBS_PLUGIN_FILE', __FILE__ );
+define( 'DR_SUBS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'DR_SUBS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'DR_SUBS_PLUGIN_VERSION', '2.1.0' );
+define( 'DR_SUBS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
  * Check plugin dependencies.
@@ -44,7 +45,7 @@ define( 'WCST_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
  * @since 1.0.0
  * @return array List of error messages if dependencies are not met.
  */
-function wcst_check_dependencies() {
+function dr_subs_check_dependencies() {
 	$errors = array();
 
 	// Check if WooCommerce is active.
@@ -117,78 +118,104 @@ function wcst_check_dependencies() {
  *
  * @since 1.0.0
  */
-function wcst_admin_notices() {
-	$errors = wcst_check_dependencies();
+function dr_subs_admin_notices() {
+	$errors = dr_subs_check_dependencies();
 	if ( ! empty( $errors ) ) {
 		foreach ( $errors as $error ) {
 			echo '<div class="notice notice-error"><p>' . esc_html( $error ) . '</p></div>';
 		}
 	}
 }
-add_action( 'admin_notices', 'wcst_admin_notices' );
+add_action( 'admin_notices', 'dr_subs_admin_notices' );
 
 // Only proceed if dependencies are met.
-if ( ! empty( wcst_check_dependencies() ) ) {
+if ( ! empty( dr_subs_check_dependencies() ) ) {
 	return;
 }
-
-// Register autoloader.
-spl_autoload_register( 'wcst_autoloader' );
 
 /**
  * Plugin autoloader.
  *
- * @since 1.0.0
+ * Accepts both DR_Subs_ (v2) and WCST_ (legacy v1) prefixes. Both map to the
+ * same file; the file defines DR_Subs_* and adds a class_alias for WCST_*.
+ *
+ * @since 2.0.0
  * @param string $class_name Class name to load.
  */
-function wcst_autoloader( $class_name ) {
-	// Only handle our plugin classes.
-	if ( 0 !== strpos( $class_name, 'WCST_' ) ) {
+function dr_subs_autoloader( $class_name ) {
+	$is_dr_subs = 0 === strpos( $class_name, 'DR_Subs_' );
+	$is_wcst    = 0 === strpos( $class_name, 'WCST_' );
+
+	if ( ! $is_dr_subs && ! $is_wcst ) {
 		return;
 	}
 
-	// Convert class name to file path.
-	$class_file = str_replace( '_', '-', strtolower( $class_name ) );
-	$class_file = str_replace( 'wcst-', '', $class_file );
+	// Normalize to a short file name (strip prefix, lowercase, hyphenate).
+	$short = str_replace( '_', '-', strtolower( $class_name ) );
+	$short = preg_replace( '/^(dr-subs-|wcst-)/', '', $short );
 
 	// Define class file mappings.
 	$class_directories = array(
-		'plugin'                 => 'includes/',
-		'admin'                  => 'includes/',
-		'ajax-handler'           => 'includes/',
-		'subscription-anatomy'   => 'includes/analyzers/',
-		'expected-behavior'      => 'includes/analyzers/',
-		'timeline-builder'       => 'includes/analyzers/',
-		'discrepancy-detector'   => 'includes/analyzers/',
-		'skipped-cycle-detector' => 'includes/analyzers/',
-		'subscription-data'      => 'includes/collectors/',
-		'logger'                 => 'includes/utilities/',
-		'security'               => 'includes/utilities/',
+		// v1 legacy classes (kept during v2 transition for back-compat shims).
+		'plugin'                    => 'includes/',
+		'admin'                     => 'includes/',
+		'ajax-handler'              => 'includes/',
+		'subscription-anatomy'      => 'includes/analyzers/',
+		'expected-behavior'         => 'includes/analyzers/',
+		'timeline-builder'          => 'includes/analyzers/',
+		'discrepancy-detector'      => 'includes/analyzers/',
+		'skipped-cycle-detector'    => 'includes/analyzers/',
+		'subscription-data'         => 'includes/collectors/',
+		'logger'                    => 'includes/utilities/',
+		'security'                  => 'includes/utilities/',
+		// v2 new classes (populated as tasks ship).
+		'migration'                 => 'includes/migration/',
+		'rule-interface'            => 'includes/rules/',
+		'rules-registry'            => 'includes/rules/',
+		'rule-match'                => 'includes/rules/',
+		'rule-ghost-sub'            => 'includes/rules/',
+		'rule-on-hold-paid'         => 'includes/rules/',
+		'rule-repeated-failures'    => 'includes/rules/',
+		'rule-mass-hold'            => 'includes/rules/',
+		'rule-total-drift'          => 'includes/rules/',
+		'rule-manual-renewal-drift' => 'includes/rules/',
+		'rule-catalog'              => 'includes/rules/',
+		'scan-context'              => 'includes/scanner/',
+		'health-scanner'            => 'includes/scanner/',
+		'fix-journal'               => 'includes/journal/',
+		'fix-journal-entry'         => 'includes/journal/',
+		'narrator'                  => 'includes/narrator/',
+		'alert-dispatcher'          => 'includes/alerts/',
+		'telemetry'                 => 'includes/telemetry/',
+		'status-transition-log'     => 'includes/observers/',
 	);
 
-	$directory = isset( $class_directories[ $class_file ] ) ? $class_directories[ $class_file ] : 'includes/';
-	$file_path = WCST_PLUGIN_DIR . $directory . 'class-' . $class_file . '.php';
+	// Explicit ambiguous-short-name overrides that can't be inferred from
+	// the short name alone (not needed yet, placeholder for future files).
+
+	$directory = isset( $class_directories[ $short ] ) ? $class_directories[ $short ] : 'includes/';
+	$file_path = DR_SUBS_PLUGIN_DIR . $directory . 'class-' . $short . '.php';
 
 	if ( file_exists( $file_path ) ) {
 		require_once $file_path;
 	}
 }
 
-// Register autoloader after function is defined.
-spl_autoload_register( 'wcst_autoloader' );
+// Register autoloader exactly once.
+spl_autoload_register( 'dr_subs_autoloader' );
 
 /**
  * Initialize the plugin.
  *
  * @since 1.0.0
  */
-function wcst_init_plugin() {
+function dr_subs_init_plugin() {
 	// Double-check dependencies before initializing.
-	if ( empty( wcst_check_dependencies() ) ) {
-		new WCST_Plugin();
+	if ( empty( dr_subs_check_dependencies() ) ) {
+		new DR_Subs_Plugin();
 	}
 }
-add_action( 'plugins_loaded', 'wcst_init_plugin', 20 );
+add_action( 'plugins_loaded', 'dr_subs_init_plugin', 20 );
 
 /**
  * Declare HPOS compatibility.
@@ -209,17 +236,22 @@ add_action(
  *
  * @since 1.0.0
  */
-function wcst_activate_plugin() {
-	WCST_Plugin::activate();
+function dr_subs_activate_plugin() {
+	// Run schema migration before the plugin class boots.
+	if ( class_exists( 'DR_Subs_Migration' ) ) {
+		DR_Subs_Migration::activate();
+	}
+
+	DR_Subs_Plugin::activate();
 }
-register_activation_hook( __FILE__, 'wcst_activate_plugin' );
+register_activation_hook( __FILE__, 'dr_subs_activate_plugin' );
 
 /**
  * Plugin deactivation hook.
  *
  * @since 1.0.0
  */
-function wcst_deactivate_plugin() {
-	WCST_Plugin::deactivate();
+function dr_subs_deactivate_plugin() {
+	DR_Subs_Plugin::deactivate();
 }
-register_deactivation_hook( __FILE__, 'wcst_deactivate_plugin' );
+register_deactivation_hook( __FILE__, 'dr_subs_deactivate_plugin' );

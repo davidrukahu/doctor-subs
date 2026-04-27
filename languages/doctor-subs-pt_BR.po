@@ -1,0 +1,1843 @@
+# Copyright (C) 2026 DavidR
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Doctor Subs 2.0.0-alpha.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/doctor-subs\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-04-23T07:15:40+00:00\n"
+"PO-Revision-Date: 2026-04-23 07:22+0000\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: doctor-subs\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: pt-BR\n"
+
+#: doctor-subs.php
+#: admin/views/partials/plugin-header.php:46
+#: includes/class-admin.php:59
+#: includes/class-admin.php:60
+#: includes/class-admin.php:172
+#. Plugin Name of the plugin
+msgid "Doctor Subs"
+msgstr "Doctor Subs"
+
+#: doctor-subs.php
+#. Plugin URI of the plugin
+msgid "https://github.com/davidrukahu/doctor-subs"
+msgstr "https://github.com/davidrukahu/doctor-subs"
+
+#: doctor-subs.php
+#. Description of the plugin
+msgid ""
+"Find and fix broken WooCommerce subscriptions. Detects ghost subs, "
+"stuck-on-hold renewals, and repeated payment failures, with one-click "
+"reversible fixes."
+msgstr ""
+"Encontre e corrija assinaturas WooCommerce quebradas. Detecta ghost subs, "
+"renovações stuck on-hold e falhas de pagamento repetidas, com correções "
+"reversíveis com um clique."
+
+#: doctor-subs.php
+#. Author of the plugin
+msgid "DavidR"
+msgstr "DavidR"
+
+#: doctor-subs.php
+#. Author URI of the plugin
+msgid "https://github.com/davidrukahu"
+msgstr "https://github.com/davidrukahu"
+
+#: admin/views/dashboard.php:24
+msgid "2 hours ago"
+msgstr "2 horas atrás"
+
+#: admin/views/dashboard.php:36
+#: admin/views/fix-history.php:25
+#: admin/views/modal-fix-preview.php:34
+#: includes/rules/class-rule-ghost-sub.php:62
+msgid "Ghost"
+msgstr "Ghost"
+
+#: admin/views/dashboard.php:37
+#: admin/views/first-run.php:155
+#: admin/views/fix-history.php:26
+#: admin/views/modal-fix-preview.php:35
+#: includes/rules/class-rule-on-hold-paid.php:59
+msgid "Stuck on-hold"
+msgstr "Stuck on-hold"
+
+#: admin/views/dashboard.php:38
+#: admin/views/fix-history.php:27
+#: admin/views/modal-fix-preview.php:36
+#: includes/rules/class-rule-repeated-failures.php:70
+msgid "Repeated fails"
+msgstr "Falhas repetidas"
+
+#: admin/views/dashboard.php:72
+msgid "The last scan didn&rsquo;t complete. Nothing was changed."
+msgstr "A última verificação não foi concluída. Nada foi alterado."
+
+#: admin/views/dashboard.php:74
+msgid "Try again"
+msgstr "Tentar novamente"
+
+#: admin/views/dashboard.php:77
+msgid "View logs"
+msgstr "Ver logs"
+
+#: admin/views/dashboard.php:84
+msgid "Subscription health counts"
+msgstr "Contagem de saúde das subscriptions"
+
+#: admin/views/dashboard.php:89
+msgid "Healthy"
+msgstr "Healthy"
+
+#: admin/views/dashboard.php:90
+msgid "no problems"
+msgstr "sem problemas"
+
+#: admin/views/dashboard.php:93
+msgid "At risk"
+msgstr "At risk"
+
+#: admin/views/dashboard.php:94
+msgid "might need attention"
+msgstr "pode precisar de atenção"
+
+#: admin/views/dashboard.php:97
+msgid "Broken"
+msgstr "Broken"
+
+#: admin/views/dashboard.php:98
+msgid "needs you now"
+msgstr "precisa de você agora"
+
+#: admin/views/dashboard.php:130
+msgid "All clear"
+msgstr "Tudo limpo"
+
+#: admin/views/dashboard.php:132
+msgid "Everything looks good."
+msgstr "Está tudo certo."
+
+#: admin/views/dashboard.php:136
+#. translators: %s: relative time
+#, php-format
+msgid "We&rsquo;ll keep watching. Last checked %s."
+msgstr "Continuaremos observando. Última verificação %s."
+
+#: admin/views/dashboard.php:147
+msgid "Needs attention"
+msgstr "Precisa de atenção"
+
+#: admin/views/dashboard.php:151
+#: includes/class-admin.php:115
+msgid "showing all broken and at-risk"
+msgstr "exibindo todos quebrados e em risco"
+
+#: admin/views/dashboard.php:155
+#. translators: %d: number of broken subs filtered
+#, php-format
+msgid "filtering to %d broken"
+msgid_plural "filtering to %d broken"
+msgstr[0] "filtrando para %d quebrados"
+msgstr[1] "filtrando para %d quebrados"
+
+#: admin/views/dashboard.php:161
+#. translators: %d: number of at-risk subs filtered
+#, php-format
+msgid "filtering to %d at-risk"
+msgid_plural "filtering to %d at-risk"
+msgstr[0] "filtrando para %d em risco"
+msgstr[1] "filtrando para %d em risco"
+
+#: admin/views/dashboard.php:170
+msgid "clear filter"
+msgstr "limpar filtro"
+
+#: admin/views/dashboard.php:179
+msgid "Rule indicator"
+msgstr "Indicador de regra"
+
+#: admin/views/dashboard.php:180
+msgid "Customer"
+msgstr "Cliente"
+
+#: admin/views/dashboard.php:181
+msgid "Subscription"
+msgstr "Subscription"
+
+#: admin/views/dashboard.php:182
+msgid "Issue"
+msgstr "Problema"
+
+#: admin/views/dashboard.php:183
+msgid "Reason"
+msgstr "Razão"
+
+#: admin/views/dashboard.php:184
+msgid "Actions"
+msgstr "Ações"
+
+#: admin/views/dashboard.php:222
+msgid "Fix"
+msgstr "Corrigir"
+
+#: admin/views/dashboard.php:230
+msgid "No subscriptions match this filter."
+msgstr "Nenhuma Subscription corresponde a este filtro."
+
+#: admin/views/first-run.php:42
+msgid "First visit"
+msgstr "Primeira visita"
+
+#: admin/views/first-run.php:50
+#. translators: %s: italic accent phrase "for problems"
+#, php-format
+msgid "Let&rsquo;s check your subscriptions %s."
+msgstr "Vamos verificar suas Subscriptions %s."
+
+#: admin/views/first-run.php:51
+msgid "for problems"
+msgstr "para problemas"
+
+#: admin/views/first-run.php:59
+msgid ""
+"We&rsquo;ll scan your active subscriptions for three common renewal "
+"failures. Takes about 30 seconds. Runs entirely on your server - nothing "
+"sent anywhere."
+msgstr ""
+"Vamos escanear suas Subscriptions ativas para três falhas comuns de "
+"renovação. Leva cerca de 30 segundos. Executa inteiramente no seu servidor "
+"- nada é enviado para nenhum lugar."
+
+#: admin/views/first-run.php:64
+msgid "Scan my subscriptions"
+msgstr "Escanear minhas Subscriptions"
+
+#: admin/views/first-run.php:73
+msgid "or"
+msgstr "ou"
+
+#: admin/views/first-run.php:74
+msgid "configure settings first"
+msgstr "configurar as configurações primeiro"
+
+#: admin/views/first-run.php:80
+msgid "Scanning"
+msgstr "Escaneando"
+
+#: admin/views/first-run.php:83
+msgid "Scanning your subscriptions"
+msgstr "Escaneando suas Subscriptions"
+
+#: admin/views/first-run.php:91
+#. translators: 1: total active subs, 2: seconds remaining
+#, php-format
+msgid ""
+"Checking <span class=\"mono tnum\">%1$d</span> active subs - about <span "
+"class=\"mono tnum\">%2$d</span> seconds left."
+msgstr ""
+"Verificando <span class=\"mono tnum\">%1$d</span> Subscriptions ativas - "
+"cerca de <span class=\"mono tnum\">%2$d</span> segundos restantes."
+
+#: admin/views/first-run.php:102
+msgid "Scan progress"
+msgstr "Progresso do escaneamento"
+
+#: admin/views/first-run.php:109
+#. translators: %s: sub_id being scanned right now
+#, php-format
+msgid "checking sub_%s"
+msgstr "verificando sub_%s"
+
+#: admin/views/first-run.php:113
+#: admin/views/modal-fix-preview.php:129
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: admin/views/first-run.php:120
+msgid "Nothing to scan yet"
+msgstr "Nada para escanear ainda"
+
+#: admin/views/first-run.php:127
+#. translators: %s: italic muted phrase "to scan yet"
+#, php-format
+msgid "You don&rsquo;t have any active subscriptions %s."
+msgstr "Você não tem nenhuma Subscription ativa %s."
+
+#: admin/views/first-run.php:128
+msgid "to scan yet"
+msgstr "para escanear ainda"
+
+#: admin/views/first-run.php:136
+msgid ""
+"Doctor Subs will start watching once you do. You can leave this tab open - "
+"or come back when your first customer subscribes."
+msgstr ""
+"Doctor Subs começará a monitorar assim que você começar. Você pode deixar "
+"esta aba aberta - ou voltar quando seu primeiro cliente assinar."
+
+#: admin/views/first-run.php:144
+msgid "What this detects"
+msgstr "O que isso detecta"
+
+#: admin/views/first-run.php:149
+msgid "Ghost subscriptions"
+msgstr "Subscriptions fantasmas"
+
+#: admin/views/first-run.php:150
+msgid ""
+"Active subscriptions that won&rsquo;t renew because the payment "
+"didn&rsquo;t get scheduled."
+msgstr "Subscriptions ativas que não renovarão porque o pagamento não foi agendado."
+
+#: admin/views/first-run.php:156
+msgid "Payment went through, but the subscription never switched back to active."
+msgstr "O pagamento foi processado, mas a Subscription nunca voltou a ativa."
+
+#: admin/views/first-run.php:161
+msgid "Repeated payment failures"
+msgstr "Falhas repetidas de pagamento"
+
+#: admin/views/first-run.php:162
+msgid "Something has been failing to process a payment for a while."
+msgstr "Algo está falhando no processamento de um pagamento há algum tempo."
+
+#: admin/views/fix-history.php:44
+#: admin/views/fix-history.php:58
+#: admin/views/partials/plugin-header.php:29
+msgid "Fix history"
+msgstr "Corrigir histórico"
+
+#: admin/views/fix-history.php:48
+msgid "Nothing here yet"
+msgstr "Nada aqui ainda"
+
+#: admin/views/fix-history.php:49
+msgid "No fixes applied."
+msgstr "Nenhuma correção aplicada."
+
+#: admin/views/fix-history.php:51
+msgid ""
+"When you apply a fix from the dashboard, it&rsquo;ll show up here so you "
+"can undo it. Fixes stay revertible for 180 days by default - change that in "
+"Settings."
+msgstr ""
+"Quando você aplica uma correção pelo dashboard, ela aparecerá aqui para que "
+"você possa desfazê-la. As correções permanecem reversíveis por 180 dias por "
+"padrão - altere isso nas Configurações."
+
+#: admin/views/fix-history.php:63
+#. translators: %d: total number of fix entries
+#, php-format
+msgid "%d fix · showing most recent first"
+msgid_plural "%d fixes · showing most recent first"
+msgstr[0] "%d correção · mostrando a mais recente primeiro"
+msgstr[1] "%d correções · mostrando as mais recentes primeiro"
+
+#: admin/views/fix-history.php:70
+msgid "Filter fixes by rule"
+msgstr "Filtrar correções por regra"
+
+#: admin/views/fix-history.php:75
+msgid "All"
+msgstr "Todas"
+
+#: admin/views/fix-history.php:116
+#. translators: %d: number of subs in batch
+#, php-format
+msgid "Fixed %d subscription in one batch"
+msgid_plural "Fixed %d subscriptions in one batch"
+msgstr[0] "Corrigida %d Subscription em um lote"
+msgstr[1] "Corrigidas %d Subscriptions em um lote"
+
+#: admin/views/fix-history.php:137
+msgid "batch id"
+msgstr "ID do lote"
+
+#: admin/views/fix-history.php:158
+msgid "Reverted"
+msgstr "Desfeito"
+
+#: admin/views/fix-history.php:172
+#. translators: %s: when the revert happened, e.g. "1h ago"
+#, php-format
+msgid "Reverted %s"
+msgstr "Desfeito %s"
+
+#: admin/views/fix-history.php:177
+msgid "Too old to revert"
+msgstr "Muito antigo para reverter"
+
+#: admin/views/fix-history.php:187
+#. translators: %d: number of subs in batch
+#, php-format
+msgid "Revert all %d"
+msgstr "Reverter tudo %d"
+
+#: admin/views/fix-history.php:191
+msgid "Revert"
+msgstr "Reverter"
+
+#: admin/views/modal-fix-preview.php:70
+msgid "What will change"
+msgstr "O que mudará"
+
+#: admin/views/modal-fix-preview.php:87
+#: includes/rules/class-rule-repeated-failures.php:146
+#: includes/rules/class-rule-repeated-failures.php:147
+msgid "unchanged"
+msgstr "inalterado"
+
+#: admin/views/modal-fix-preview.php:95
+msgid "You can undo this from Fix history at any time."
+msgstr "Você pode desfazer isso a qualquer momento no histórico de correções."
+
+#: admin/views/modal-fix-preview.php:115
+msgid "Heads up:"
+msgstr "Aviso:"
+
+#: admin/views/modal-fix-preview.php:117
+msgid ""
+"the payment we re-scheduled already went through. Reverting this fix will "
+"not refund the customer - it only removes the fix from your history. If a "
+"refund is needed, handle it in the WooCommerce order directly."
+msgstr ""
+"o pagamento que reprogramamos já foi processado. Reverter esta correção não "
+"reembolsará o cliente - apenas remove a correção do seu histórico. Se um "
+"reembolso for necessário, faça-o diretamente no pedido WooCommerce."
+
+#: admin/views/modal-fix-preview.php:132
+msgid "Fix subscription"
+msgstr "Corrigir Subscription"
+
+#: admin/views/partials/plugin-header.php:25
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: admin/views/partials/plugin-header.php:33
+#: admin/views/settings.php:53
+msgid "Settings"
+msgstr "Configurações"
+
+#: admin/views/partials/plugin-header.php:47
+msgid "Find and fix broken WooCommerce subscriptions."
+msgstr "Encontre e corrija assinaturas WooCommerce com problemas."
+
+#: admin/views/partials/plugin-header.php:56
+#. translators: %s: relative time, e.g. "2 hours ago"
+#, php-format
+msgid "Last scanned %s"
+msgstr "Última verificação %s"
+
+#: admin/views/partials/plugin-header.php:62
+msgid "Keyboard shortcut: R"
+msgstr "Atalho do teclado: R"
+
+#: admin/views/partials/plugin-header.php:69
+msgid "Refresh now"
+msgstr "Atualizar agora"
+
+#: admin/views/partials/plugin-header.php:69
+msgid "Refresh"
+msgstr "Atualizar"
+
+#: admin/views/partials/plugin-header.php:77
+msgid "Doctor Subs sections"
+msgstr "Seções Doctor Subs"
+
+#: admin/views/settings.php:34
+msgid "Forever"
+msgstr "Para sempre"
+
+#: admin/views/settings.php:37
+msgid "365 days"
+msgstr "365 dias"
+
+#: admin/views/settings.php:40
+#. translators: %d: number of days
+#, php-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dia"
+msgstr[1] "%d dias"
+
+#: admin/views/settings.php:57
+msgid "Alerts"
+msgstr "Alertas"
+
+#: admin/views/settings.php:59
+msgid ""
+"When something breaks between scans, we&rsquo;ll email you a daily digest. "
+"Off by default."
+msgstr ""
+"Quando algo falhar entre as verificações, enviaremos um resumo diário por "
+"e-mail. Desativado por padrão."
+
+#: admin/views/settings.php:64
+msgid "Email alerts"
+msgstr "Alertas por e-mail"
+
+#: admin/views/settings.php:75
+#: admin/views/settings.php:76
+#: admin/views/settings.php:171
+#: admin/views/settings.php:172
+msgid "On"
+msgstr "Ativado"
+
+#: admin/views/settings.php:75
+#: admin/views/settings.php:76
+#: admin/views/settings.php:171
+#: admin/views/settings.php:172
+msgid "Off"
+msgstr "Desativado"
+
+#: admin/views/settings.php:80
+msgid ""
+"When new broken subscriptions appear, you&rsquo;ll get a daily summary "
+"email."
+msgstr ""
+"Quando surgirem novas assinaturas com problemas, você receberá um e-mail "
+"resumo diário."
+
+#: admin/views/settings.php:87
+msgid "Send to"
+msgstr "Enviar para"
+
+#: admin/views/settings.php:97
+msgid "Defaults to your WordPress admin email."
+msgstr "Por padrão, usa o e-mail do administrador do WordPress."
+
+#: admin/views/settings.php:110
+msgid "Fix history retention"
+msgstr "Retenção do histórico de correções"
+
+#: admin/views/settings.php:112
+msgid "Older entries get pruned automatically. Recent entries stay revertible."
+msgstr ""
+"Entradas mais antigas são removidas automaticamente. Entradas recentes "
+"permanecem reversíveis."
+
+#: admin/views/settings.php:118
+msgid "Keep fixes for"
+msgstr "Manter correções por"
+
+#: admin/views/settings.php:121
+msgid "More about retention"
+msgstr "Mais sobre retenção"
+
+#: admin/views/settings.php:123
+msgid ""
+"Fixes older than this stay in your history for reference, but the Revert "
+"button is removed. They are not deleted from the database unless you prune "
+"manually."
+msgstr ""
+"Correções anteriores a esta permanecem no seu histórico para referência, "
+"mas o botão Reverter é removido. Elas não são excluídas do banco de dados a "
+"menos que você faça a limpeza manualmente."
+
+#: admin/views/settings.php:137
+msgid "Older fixes stay in your history but can&rsquo;t be reverted anymore."
+msgstr ""
+"Correções antigas permanecem no seu histórico, mas não podem mais ser "
+"revertidas."
+
+#: admin/views/settings.php:145
+msgid "Help us improve"
+msgstr "Ajude-nos a melhorar"
+
+#: admin/views/settings.php:147
+msgid ""
+"Anonymous telemetry helps us know which fixes are actually used. We only "
+"send the rule name and a timestamp when a fix is applied. Nothing else - no "
+"customer data, no subscription details, no identifying information."
+msgstr ""
+"A telemetria anônima nos ajuda a saber quais correções são realmente "
+"usadas. Enviamos apenas o nome da regra e um carimbo de data/hora quando "
+"uma correção é aplicada. Nada mais — nenhum dado do cliente, nenhum detalhe "
+"da subscription, nenhuma informação identificável."
+
+#: admin/views/settings.php:153
+msgid "Send anonymous fix stats"
+msgstr "Enviar estatísticas anônimas das correções"
+
+#: admin/views/settings.php:156
+msgid "What exactly gets sent"
+msgstr "O que exatamente é enviado"
+
+#: admin/views/settings.php:158
+msgid ""
+"Three fields only: (1) the rule name (e.g. ghost_sub), (2) an anonymous "
+"install hash, (3) a timestamp. We never see your store URL, customer data, "
+"subscription details, or store name."
+msgstr ""
+"Apenas três campos: (1) o nome da regra (ex. ghost_sub), (2) um hash de "
+"instalação anônimo, (3) um carimbo de data/hora. Nunca vemos a URL da sua "
+"loja, dados do cliente, detalhes da subscription ou nome da loja."
+
+#: admin/views/settings.php:176
+msgid "Off by default. Turn it on if you want to help us build the plugin better."
+msgstr "Desligado por padrão. Ative se quiser ajudar a melhorar o plugin."
+
+#: admin/views/settings.php:184
+msgid "Save changes"
+msgstr "Salvar alterações"
+
+#: admin/views/settings.php:187
+msgid "Discard"
+msgstr "Descartar"
+
+#: admin/views/settings.php:190
+#: includes/class-admin.php:123
+msgid "Saved."
+msgstr "Salvo."
+
+#: admin/views/settings.php:195
+#. translators: %s: relative time
+#, php-format
+msgid "Last saved %s."
+msgstr "Última salvaguarda %s."
+
+#: doctor-subs.php:74
+msgid "Doctor Subs requires WooCommerce to be installed and activated."
+msgstr "Doctor Subs requer WooCommerce instalado e ativado."
+
+#: doctor-subs.php:110
+msgid ""
+"Doctor Subs requires WooCommerce Subscriptions to be installed and "
+"activated."
+msgstr "Doctor Subs requer WooCommerce Subscriptions instalado e ativado."
+
+#: includes/alerts/class-alert-dispatcher.php:147
+#. translators: %d: number of affected subscriptions.
+#, php-format
+msgid "Doctor Subs: %d subscription needs attention"
+msgid_plural "Doctor Subs: %d subscriptions need attention"
+msgstr[0] "Doctor Subs: %d subscription precisa de atenção"
+msgstr[1] "Doctor Subs: %d subscriptions precisam de atenção"
+
+#: includes/alerts/class-alert-dispatcher.php:169
+#. translators: 1: site name, 2: count
+#, php-format
+msgid ""
+"%2$d subscription on %1$s started showing problems between the last scan "
+"and this one."
+msgid_plural ""
+"%2$d subscriptions on %1$s started showing problems between the last scan "
+"and this one."
+msgstr[0] ""
+"%2$d subscription no %1$s começou a apresentar problemas entre a última "
+"verificação e esta."
+msgstr[1] ""
+"%2$d subscriptions no %1$s começaram a apresentar problemas entre a última "
+"verificação e esta."
+
+#: includes/alerts/class-alert-dispatcher.php:186
+msgid "Open Doctor Subs:"
+msgstr "Abrir Doctor Subs:"
+
+#: includes/alerts/class-alert-dispatcher.php:189
+msgid ""
+"You received this because email alerts are on in Doctor Subs. Change "
+"settings:"
+msgstr ""
+"Você recebeu isto porque os alertas por e-mail estão ativados no Doctor "
+"Subs. Alterar configurações:"
+
+#: includes/alerts/class-alert-dispatcher.php:231
+#. translators: 1: customer name, 2: sub ID, 3: rule label
+#, php-format
+msgid "- %1$s (#%2$d) - %3$s"
+msgstr "- %1$s (#%2$d) - %3$s"
+
+#: includes/alerts/class-alert-dispatcher.php:232
+msgid "(no name)"
+msgstr "(sem nome)"
+
+#: includes/alerts/class-alert-dispatcher.php:234
+msgid "Issue detected"
+msgstr "Problema detectado"
+
+#: includes/analyzers/class-discrepancy-detector.php:55
+#: includes/analyzers/class-expected-behavior.php:64
+#: includes/analyzers/class-skipped-cycle-detector.php:63
+#: includes/analyzers/class-subscription-anatomy.php:61
+#: includes/analyzers/class-timeline-builder.php:75
+msgid "Subscription not found."
+msgstr "Subscription não encontrada."
+
+#: includes/analyzers/class-discrepancy-detector.php:109
+#. translators: %d: number of days overdue
+#, php-format
+msgid "Payment is %d days overdue"
+msgstr "Pagamento está %d dias atrasado"
+
+#: includes/analyzers/class-discrepancy-detector.php:115
+msgid "Check payment method and retry payment or contact customer."
+msgstr ""
+"Verifique o método de pagamento e tente pagar novamente ou entre em contato "
+"com o cliente."
+
+#: includes/analyzers/class-discrepancy-detector.php:126
+#. translators: %d: number of days until payment is due
+#, php-format
+msgid "Payment due in %d days"
+msgstr "Pagamento vence em %d dias"
+
+#: includes/analyzers/class-discrepancy-detector.php:131
+msgid "Monitor payment processing and ensure payment method is valid."
+msgstr ""
+"Monitore o processamento do pagamento e garanta que o método de pagamento "
+"seja válido."
+
+#: includes/analyzers/class-discrepancy-detector.php:147
+msgid "Payment interval differs from expected schedule"
+msgstr "Intervalo de pagamento difere do cronograma esperado"
+
+#: includes/analyzers/class-discrepancy-detector.php:153
+msgid "Review subscription schedule and payment processing."
+msgstr "Revise o cronograma da Subscription e o processamento do pagamento."
+
+#: includes/analyzers/class-discrepancy-detector.php:208
+msgid "No renewal action scheduled for next payment"
+msgstr "Nenhuma ação de renovação agendada para o próximo pagamento"
+
+#: includes/analyzers/class-discrepancy-detector.php:213
+msgid "Manually schedule renewal action or check Action Scheduler configuration."
+msgstr ""
+"Agende manualmente a ação de renovação ou verifique a configuração do "
+"Action Scheduler."
+
+#: includes/analyzers/class-discrepancy-detector.php:238
+#. translators: %d: number of failed actions
+#, php-format
+msgid "%d failed actions detected"
+msgstr "%d ações falhas detectadas"
+
+#: includes/analyzers/class-discrepancy-detector.php:243
+msgid "Review failed actions in Action Scheduler and resolve underlying issues."
+msgstr ""
+"Revise as ações falhas no Action Scheduler e resolva os problemas "
+"subjacentes."
+
+#: includes/analyzers/class-discrepancy-detector.php:269
+#. translators: %s: subscription status
+#, php-format
+msgid "Subscription in unexpected status: %s"
+msgstr "Subscription em status inesperado: %s"
+
+#: includes/analyzers/class-discrepancy-detector.php:274
+msgid "Review subscription status and take appropriate action."
+msgstr "Revise o status da Subscription e tome a ação apropriada."
+
+#: includes/analyzers/class-discrepancy-detector.php:289
+#. translators: 1: subscription status, 2: number of days
+#, php-format
+msgid "Subscription stuck in %1$s status for %2$d days"
+msgstr "Subscription travada no status %1$s por %2$d dias"
+
+#: includes/analyzers/class-discrepancy-detector.php:295
+msgid "Investigate why subscription is stuck and take corrective action."
+msgstr "Investigue por que a Subscription está travada e tome ação corretiva."
+
+#: includes/analyzers/class-discrepancy-detector.php:321
+msgid "No payment token found for subscription"
+msgstr "Nenhum token de pagamento encontrado para a Subscription"
+
+#: includes/analyzers/class-discrepancy-detector.php:326
+msgid "Check payment method configuration and ensure tokenization is working."
+msgstr ""
+"Verifique a configuração do método de pagamento e garanta que a tokenização "
+"esteja funcionando."
+
+#: includes/analyzers/class-discrepancy-detector.php:341
+msgid "Payment method has expired"
+msgstr "Método de pagamento expirou"
+
+#: includes/analyzers/class-discrepancy-detector.php:346
+msgid "Contact customer to update payment method."
+msgstr "Contate o cliente para atualizar o método de pagamento."
+
+#: includes/analyzers/class-discrepancy-detector.php:354
+#. translators: %d: number of days until payment method expires
+#, php-format
+msgid "Payment method expires in %d days"
+msgstr "O método de pagamento expira em %d dias"
+
+#: includes/analyzers/class-discrepancy-detector.php:359
+msgid "Notify customer to update payment method before expiry."
+msgstr ""
+"Notifique o cliente para atualizar o método de pagamento antes do "
+"vencimento."
+
+#: includes/analyzers/class-discrepancy-detector.php:397
+msgid "Renewal reminder emails are disabled"
+msgstr "E-mails de lembrete de renovação estão desativados"
+
+#: includes/analyzers/class-discrepancy-detector.php:401
+msgid "Enable renewal reminder emails to improve customer experience."
+msgstr ""
+"Ative os e-mails de lembrete de renovação para melhorar a experiência do "
+"cliente."
+
+#: includes/analyzers/class-discrepancy-detector.php:412
+msgid "Payment failed emails are disabled"
+msgstr "E-mails de falha no pagamento estão desativados"
+
+#: includes/analyzers/class-discrepancy-detector.php:416
+msgid "Enable payment failed emails to notify customers of payment issues."
+msgstr ""
+"Ative os e-mails de falha no pagamento para notificar os clientes sobre "
+"problemas com o pagamento."
+
+#: includes/analyzers/class-discrepancy-detector.php:440
+msgid "Subscription requires manual renewal"
+msgstr "A Subscription requer renovação manual"
+
+#: includes/analyzers/class-discrepancy-detector.php:444
+msgid "Monitor subscription and process payments manually."
+msgstr "Monitore a Subscription e processe os pagamentos manualmente."
+
+#: includes/analyzers/class-discrepancy-detector.php:456
+#. translators: %d: number of retry attempts
+#, php-format
+msgid "High payment retry count: %d attempts"
+msgstr "Alta contagem de tentativas de pagamento: %d tentativas"
+
+#: includes/analyzers/class-discrepancy-detector.php:460
+msgid "Contact customer to resolve payment method issues."
+msgstr "Contate o cliente para resolver problemas com o método de pagamento."
+
+#: includes/analyzers/class-discrepancy-detector.php:486
+msgid "Subscription contains non-subscription product"
+msgstr "A Subscription contém produto que não é Subscription"
+
+#: includes/analyzers/class-discrepancy-detector.php:491
+msgid "Review subscription products and ensure all are subscription products."
+msgstr ""
+"Revise os produtos da Subscription e assegure que todos sejam produtos "
+"Subscription."
+
+#: includes/analyzers/class-discrepancy-detector.php:516
+msgid "No Stripe customer ID found"
+msgstr "Nenhum ID de cliente Stripe encontrado"
+
+#: includes/analyzers/class-discrepancy-detector.php:520
+msgid "Check Stripe integration and customer creation process."
+msgstr "Verifique a integração com Stripe e o processo de criação do cliente."
+
+#: includes/analyzers/class-discrepancy-detector.php:587
+msgid ""
+"Stripe payment method detachment detected - likely caused by cloned/staging "
+"site"
+msgstr ""
+"Detectada desvinculação do método de pagamento Stripe - provavelmente "
+"causada por site clonado/ambiente de testes"
+
+#: includes/analyzers/class-discrepancy-detector.php:595
+msgid ""
+"This is a known issue when cloning sites with WooCommerce Subscriptions. "
+"Update to WooCommerce Stripe Gateway 7.x+ which includes fixes. If already "
+"updated, re-attach the payment method to the Stripe customer or contact "
+"Stripe support."
+msgstr ""
+"Este é um problema conhecido ao clonar sites com WooCommerce Subscriptions. "
+"Atualize para WooCommerce Stripe Gateway 7.x+ que inclui correções. Se já "
+"estiver atualizado, reanexe o método de pagamento ao cliente Stripe ou "
+"contate o suporte Stripe."
+
+#: includes/analyzers/class-discrepancy-detector.php:636
+#. translators: %d: number of failed renewals
+#, php-format
+msgid "Potential payment method detachment: %d failed renewal(s) with Stripe errors"
+msgstr ""
+"Potencial desvinculação do método de pagamento: %d tentativa(s) de "
+"renovação falhada(s) com erros Stripe"
+
+#: includes/analyzers/class-discrepancy-detector.php:645
+msgid ""
+"Review failed renewal orders for Stripe payment method errors. This may "
+"indicate a detached payment method issue from cloned/staging sites."
+msgstr ""
+"Revise pedidos de renovação falhados por erros no método de pagamento "
+"Stripe. Isso pode indicar um problema de método de pagamento desvinculado "
+"em sites clonados/ambientes de testes."
+
+#: includes/analyzers/class-discrepancy-detector.php:671
+msgid ""
+"WooCommerce Subscriptions duplicate site detected - payment methods may be "
+"detached"
+msgstr ""
+"Detecção de site duplicado WooCommerce Subscriptions - métodos de pagamento "
+"podem estar desvinculados"
+
+#: includes/analyzers/class-discrepancy-detector.php:676
+msgid ""
+"Ensure WooCommerce Stripe Gateway 7.x+ is installed with fixes for cloned "
+"sites. Monitor subscription renewals closely."
+msgstr ""
+"Certifique-se de que o WooCommerce Stripe Gateway 7.x+ esteja instalado com "
+"correções para sites clonados. Monitore de perto as renovações de "
+"subscription."
+
+#: includes/analyzers/class-discrepancy-detector.php:693
+#. translators: %s: environment type
+#, php-format
+msgid ""
+"Running in %s environment with Stripe - ensure payment methods are properly "
+"configured"
+msgstr ""
+"Executando em ambiente %s com Stripe - certifique-se de que os métodos de "
+"pagamento estão configurados corretamente"
+
+#: includes/analyzers/class-discrepancy-detector.php:700
+msgid ""
+"Staging/development environments can cause payment method detachment "
+"issues. Ensure WooCommerce Stripe Gateway has proper safeguards enabled."
+msgstr ""
+"Ambientes de staging/desenvolvimento podem causar problemas de "
+"desvinculação de métodos de pagamento. Certifique-se de que o WooCommerce "
+"Stripe Gateway tenha as proteções adequadas ativadas."
+
+#: includes/analyzers/class-discrepancy-detector.php:781
+#. translators: 1: error type, 2: count
+#, php-format
+msgid "Stripe renewal error detected: %1$s (%2$d occurrence(s))"
+msgstr "Erro de renovação do Stripe detectado: %1$s (%2$d ocorrência)"
+
+#: includes/analyzers/class-discrepancy-detector.php:791
+msgid ""
+"Review failed renewal orders and contact customer to resolve payment method "
+"issues."
+msgstr ""
+"Revise os pedidos de renovação falhados e contate o cliente para resolver "
+"os problemas do método de pagamento."
+
+#: includes/analyzers/class-discrepancy-detector.php:815
+msgid "No PayPal subscription ID found"
+msgstr "Nenhum ID de subscription do PayPal encontrado"
+
+#: includes/analyzers/class-discrepancy-detector.php:819
+msgid "Check PayPal integration and subscription creation process."
+msgstr "Verifique a integração do PayPal e o processo de criação de subscription."
+
+#: includes/analyzers/class-expected-behavior.php:34
+#: includes/analyzers/class-expected-behavior.php:45
+msgid "unknown"
+msgstr "desconhecido"
+
+#: includes/analyzers/class-expected-behavior.php:58
+#: includes/analyzers/class-skipped-cycle-detector.php:57
+#: includes/analyzers/class-subscription-anatomy.php:55
+#: includes/analyzers/class-timeline-builder.php:69
+msgid "WooCommerce Subscriptions is not active or properly loaded."
+msgstr "O WooCommerce Subscriptions não está ativo ou carregado corretamente."
+
+#: includes/analyzers/class-expected-behavior.php:126
+msgid "Payment method not found or WooCommerce not available."
+msgstr "Método de pagamento não encontrado ou WooCommerce indisponível."
+
+#: includes/analyzers/class-expected-behavior.php:135
+msgid "Payment gateway not found."
+msgstr "Gateway de pagamento não encontrado."
+
+#: includes/analyzers/class-expected-behavior.php:178
+msgid "Manual renewals require customer action to complete payments."
+msgstr "Renovações manuais requerem ação do cliente para completar os pagamentos."
+
+#: includes/analyzers/class-expected-behavior.php:179
+msgid "Customer must manually renew the subscription."
+msgstr "O cliente deve renovar manualmente a subscription."
+
+#: includes/analyzers/class-expected-behavior.php:189
+msgid "Renewals are handled by WordPress Action Scheduler."
+msgstr "As renovações são gerenciadas pelo WordPress Action Scheduler."
+
+#: includes/analyzers/class-expected-behavior.php:196
+#. translators: %s: next payment date
+#, php-format
+msgid "Automated renewal scheduled for %s"
+msgstr "Renovação automática agendada para %s"
+
+#: includes/analyzers/class-expected-behavior.php:209
+msgid "Renewals are controlled by the payment gateway."
+msgstr "As renovações são controladas pelo gateway de pagamento."
+
+#: includes/analyzers/class-expected-behavior.php:210
+msgid "Gateway will notify site when payment is processed."
+msgstr "O gateway notificará o site quando o pagamento for processado."
+
+#: includes/analyzers/class-expected-behavior.php:254
+msgid "No further automatic actions expected."
+msgstr "Nenhuma outra ação automática esperada."
+
+#: includes/analyzers/class-expected-behavior.php:273
+msgid "No parent order found for this subscription."
+msgstr "Nenhum pedido pai encontrado para esta subscription."
+
+#: includes/analyzers/class-expected-behavior.php:300
+msgid "No subscription switches detected."
+msgstr "Nenhuma troca de subscription detectada."
+
+#: includes/analyzers/class-expected-behavior.php:308
+msgid "This subscription has been modified through subscription switching."
+msgstr "Esta assinatura foi modificada através da troca de assinatura."
+
+#: includes/analyzers/class-expected-behavior.php:310
+msgid "Switch logs should contain detailed information about the changes."
+msgstr ""
+"Os registros de troca devem conter informações detalhadas sobre as "
+"alterações."
+
+#: includes/analyzers/class-expected-behavior.php:311
+msgid "Prorated amounts should be calculated based on timing and pricing."
+msgstr "Os valores proporcionais devem ser calculados com base no tempo e no preço."
+
+#: includes/analyzers/class-expected-behavior.php:312
+msgid "New billing schedule should reflect the switched product configuration."
+msgstr ""
+"O novo cronograma de cobrança deve refletir a configuração do produto "
+"trocado."
+
+#: includes/analyzers/class-expected-behavior.php:411
+msgid "WordPress cron triggers Action Scheduler"
+msgstr "WordPress cron aciona Action Scheduler"
+
+#: includes/analyzers/class-expected-behavior.php:412
+msgid "Action Scheduler executes scheduled renewal action"
+msgstr "Action Scheduler executa a ação de renovação agendada"
+
+#: includes/analyzers/class-expected-behavior.php:413
+#: includes/analyzers/class-expected-behavior.php:439
+msgid "New renewal order is created"
+msgstr "Novo pedido de renovação é criado"
+
+#: includes/analyzers/class-expected-behavior.php:414
+msgid "Payment is processed via the payment gateway"
+msgstr "Pagamento é processado via gateway de pagamento"
+
+#: includes/analyzers/class-expected-behavior.php:415
+msgid "Subscription dates are updated"
+msgstr "Datas da assinatura são atualizadas"
+
+#: includes/analyzers/class-expected-behavior.php:416
+msgid "Next renewal action is scheduled"
+msgstr "Próxima ação de renovação é agendada"
+
+#: includes/analyzers/class-expected-behavior.php:419
+msgid "WordPress cron must be functioning"
+msgstr "WordPress cron deve estar funcionando"
+
+#: includes/analyzers/class-expected-behavior.php:420
+msgid "Action Scheduler must be operational"
+msgstr "Action Scheduler deve estar operacional"
+
+#: includes/analyzers/class-expected-behavior.php:421
+msgid "Payment gateway must be available"
+msgstr "Gateway de pagamento deve estar disponível"
+
+#: includes/analyzers/class-expected-behavior.php:436
+msgid "Payment gateway processes payment on their schedule"
+msgstr "Gateway de pagamento processa o pagamento conforme seu cronograma"
+
+#: includes/analyzers/class-expected-behavior.php:437
+msgid "Gateway sends webhook notification to your site"
+msgstr "Gateway envia notificação webhook para seu site"
+
+#: includes/analyzers/class-expected-behavior.php:438
+msgid "Site receives and processes webhook"
+msgstr "Site recebe e processa o webhook"
+
+#: includes/analyzers/class-expected-behavior.php:440
+msgid "Subscription is updated with new payment information"
+msgstr "Assinatura é atualizada com novas informações de pagamento"
+
+#: includes/analyzers/class-expected-behavior.php:443
+msgid "Gateway subscription must be active"
+msgstr "Assinatura no gateway deve estar ativa"
+
+#: includes/analyzers/class-expected-behavior.php:444
+msgid "Webhook endpoint must be accessible"
+msgstr "Endpoint do webhook deve ser acessível"
+
+#: includes/analyzers/class-expected-behavior.php:445
+msgid "Webhook authentication must be valid"
+msgstr "Autenticação do webhook deve ser válida"
+
+#: includes/analyzers/class-expected-behavior.php:446
+msgid "Site must be able to receive external requests"
+msgstr "O site deve ser capaz de receber solicitações externas"
+
+#: includes/analyzers/class-expected-behavior.php:461
+msgid "Subscription is active and should process renewals automatically."
+msgstr "Subscription está ativa e deve processar renovações automaticamente."
+
+#: includes/analyzers/class-expected-behavior.php:462
+msgid "Subscription is suspended and will not process renewals until reactivated."
+msgstr "Subscription está suspensa e não processará renovações até ser reativada."
+
+#: includes/analyzers/class-expected-behavior.php:463
+msgid "Subscription has been cancelled and will not renew."
+msgstr "Subscription foi cancelada e não será renovada."
+
+#: includes/analyzers/class-expected-behavior.php:464
+msgid "Subscription has reached its natural end date."
+msgstr "Subscription alcançou sua data final natural."
+
+#: includes/analyzers/class-expected-behavior.php:465
+msgid "Subscription is set to cancel at the end of the current billing period."
+msgstr ""
+"Subscription está programada para cancelar no final do período de cobrança "
+"atual."
+
+#: includes/analyzers/class-expected-behavior.php:466
+msgid "Subscription is awaiting initial payment or activation."
+msgstr "Subscription está aguardando pagamento inicial ou ativação."
+
+#: includes/analyzers/class-expected-behavior.php:469
+msgid "Unknown status."
+msgstr "Status desconhecido."
+
+#: includes/analyzers/class-expected-behavior.php:507
+#. translators: %s: next payment date
+#, php-format
+msgid "Next renewal payment due: %s"
+msgstr "Próximo pagamento de renovação devido: %s"
+
+#: includes/analyzers/class-expected-behavior.php:515
+#. translators: %s: end date
+#, php-format
+msgid "Subscription will expire on: %s"
+msgstr "Subscription expirará em: %s"
+
+#: includes/analyzers/class-expected-behavior.php:521
+msgid "Subscription will continue indefinitely until cancelled."
+msgstr "Subscription continuará indefinidamente até ser cancelada."
+
+#: includes/analyzers/class-expected-behavior.php:536
+msgid "No automatic renewals will occur while subscription is on hold."
+msgstr ""
+"Nenhuma renovação automática ocorrerá enquanto a Subscription estiver em "
+"espera."
+
+#: includes/analyzers/class-expected-behavior.php:537
+msgid "Subscription must be reactivated to resume billing."
+msgstr "Subscription deve ser reativada para retomar a cobrança."
+
+#: includes/analyzers/class-expected-behavior.php:538
+msgid "Customer access to subscription content may be restricted."
+msgstr "O acesso do cliente ao conteúdo da Subscription pode ser restrito."
+
+#: includes/analyzers/class-expected-behavior.php:556
+#. translators: %s: next payment date
+#, php-format
+msgid "Subscription will be cancelled after the next payment on: %s"
+msgstr "Subscription será cancelada após o próximo pagamento em: %s"
+
+#: includes/analyzers/class-expected-behavior.php:559
+msgid "One final renewal payment will be processed."
+msgstr "Um pagamento final de renovação será processado."
+
+#: includes/analyzers/class-expected-behavior.php:560
+msgid "After final payment, status will change to cancelled."
+msgstr "Após o pagamento final, o status mudará para cancelado."
+
+#: includes/analyzers/class-expected-behavior.php:565
+msgid "Subscription will be cancelled immediately as no next payment is scheduled."
+msgstr ""
+"Subscription será cancelada imediatamente, pois nenhum próximo pagamento "
+"está agendado."
+
+#: includes/analyzers/class-expected-behavior.php:593
+msgid "Customer completes checkout with subscription product"
+msgstr "Cliente conclui a finalização da compra com o produto Subscription"
+
+#: includes/analyzers/class-expected-behavior.php:594
+msgid "Parent order is created first"
+msgstr "Pedido principal é criado primeiro"
+
+#: includes/analyzers/class-expected-behavior.php:595
+msgid "Subscription is created as a copy of the parent order"
+msgstr "A assinatura é criada como uma cópia do pedido principal"
+
+#: includes/analyzers/class-expected-behavior.php:596
+msgid "Future renewals are created as copies of the subscription"
+msgstr "Renovações futuras são criadas como cópias da assinatura"
+
+#: includes/analyzers/class-expected-behavior.php:615
+msgid "Currency matches"
+msgstr "A moeda corresponde"
+
+#: includes/analyzers/class-expected-behavior.php:617
+msgid "Currency does not match parent order"
+msgstr "A moeda não corresponde ao pedido principal"
+
+#: includes/analyzers/class-expected-behavior.php:621
+msgid "Customer ID matches"
+msgstr "O ID do cliente corresponde"
+
+#: includes/analyzers/class-expected-behavior.php:623
+msgid "Customer ID does not match parent order"
+msgstr "O ID do cliente não corresponde ao pedido principal"
+
+#: includes/analyzers/class-expected-behavior.php:628
+msgid "Payment method matches"
+msgstr "O método de pagamento corresponde"
+
+#: includes/analyzers/class-expected-behavior.php:630
+msgid "Payment method does not match parent order"
+msgstr "O método de pagamento não corresponde ao pedido principal"
+
+#: includes/analyzers/class-expected-behavior.php:637
+msgid ""
+"Some differences may be expected due to subscription switching, admin "
+"edits, or customizations."
+msgstr ""
+"Algumas diferenças podem ser esperadas devido à troca de assinatura, "
+"edições administrativas ou personalizações."
+
+#: includes/analyzers/class-expected-behavior.php:652
+#: includes/analyzers/class-expected-behavior.php:733
+#: includes/analyzers/class-expected-behavior.php:757
+#: includes/analyzers/class-expected-behavior.php:781
+#: includes/analyzers/class-expected-behavior.php:805
+#: includes/analyzers/class-expected-behavior.php:829
+msgid "Mode could not be determined"
+msgstr "O modo não pôde ser determinado"
+
+#: includes/analyzers/class-expected-behavior.php:677
+#: includes/analyzers/class-expected-behavior.php:688
+msgid "Sandbox/Test Mode"
+msgstr "Modo Sandbox/Teste"
+
+#: includes/analyzers/class-expected-behavior.php:677
+#: includes/analyzers/class-expected-behavior.php:693
+msgid "Live/Production Mode"
+msgstr "Modo Ao Vivo/Produção"
+
+#: includes/analyzers/class-expected-behavior.php:741
+msgid "Stripe Test Mode"
+msgstr "Modo de Teste Stripe"
+
+#: includes/analyzers/class-expected-behavior.php:741
+msgid "Stripe Live Mode"
+msgstr "Modo Ao Vivo Stripe"
+
+#: includes/analyzers/class-expected-behavior.php:765
+msgid "PayPal Sandbox Mode"
+msgstr "Modo Sandbox PayPal"
+
+#: includes/analyzers/class-expected-behavior.php:765
+msgid "PayPal Live Mode"
+msgstr "Modo Ao Vivo PayPal"
+
+#: includes/analyzers/class-expected-behavior.php:789
+msgid "Square Sandbox Mode"
+msgstr "Modo Sandbox Square"
+
+#: includes/analyzers/class-expected-behavior.php:789
+msgid "Square Live Mode"
+msgstr "Modo Ao Vivo Square"
+
+#: includes/analyzers/class-expected-behavior.php:813
+msgid "Braintree Sandbox Mode"
+msgstr "Modo Sandbox Braintree"
+
+#: includes/analyzers/class-expected-behavior.php:813
+msgid "Braintree Live Mode"
+msgstr "Modo Ao Vivo Braintree"
+
+#: includes/analyzers/class-expected-behavior.php:837
+msgid "Authorize.net Test Mode"
+msgstr "Modo de Teste Authorize.net"
+
+#: includes/analyzers/class-expected-behavior.php:837
+msgid "Authorize.net Live Mode"
+msgstr "Modo ao Vivo Authorize.net"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:133
+#. translators: %s: start date
+#, php-format
+msgid "No payments received since start date %s"
+msgstr "Nenhum pagamento recebido desde a data de início %s"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:142
+msgid "Check if payments are being processed correctly."
+msgstr "Verifique se os pagamentos estão sendo processados corretamente."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:182
+#. translators: 1: expected payment date, 2: actual next payment date
+#, php-format
+msgid "Payment cycle skipped — expected payment around %1$s, next payment was %2$s"
+msgstr ""
+"Ciclo de pagamento ignorado — pagamento esperado por volta de %1$s, próximo "
+"pagamento foi em %2$s"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:194
+msgid ""
+"Review what happened during this period and consider if payment should be "
+"collected."
+msgstr ""
+"Revise o que aconteceu durante este período e considere se o pagamento deve "
+"ser cobrado."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:224
+#. translators: 1: expected payment date, 2: current date
+#, php-format
+msgid "Payment overdue — expected payment around %1$s, now %2$s"
+msgstr "Pagamento atrasado — pagamento esperado por volta de %1$s, agora é %2$s"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:235
+msgid "Check payment processing and customer status."
+msgstr "Verifique o processamento do pagamento e o status do cliente."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:282
+#. translators: %d: order ID
+#, php-format
+msgid "Manual payment completion detected for order #%d"
+msgstr "Conclusão manual de pagamento detectada para o pedido #%d"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:292
+msgid "Verify manual payment was properly recorded."
+msgstr "Verifique se o pagamento manual foi registrado corretamente."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:303
+#. translators: %d: order ID
+#, php-format
+msgid "Order #%d marked complete without transaction ID"
+msgstr "Pedido #%d marcado como concluído sem ID de transação"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:312
+msgid "Verify payment was actually received and properly recorded."
+msgstr "Verifique se o pagamento foi realmente recebido e registrado corretamente."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:343
+msgid "Subscription shows Expired but has a valid future next payment date"
+msgstr ""
+"Subscription mostra Expirado, mas possui uma próxima data de pagamento "
+"válida no futuro"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:349
+msgid "Review subscription status and payment schedule for consistency."
+msgstr ""
+"Revise o status da Subscription e o cronograma de pagamentos para "
+"consistência."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:363
+msgid "Subscription shows Active but has passed its end date"
+msgstr "Subscription mostra Ativo, mas já passou da data de término"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:369
+msgid "Consider updating subscription status to reflect actual state."
+msgstr "Considere atualizar o status da Subscription para refletir o estado real."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:408
+msgid "No scheduled subscription payment actions found"
+msgstr "Nenhuma ação de pagamento programada para Subscription encontrada"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:413
+msgid "Check if subscription payments are properly scheduled."
+msgstr "Verifique se os pagamentos da Subscription estão devidamente agendados."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:434
+#. translators: %s: action hook name
+#, php-format
+msgid "Failed Action Scheduler event: %s"
+msgstr "Evento do Action Scheduler falhou: %s"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:444
+msgid "Review failed action and consider manual intervention."
+msgstr "Revise a ação falhada e considere intervenção manual."
+
+#: includes/analyzers/class-skipped-cycle-detector.php:502
+#. translators: %d: year
+#, php-format
+msgid "No renewals found for year %d"
+msgstr "Nenhuma renovação encontrada para o ano %d"
+
+#: includes/analyzers/class-skipped-cycle-detector.php:507
+msgid "Investigate why no renewals occurred during this period."
+msgstr "Investigue por que nenhuma renovação ocorreu durante este período."
+
+#: includes/analyzers/class-subscription-anatomy.php:235
+msgid "Action Scheduler tables not found."
+msgstr "Tabelas do Action Scheduler não encontradas."
+
+#: includes/analyzers/class-subscription-anatomy.php:375
+msgid "Payment gateway not found or not available."
+msgstr "Gateway de pagamento não encontrado ou indisponível."
+
+#: includes/analyzers/class-subscription-anatomy.php:378
+msgid "Payment gateway is disabled or not available."
+msgstr "Gateway de pagamento está desativado ou indisponível."
+
+#: includes/analyzers/class-subscription-anatomy.php:384
+msgid ""
+"Subscription is set to manual renewal but payment gateway supports "
+"automatic renewals."
+msgstr ""
+"Subscription está configurada para renovação manual, mas o gateway de "
+"pagamento suporta renovações automáticas."
+
+#: includes/analyzers/class-subscription-anatomy.php:390
+msgid "Payment token appears to be invalid or expired."
+msgstr "O token de pagamento parece estar inválido ou expirado."
+
+#: includes/analyzers/class-subscription-anatomy.php:431
+msgid "Token not found or invalid."
+msgstr "Token não encontrado ou inválido."
+
+#: includes/analyzers/class-timeline-builder.php:144
+msgid "Subscription created"
+msgstr "Subscription criada"
+
+#: includes/analyzers/class-timeline-builder.php:145
+msgid "Subscription started"
+msgstr "Subscription iniciada"
+
+#: includes/analyzers/class-timeline-builder.php:146
+msgid "Trial period ended"
+msgstr "Período de teste encerrado"
+
+#: includes/analyzers/class-timeline-builder.php:147
+msgid "Last payment processed"
+msgstr "Último pagamento processado"
+
+#: includes/analyzers/class-timeline-builder.php:148
+msgid "Next payment scheduled"
+msgstr "Próximo pagamento agendado"
+
+#: includes/analyzers/class-timeline-builder.php:149
+msgid "Subscription cancelled"
+msgstr "Subscription cancelada"
+
+#: includes/analyzers/class-timeline-builder.php:150
+msgid "Subscription ended"
+msgstr "Subscription encerrada"
+
+#: includes/analyzers/class-timeline-builder.php:266
+#. translators: 1: order type, 2: order ID
+#, php-format
+msgid "%1$s order #%2$d created"
+msgstr "%1$s pedido #%2$d criado"
+
+#: includes/analyzers/class-timeline-builder.php:272
+#. translators: 1: order type, 2: order ID, 3: order total
+#, php-format
+msgid "%1$s order #%2$d created with total %3$s"
+msgstr "%1$s pedido #%2$d criado com total de %3$s"
+
+#: includes/analyzers/class-timeline-builder.php:296
+#. translators: %d: order ID
+#, php-format
+msgid "Payment completed for order #%d"
+msgstr "Pagamento concluído para o pedido #%d"
+
+#: includes/analyzers/class-timeline-builder.php:301
+#. translators: 1: order ID, 2: payment amount
+#, php-format
+msgid "Payment of %2$s completed for order #%1$d"
+msgstr "Pagamento de %2$s concluído para o pedido #%1$d"
+
+#: includes/analyzers/class-timeline-builder.php:332
+#. translators: %d: order ID
+#, php-format
+msgid "Order #%d note"
+msgstr "Nota do pedido #%d"
+
+#: includes/analyzers/class-timeline-builder.php:612
+msgid "Scheduled subscription payment"
+msgstr "Pagamento de Subscription agendado"
+
+#: includes/analyzers/class-timeline-builder.php:613
+msgid "Scheduled subscription expiration"
+msgstr "Expiração de Subscription agendada"
+
+#: includes/analyzers/class-timeline-builder.php:614
+msgid "Scheduled trial end"
+msgstr "Fim do período de teste agendado"
+
+#: includes/analyzers/class-timeline-builder.php:615
+msgid "End of prepaid term"
+msgstr "Fim do período pré-pago"
+
+#: includes/analyzers/class-timeline-builder.php:635
+#. translators: 1: hook name, 2: action status, 3: action arguments
+#, php-format
+msgid "Action: %1$s | Status: %2$s | Args: %3$s"
+msgstr "Ação: %1$s | Status: %2$s | Args: %3$s"
+
+#: includes/analyzers/class-timeline-builder.php:695
+msgid "Failed Scheduled Action"
+msgstr "Ação Agendada Falhou"
+
+#: includes/analyzers/class-timeline-builder.php:698
+#. translators: 1: action hook, 2: timestamp
+#, php-format
+msgid "Scheduled action \"%1$s\" failed at %2$s"
+msgstr "Ação agendada \"%1$s\" falhou em %2$s"
+
+#: includes/class-admin.php:116
+#, php-format
+msgid "filtering to %1$d %2$s"
+msgstr "filtrando para %1$d %2$s"
+
+#: includes/class-admin.php:117
+msgid "Could not load the fix preview. Try again in a moment."
+msgstr ""
+"Não foi possível carregar a pré-visualização da correção. Tente novamente "
+"em um momento."
+
+#: includes/class-admin.php:118
+msgid "Applying…"
+msgstr "Aplicando…"
+
+#: includes/class-admin.php:119
+msgid "Something went wrong - nothing was changed."
+msgstr "Algo deu errado - nada foi alterado."
+
+#: includes/class-admin.php:120
+msgid "Reverting…"
+msgstr "Revertendo…"
+
+#: includes/class-admin.php:121
+msgid "Revert this fix? The subscription will return to its previous state."
+msgstr "Reverter esta correção? A Subscription retornará ao estado anterior."
+
+#: includes/class-admin.php:122
+msgid "Saving…"
+msgstr "Salvando…"
+
+#: includes/class-admin.php:124
+msgid "Could not save. Check your connection and try again."
+msgstr "Não foi possível salvar. Verifique sua conexão e tente novamente."
+
+#: includes/class-admin.php:141
+msgid "Open"
+msgstr "Abrir"
+
+#: includes/class-admin.php:291
+#: includes/class-ajax-handler.php:383
+msgid "You do not have permission to do this."
+msgstr "Você não tem permissão para fazer isso."
+
+#: includes/class-admin.php:517
+msgid "never"
+msgstr "nunca"
+
+#: includes/class-admin.php:565
+msgid "just now"
+msgstr "agora mesmo"
+
+#: includes/class-admin.php:570
+#. translators: %d: minutes
+#, php-format
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "há %d minuto"
+msgstr[1] "há %d minutos"
+
+#: includes/class-admin.php:575
+#. translators: %d: hours
+#, php-format
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] "há %d hora"
+msgstr[1] "há %d horas"
+
+#: includes/class-admin.php:580
+#. translators: %d: days
+#, php-format
+msgid "%d day ago"
+msgid_plural "%d days ago"
+msgstr[0] "há %d dia"
+msgstr[1] "há %d dias"
+
+#: includes/class-admin.php:582
+msgid "M j"
+msgstr "M j"
+
+#: includes/class-ajax-handler.php:75
+#: includes/class-ajax-handler.php:122
+msgid "Invalid subscription ID."
+msgstr "ID de Subscription inválido."
+
+#: includes/class-ajax-handler.php:81
+msgid "No matching rule found for this subscription."
+msgstr "Nenhuma regra correspondente encontrada para esta Subscription."
+
+#: includes/class-ajax-handler.php:89
+msgid ""
+"This subscription no longer matches the rule (state changed since scan). "
+"Re-scan and try again."
+msgstr ""
+"Esta Subscription não corresponde mais à regra (estado alterado desde a "
+"verificação). Refaça a verificação e tente novamente."
+
+#: includes/class-ajax-handler.php:128
+msgid "No matching rule for this subscription."
+msgstr "Nenhuma regra correspondente para esta Subscription."
+
+#: includes/class-ajax-handler.php:136
+msgid "State changed since scan. Re-scan and try again."
+msgstr "Estado alterado desde a verificação. Refaça a verificação e tente novamente."
+
+#: includes/class-ajax-handler.php:172
+msgid "Fix applied."
+msgstr "Correção aplicada."
+
+#: includes/class-ajax-handler.php:186
+msgid "Invalid journal entry."
+msgstr "Entrada de diário inválida."
+
+#: includes/class-ajax-handler.php:222
+msgid "Missing rule_id."
+msgstr "Falta rule_id."
+
+#: includes/class-ajax-handler.php:228
+msgid "Unknown rule."
+msgstr "Regra desconhecida."
+
+#: includes/class-ajax-handler.php:240
+msgid "No matching subscriptions to fix."
+msgstr "Nenhuma Subscription correspondente para corrigir."
+
+#: includes/class-ajax-handler.php:257
+msgid "No longer matches rule; skipped."
+msgstr "Não corresponde mais à regra; ignorado."
+
+#: includes/class-ajax-handler.php:306
+msgid "Missing batch_id."
+msgstr "Falta batch_id."
+
+#: includes/class-ajax-handler.php:361
+msgid "Enter a valid email address."
+msgstr "Digite um endereço de e-mail válido."
+
+#: includes/collectors/class-subscription-data.php:67
+#: includes/collectors/class-subscription-data.php:136
+#. translators: %d: subscription ID
+#, php-format
+msgid "Subscription #%d"
+msgstr "Subscription #%d"
+
+#: includes/journal/class-fix-journal.php:140
+msgid "Journal entry not found."
+msgstr "Entrada de diário não encontrada."
+
+#: includes/journal/class-fix-journal.php:147
+msgid "Already reverted."
+msgstr "Já revertido."
+
+#: includes/journal/class-fix-journal.php:159
+#. translators: %s: rule_id
+#, php-format
+msgid "Rule \"%s\" is not registered; cannot revert."
+msgstr "A regra \"%s\" não está registrada; não é possível reverter."
+
+#: includes/journal/class-fix-journal.php:172
+msgid "Revert raised an error; nothing was changed."
+msgstr "Reverter gerou um erro; nada foi alterado."
+
+#: includes/narrator/class-narrator.php:88
+#: includes/narrator/class-narrator.php:92
+#: includes/narrator/class-narrator.php:98
+#: includes/rules/class-rule-ghost-sub.php:279
+#: includes/rules/class-rule-on-hold-paid.php:276
+#: includes/rules/class-rule-repeated-failures.php:274
+msgid "This customer"
+msgstr "Este cliente"
+
+#: includes/rules/class-rule-ghost-sub.php:130
+msgid "Next payment"
+msgstr "Próximo pagamento"
+
+#: includes/rules/class-rule-ghost-sub.php:131
+msgid "— (not scheduled)"
+msgstr "— (não agendado)"
+
+#: includes/rules/class-rule-ghost-sub.php:132
+msgid "(UTC)"
+msgstr "(UTC)"
+
+#: includes/rules/class-rule-ghost-sub.php:136
+msgid "AS event"
+msgstr "Evento AS"
+
+#: includes/rules/class-rule-ghost-sub.php:137
+msgid "missing"
+msgstr "faltando"
+
+#: includes/rules/class-rule-ghost-sub.php:142
+#: includes/rules/class-rule-on-hold-paid.php:139
+#: includes/rules/class-rule-repeated-failures.php:145
+msgid "Sub status"
+msgstr "Status da Sub"
+
+#: includes/rules/class-rule-ghost-sub.php:143
+#: includes/rules/class-rule-ghost-sub.php:144
+#: includes/rules/class-rule-on-hold-paid.php:141
+msgid "active"
+msgstr "ativo"
+
+#: includes/rules/class-rule-ghost-sub.php:291
+#, php-format
+msgid ""
+"%1$s's subscription was supposed to renew <em>today</em>. WordPress didn't "
+"schedule the payment event, so nothing was charged."
+msgstr ""
+"A assinatura de %1$s deveria ser renovada <em>hoje</em>. WordPress não "
+"agendou o evento de pagamento, então nada foi cobrado."
+
+#: includes/rules/class-rule-ghost-sub.php:296
+#, php-format
+msgid ""
+"%1$s's subscription was supposed to renew on <em>%2$s</em> (%3$d days ago). "
+"WordPress didn't schedule the payment event, so nothing was charged."
+msgstr ""
+"A assinatura de %1$s deveria ser renovada em <em>%2$s</em> (%3$d dias "
+"atrás). WordPress não agendou o evento de pagamento, então nada foi cobrado."
+
+#: includes/rules/class-rule-ghost-sub.php:301
+#, php-format
+msgid ""
+"%1$s's subscription was supposed to renew on <em>%2$s</em>, about %3$d days "
+"ago. WordPress didn't schedule the payment event, so %1$s hasn't been "
+"billed for any cycles since."
+msgstr ""
+"A assinatura de %1$s deveria ser renovada em <em>%2$s</em>, há cerca de "
+"%3$d dias. WordPress não agendou o evento de pagamento, então %1$s não foi "
+"cobrado por nenhum ciclo desde então."
+
+#: includes/rules/class-rule-ghost-sub.php:306
+#, php-format
+msgid ""
+"%1$s's subscription was supposed to renew on <em>%2$s</em>, over a month "
+"ago. WordPress didn't schedule the payment event, so %1$s hasn't been "
+"billed for any cycles since."
+msgstr ""
+"A assinatura de %1$s deveria ser renovada em <em>%2$s</em>, há mais de um "
+"mês. WordPress não agendou o evento de pagamento, então %1$s não foi "
+"cobrado por nenhum ciclo desde então."
+
+#: includes/rules/class-rule-on-hold-paid.php:140
+msgid "on-hold"
+msgstr "em espera"
+
+#: includes/rules/class-rule-on-hold-paid.php:145
+#. translators: %d: renewal order id
+#, php-format
+msgid "Renewal #%d"
+msgstr "Renovação #%d"
+
+#: includes/rules/class-rule-on-hold-paid.php:191
+#. translators: used as a note on the order when Doctor Subs flips it.
+msgid ""
+"Doctor Subs: marked complete after matching Stripe charge capture on "
+"on-hold subscription."
+msgstr ""
+"Doctor Subs: marcado como concluído após captura de cobrança correspondente "
+"no Stripe para assinatura em espera."
+
+#: includes/rules/class-rule-on-hold-paid.php:198
+#. translators: order note on the subscription when Doctor Subs activates it.
+msgid "Doctor Subs: flipped to active after matching Stripe-paid renewal."
+msgstr ""
+"Doctor Subs: alterado para ativo após renovação paga correspondente no "
+"Stripe."
+
+#: includes/rules/class-rule-on-hold-paid.php:245
+#: includes/rules/class-rule-on-hold-paid.php:256
+msgid "Doctor Subs: reverted status change."
+msgstr "Doctor Subs: reversão da mudança de status."
+
+#: includes/rules/class-rule-on-hold-paid.php:285
+#. translators: 1: first name, 2: amount, 3: date
+#, php-format
+msgid ""
+"%1$s's last renewal payment went through in Stripe on <em>%3$s</em> - they "
+"were charged %2$s. But the subscription status stayed \"on-hold\" instead "
+"of switching back to active."
+msgstr ""
+"O último pagamento de renovação de %1$s foi processado no Stripe em "
+"<em>%3$s</em> - foi cobrado %2$s. Mas o status da assinatura permaneceu "
+"\"em espera\" em vez de voltar para ativo."
+
+#: includes/rules/class-rule-on-hold-paid.php:294
+#. translators: %s: first name
+#, php-format
+msgid ""
+"%s's last renewal payment went through in Stripe, but the subscription "
+"stayed on-hold instead of flipping back to active."
+msgstr ""
+"O último pagamento de renovação de %s foi processado no Stripe, mas a "
+"assinatura permaneceu em espera em vez de voltar para ativo."
+
+#: includes/rules/class-rule-repeated-failures.php:139
+msgid "Retry payment"
+msgstr "Tentar pagamento novamente"
+
+#: includes/rules/class-rule-repeated-failures.php:140
+#. translators: %d: count
+#, php-format
+msgid "%d failed attempt"
+msgid_plural "%d failed attempts"
+msgstr[0] "%d tentativa falhada"
+msgstr[1] "%d tentativas falhadas"
+
+#: includes/rules/class-rule-repeated-failures.php:141
+#. translators: %s: time
+#, php-format
+msgid "one retry at %s (UTC)"
+msgstr "uma nova tentativa às %s (UTC)"
+
+#: includes/rules/class-rule-repeated-failures.php:283
+#. translators: 1: first name, 2: count, 3: window days
+#, php-format
+msgid ""
+"Something has been failing to process %1$s's renewal for a while - %2$d "
+"failed attempts in the last %3$d days. Worth looking at the card on file or "
+"the gateway log."
+msgstr ""
+"Algo tem falhado ao processar a renovação de %1$s por um tempo - %2$d "
+"tentativas falhadas nos últimos %3$d dias. Vale a pena verificar o cartão "
+"registrado ou o log do gateway."
+
+#: includes/rules/class-rule-repeated-failures.php:292
+#. translators: 1: first name, 2: count, 3: window days
+#, php-format
+msgid ""
+"%1$s's renewal has failed %2$d times in the last %3$d days. Often a gateway "
+"blip that clears on retry, but worth another look if this retry fails too."
+msgstr ""
+"A renovação de %1$s falhou %2$d vezes nos últimos %3$d dias. Frequentemente "
+"é uma falha temporária do gateway que se resolve na nova tentativa, mas "
+"vale verificar novamente se essa nova tentativa também falhar."
+
+#: includes/utilities/class-security.php:32
+msgid "Security check failed. Please refresh the page and try again."
+msgstr ""
+"Falha na verificação de segurança. Por favor, atualize a página e tente "
+"novamente."
+
+#: includes/utilities/class-security.php:45
+msgid "You do not have permission to perform this action."
+msgstr "Você não tem permissão para realizar esta ação."
+
+#: includes/utilities/class-security.php:61
+msgid "Invalid subscription ID provided."
+msgstr "ID de subscription inválido fornecido."
+
+#: includes/utilities/class-security.php:114
+#. translators: 1: action name, 2: time window in seconds
+#, php-format
+msgid "Rate limit exceeded for %1$s. Please wait %2$d seconds before trying again."
+msgstr ""
+"Limite de taxa excedido para %1$s. Por favor, espere %2$d segundos antes de "
+"tentar novamente."

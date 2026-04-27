@@ -1,0 +1,2942 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Doctor Subs v2 - All Surfaces Preview</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="../admin/css/tokens.css">
+<link rel="stylesheet" href="../admin/css/admin.css">
+<link rel="stylesheet" href="../admin/css/responsive.css">
+<style>
+/* Preview chrome only - not part of the plugin */
+html, body {
+	margin: 0;
+	background: oklch(95% 0.008 200);
+	font-family: 'Switzer', system-ui, sans-serif;
+	color: oklch(18% 0.015 210);
+}
+
+.preview-header {
+	position: sticky; top: 0; z-index: 200;
+	background: oklch(99% 0.004 200);
+	border-bottom: 1px solid oklch(92% 0.008 200);
+	padding: 14px 28px;
+	display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+}
+.preview-header .title { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; font-weight: 400; }
+.preview-header .meta { font-size: 12px; color: oklch(55% 0.01 210); }
+.preview-header .toc { display: flex; gap: 12px; margin-left: auto; flex-wrap: wrap; }
+.preview-header .toc a {
+	font-size: 12px;
+	color: oklch(38% 0.012 210);
+	text-decoration: none;
+	border-bottom: 1px dotted oklch(72% 0.008 210);
+	padding-bottom: 1px;
+}
+.preview-header .toc a:hover { color: oklch(28% 0.05 195); border-bottom-color: oklch(48% 0.06 195); }
+
+.preview-section { padding: 40px 28px 20px; }
+.preview-group { padding: 20px 28px 10px; }
+.preview-group h1 {
+	font-family: 'Instrument Serif', serif;
+	font-size: 36px; letter-spacing: -0.015em; font-weight: 400;
+	margin: 0 0 4px;
+}
+.preview-group p { color: oklch(55% 0.01 210); font-size: 13.5px; max-width: 720px; margin: 0; }
+
+.preview-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(55% 0.01 210); margin-bottom: 8px; }
+.preview-title { font-family: 'Instrument Serif', serif; font-size: 24px; letter-spacing: -0.015em; margin-bottom: 2px; font-weight: 400; }
+.preview-desc { font-size: 13px; color: oklch(38% 0.012 210); max-width: 640px; margin-bottom: 20px; }
+
+/* The WP admin "shell" wrapping each rendered surface */
+.preview-frame {
+	border-radius: 8px;
+	overflow: hidden;
+	box-shadow: 0 2px 8px oklch(18% 0.015 210 / 0.08), 0 16px 40px oklch(18% 0.015 210 / 0.06);
+	border: 1px solid oklch(92% 0.008 200);
+	background: oklch(99% 0.004 200);
+	position: relative;
+}
+
+.wp-shell { height: 780px; display: flex; flex-direction: column; overflow: hidden; }
+.wp-topbar {
+	height: 34px;
+	background: oklch(16% 0.012 210);
+	color: oklch(75% 0.008 210);
+	font-size: 12px;
+	display: flex; align-items: center;
+	padding: 0 14px; gap: 16px;
+	border-bottom: 1px solid oklch(10% 0.01 210);
+}
+.wp-topbar-site { color: oklch(88% 0.01 210); font-weight: 500; }
+.wp-topbar-dim { opacity: 0.6; }
+.wp-topbar-spacer { flex: 1; }
+.wp-shell-body { display: flex; flex: 1; min-height: 0; }
+.wp-sidebar {
+	width: 188px; flex: 0 0 188px;
+	background: oklch(22% 0.012 210);
+	color: oklch(80% 0.008 210);
+	font-size: 12.5px;
+	padding: 14px 0; user-select: none;
+}
+.wp-sidebar-label {
+	padding: 4px 16px 12px; font-size: 10.5px; letter-spacing: 0.12em;
+	text-transform: uppercase; color: oklch(58% 0.01 210);
+}
+.wp-sidebar-item {
+	padding: 7px 16px; display: flex; align-items: center; gap: 10px;
+	color: oklch(78% 0.008 210);
+	border-left: 2px solid transparent;
+}
+.wp-sidebar-item.active {
+	background: oklch(30% 0.03 200);
+	color: oklch(95% 0.008 200);
+	border-left-color: oklch(60% 0.07 195);
+}
+.wp-sidebar-icon { width: 14px; opacity: 0.7; text-align: center; font-size: 12px; }
+.wp-main { flex: 1; overflow: auto; background: oklch(99% 0.004 200); }
+
+/* Modal preview - scope the fixed-position modal to its preview frame */
+.preview-frame--modal {
+	position: relative;
+	height: 820px;
+	isolation: isolate;
+	overflow: hidden;
+}
+.preview-frame--modal .wp-shell { height: 100%; }
+.preview-frame--modal .modal-backdrop {
+	position: absolute !important;
+	inset: 0 !important;
+	z-index: 20;
+}
+.preview-frame--modal .modal {
+	position: absolute !important;
+	top: 48px !important;
+	left: 50% !important;
+	transform: translateX(-50%) !important;
+	width: 560px !important;
+	max-width: calc(100% - 60px) !important;
+	max-height: calc(100% - 96px) !important;
+	z-index: 30;
+	overflow-y: auto;
+}
+
+.preview-frame--modal .executed-warning-note {
+	margin-top: 10px;
+	padding: 10px 14px;
+	background: oklch(95% 0.02 160);
+	color: oklch(32% 0.06 160);
+	border-radius: 6px;
+	font-size: 12.5px;
+	max-width: 720px;
+}
+
+hr.sep {
+	border: 0;
+	border-top: 1px solid oklch(87% 0.01 200);
+	margin: 40px 0 0;
+}
+
+@media print {
+	.preview-header, .preview-label, .preview-title, .preview-desc { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="preview-header">
+	<div>
+		<div class="title">Doctor Subs v2 - All Surfaces Preview</div>
+		<div class="meta">9 states rendered from real PHP templates · <code>design-brief/all-surfaces-preview.html</code></div>
+	</div>
+	<nav class="toc">
+		<a href="#s1">First-run</a>
+		<a href="#s1-scan">· scanning</a>
+		<a href="#s1-zero">· zero</a>
+		<a href="#s2">Dashboard</a>
+		<a href="#s2-healthy">· all healthy</a>
+		<a href="#s2-failed">· scan failed</a>
+		<a href="#s3">Fix modal</a>
+		<a href="#s3-exec">· exec warning</a>
+		<a href="#s4">Fix history</a>
+		<a href="#s4-empty">· empty</a>
+		<a href="#s5">Settings</a>
+	</nav>
+</div>
+
+<section class="preview-group">
+	<h1>Surface 1 - First-run landing</h1>
+	<p>The very first visit to the plugin. Before any scan has run. Panic-mode entry point must lower the merchant's heart rate.</p>
+</section>
+
+<section class="preview-section" id="s1">
+	<div class="preview-label">State: default</div>
+	<div class="preview-title">Default - the calm CTA</div>
+	<div class="preview-desc">What a brand-new install sees. Instrument Serif hero, one primary action, three detect-rows underneath.</div>
+	<div class="preview-frame">	<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs"
+			   aria-current="page">
+				Dashboard			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   >
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="firstrun">
+		
+			<div class="kicker">First visit</div>
+
+			<h1 class="hero">
+				Let&rsquo;s check your subscriptions <span class="accent">for problems</span>.			</h1>
+
+			<p class="lede">
+				We&amp;rsquo;ll scan your active subscriptions for three common renewal failures. Takes about 30 seconds. Runs entirely on your server - nothing sent anywhere.			</p>
+
+			<div class="actions">
+				<button type="button" class="btn btn-primary" data-dr-subs-scan>
+					Scan my subscriptions					<svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+					     stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+					     aria-hidden="true">
+						<path d="M9 18l6-6-6-6" />
+					</svg>
+				</button>
+				<a href="#admin.php?page=doctor-subs&tab=settings"
+				   class="secondary">
+					<em>or</em>
+					configure settings first				</a>
+			</div>
+
+		
+		<div class="detects">
+			<div class="detects-head">
+				<span class="count">03</span>
+				<h2>What this detects</h2>
+			</div>
+
+			<div class="detect-row">
+				<span class="n">01</span>
+				<span class="name">Ghost subscriptions</span>
+				<span class="desc">Active subscriptions that won&amp;rsquo;t renew because the payment didn&amp;rsquo;t get scheduled.</span>
+			</div>
+
+			<div class="detect-row">
+				<span class="n">02</span>
+				<span class="name">Stuck on-hold</span>
+				<span class="desc">Payment went through, but the subscription never switched back to active.</span>
+			</div>
+
+			<div class="detect-row">
+				<span class="n">03</span>
+				<span class="name">Repeated payment failures</span>
+				<span class="desc">Something has been failing to process a payment for a while.</span>
+			</div>
+		</div>
+	</div>
+</div>
+			</main>
+		</div>
+	</div>
+	</div>
+</section>
+
+<section class="preview-section" id="s1-scan">
+	<div class="preview-label">State: scanning</div>
+	<div class="preview-title">Scanning (midway through first scan)</div>
+	<div class="preview-desc">Deterministic progress bar. Live <code>sub_id</code> being checked. Honest, not performative.</div>
+	<div class="preview-frame">	<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs"
+			   aria-current="page">
+				Dashboard			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   >
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="firstrun">
+		
+			<div class="kicker">Scanning</div>
+
+			<h1 class="hero">
+				Scanning your subscriptions				<span class="hero-accent">…</span>
+			</h1>
+
+			<p class="lede">
+				Checking <span class="mono tnum">247</span> active subs - about <span class="mono tnum">18</span> seconds left.			</p>
+
+			<div class="scanning-bar">
+				<div class="progress" role="progressbar"
+				     aria-valuenow="40"
+				     aria-valuemin="0" aria-valuemax="100"
+				     aria-label="Scan progress">
+					<div class="thumb" style="width: 40%;"></div>
+				</div>
+				<div class="scanning-meta">
+					<span class="mono tnum">
+						checking sub_00103					</span>
+					<button type="button" class="linklike" data-dr-subs-cancel-scan>
+						Cancel					</button>
+				</div>
+			</div>
+
+		
+		<div class="detects">
+			<div class="detects-head">
+				<span class="count">03</span>
+				<h2>What this detects</h2>
+			</div>
+
+			<div class="detect-row">
+				<span class="n">01</span>
+				<span class="name">Ghost subscriptions</span>
+				<span class="desc">Active subscriptions that won&amp;rsquo;t renew because the payment didn&amp;rsquo;t get scheduled.</span>
+			</div>
+
+			<div class="detect-row">
+				<span class="n">02</span>
+				<span class="name">Stuck on-hold</span>
+				<span class="desc">Payment went through, but the subscription never switched back to active.</span>
+			</div>
+
+			<div class="detect-row">
+				<span class="n">03</span>
+				<span class="name">Repeated payment failures</span>
+				<span class="desc">Something has been failing to process a payment for a while.</span>
+			</div>
+		</div>
+	</div>
+</div>
+			</main>
+		</div>
+	</div>
+	</div>
+</section>
+
+<section class="preview-section" id="s1-zero">
+	<div class="preview-label">State: zero active subs</div>
+	<div class="preview-title">Nothing to scan yet</div>
+	<div class="preview-desc">Alternative copy for stores with no active subscriptions. No CTA.</div>
+	<div class="preview-frame">	<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs"
+			   aria-current="page">
+				Dashboard			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   >
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="firstrun">
+		
+			<div class="kicker">Nothing to scan yet</div>
+
+			<h1 class="hero hero--zero">
+				You don&rsquo;t have any active subscriptions <span class="accent accent--muted">to scan yet</span>.			</h1>
+
+			<p class="lede">
+				Doctor Subs will start watching once you do. You can leave this tab open - or come back when your first customer subscribes.			</p>
+
+		
+		<div class="detects">
+			<div class="detects-head">
+				<span class="count">03</span>
+				<h2>What this detects</h2>
+			</div>
+
+			<div class="detect-row">
+				<span class="n">01</span>
+				<span class="name">Ghost subscriptions</span>
+				<span class="desc">Active subscriptions that won&amp;rsquo;t renew because the payment didn&amp;rsquo;t get scheduled.</span>
+			</div>
+
+			<div class="detect-row">
+				<span class="n">02</span>
+				<span class="name">Stuck on-hold</span>
+				<span class="desc">Payment went through, but the subscription never switched back to active.</span>
+			</div>
+
+			<div class="detect-row">
+				<span class="n">03</span>
+				<span class="name">Repeated payment failures</span>
+				<span class="desc">Something has been failing to process a payment for a while.</span>
+			</div>
+		</div>
+	</div>
+</div>
+			</main>
+		</div>
+	</div>
+	</div>
+</section>
+
+<hr class="sep">
+
+<section class="preview-group">
+	<h1>Surface 2 - Dashboard</h1>
+	<p>The main surface after a scan completes. Also what returning merchants land on. Three counters, one "Needs attention" table.</p>
+</section>
+
+<section class="preview-section" id="s2">
+	<div class="preview-label">State: default (mixed)</div>
+	<div class="preview-title">Normal weekday - 3 broken, 3 at-risk</div>
+	<div class="preview-desc">Terracotta for broken, warm amber for at-risk, muted green for healthy. Counters are clickable filters. "Needs attention" table shows the breakdown.</div>
+	<div class="preview-frame">	<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+					<div class="plugin-meta">
+				<span>
+					Last scanned 2 hours ago				</span>
+				<span class="sep">·</span>
+				<button type="button" class="refresh" data-dr-subs-refresh
+				        aria-keyshortcuts="R"
+				        title="Keyboard shortcut: R">
+					<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+					     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+						<path d="M21 3v5h-5" />
+					</svg>
+					Refresh					<kbd class="kbd-hint" aria-hidden="true">R</kbd>
+				</button>
+			</div>
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs"
+			   aria-current="page">
+				Dashboard			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   >
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="dashboard">
+
+		
+		<!-- Counters row -->
+		<div class="counters"
+		     role="group" aria-label="Subscription health counts">
+
+											<button type="button"
+				        class="counter"
+				        data-state="healthy"
+				        data-dr-subs-filter="healthy"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-healthy" aria-hidden="true"></span>
+						<span>Healthy</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">238</span>
+						<span class="hint">no problems</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="risk"
+				        data-dr-subs-filter="risk"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-risk" aria-hidden="true"></span>
+						<span>At risk</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">3</span>
+						<span class="hint">might need attention</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="broken"
+				        data-dr-subs-filter="broken"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-broken" aria-hidden="true"></span>
+						<span>Broken</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">3</span>
+						<span class="hint">needs you now</span>
+					</span>
+				</button>
+					</div>
+
+		
+			<!-- Needs attention table -->
+			<div class="table-region">
+				<div class="table-head">
+					<div class="left">
+						<h2>Needs attention</h2>
+						<span class="meta">
+							showing all broken and at-risk						</span>
+					</div>
+									</div>
+
+				<div class="table-wrap">
+					<table class="ds-table">
+						<thead>
+							<tr>
+								<th style="width: 40px;"><span class="screen-reader-text">Rule indicator</span></th>
+								<th>Customer</th>
+								<th>Subscription</th>
+								<th>Issue</th>
+								<th>Reason</th>
+								<th class="action-cell"><span class="screen-reader-text">Actions</span></th>
+							</tr>
+						</thead>
+						<tbody>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="4812"
+							    data-rule="ghost"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-broken" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Sarah Mendez								</td>
+								<td>
+									<span class="sub-id">#4812</span>
+																			<span class="amount">$29.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-broken">
+										Ghost									</span>
+								</td>
+								<td class="reason" title="Next payment didn&apos;t get rescheduled after the March 15 renewal.">
+									Next payment didn&apos;t get rescheduled after the March 15 renewal.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="4812">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="5104"
+							    data-rule="onhold"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Marcus Abernathy								</td>
+								<td>
+									<span class="sub-id">#5104</span>
+																			<span class="amount">$29.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Stuck on-hold									</span>
+								</td>
+								<td class="reason" title="Charged $29 in Stripe on Apr 8 but subscription stayed on-hold.">
+									Charged $29 in Stripe on Apr 8 but subscription stayed on-hold.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="5104">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="3918"
+							    data-rule="repfail"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Anya Volkova								</td>
+								<td>
+									<span class="sub-id">#3918</span>
+																			<span class="amount">$49.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Repeated fails									</span>
+								</td>
+								<td class="reason" title="4 failed renewal attempts since Mar 22 - looks like a gateway issue.">
+									4 failed renewal attempts since Mar 22 - looks like a gateway issue.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="3918">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="6230"
+							    data-rule="ghost"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-broken" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Jin-ho Park								</td>
+								<td>
+									<span class="sub-id">#6230</span>
+																			<span class="amount">$15.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-broken">
+										Ghost									</span>
+								</td>
+								<td class="reason" title="Renewal event for Apr 19 missing from the scheduler.">
+									Renewal event for Apr 19 missing from the scheduler.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="6230">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="6477"
+							    data-rule="repfail"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Beatrice Owoyemi								</td>
+								<td>
+									<span class="sub-id">#6477</span>
+																			<span class="amount">$79.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Repeated fails									</span>
+								</td>
+								<td class="reason" title="2 failed attempts in the last 36 hours - card may be declining.">
+									2 failed attempts in the last 36 hours - card may be declining.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="6477">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="2201"
+							    data-rule="onhold"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Theo Lindqvist								</td>
+								<td>
+									<span class="sub-id">#2201</span>
+																			<span class="amount">$12.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Stuck on-hold									</span>
+								</td>
+								<td class="reason" title="Last payment succeeded Apr 12, status has been on-hold since.">
+									Last payment succeeded Apr 12, status has been on-hold since.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="2201">
+										Fix									</button>
+								</td>
+							</tr>
+																		</tbody>
+					</table>
+				</div>
+			</div>
+
+			</div>
+</div>
+			</main>
+		</div>
+	</div>
+	</div>
+</section>
+
+<section class="preview-section" id="s2-healthy">
+	<div class="preview-label">State: all healthy</div>
+	<div class="preview-title">Everything looks good</div>
+	<div class="preview-desc">Zero broken, zero at-risk. Quiet confirmation replaces the table. The most calming state the product can produce.</div>
+	<div class="preview-frame">	<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+					<div class="plugin-meta">
+				<span>
+					Last scanned 2 hours ago				</span>
+				<span class="sep">·</span>
+				<button type="button" class="refresh" data-dr-subs-refresh
+				        aria-keyshortcuts="R"
+				        title="Keyboard shortcut: R">
+					<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+					     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+						<path d="M21 3v5h-5" />
+					</svg>
+					Refresh					<kbd class="kbd-hint" aria-hidden="true">R</kbd>
+				</button>
+			</div>
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs"
+			   aria-current="page">
+				Dashboard			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   >
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="dashboard">
+
+		
+		<!-- Counters row -->
+		<div class="counters"
+		     role="group" aria-label="Subscription health counts">
+
+											<button type="button"
+				        class="counter"
+				        data-state="healthy"
+				        data-dr-subs-filter="healthy"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-healthy" aria-hidden="true"></span>
+						<span>Healthy</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">241</span>
+						<span class="hint">no problems</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="risk"
+				        data-dr-subs-filter="risk"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-risk" aria-hidden="true"></span>
+						<span>At risk</span>
+					</span>
+					<span class="counter-n zero">
+						<span class="num tnum">0</span>
+						<span class="hint">might need attention</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="broken"
+				        data-dr-subs-filter="broken"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-broken" aria-hidden="true"></span>
+						<span>Broken</span>
+					</span>
+					<span class="counter-n zero">
+						<span class="num tnum">0</span>
+						<span class="hint">needs you now</span>
+					</span>
+				</button>
+					</div>
+
+		
+			<!-- All-healthy empty state -->
+			<div class="all-clear fade-in">
+				<div class="kicker">
+					<span class="dot dot-healthy" aria-hidden="true"></span>
+					All clear				</div>
+				<h2>Everything looks good.</h2>
+				<p>
+					We&amp;rsquo;ll keep watching. Last checked 2 hours ago.				</p>
+			</div>
+
+			</div>
+</div>
+			</main>
+		</div>
+	</div>
+	</div>
+</section>
+
+<section class="preview-section" id="s2-failed">
+	<div class="preview-label">State: scan failed</div>
+	<div class="preview-title">Inline banner, non-blocking</div>
+	<div class="preview-desc">Scanner crashed or timed out. Calm tone, action available, nothing blocking the rest of the UI. Note: uses background-tint banner (not left-stripe - that pattern was rewritten).</div>
+	<div class="preview-frame">	<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+					<div class="plugin-meta stale">
+				<span>
+					Last scanned 18 hours ago				</span>
+				<span class="sep">·</span>
+				<button type="button" class="refresh" data-dr-subs-refresh
+				        aria-keyshortcuts="R"
+				        title="Keyboard shortcut: R">
+					<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+					     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+						<path d="M21 3v5h-5" />
+					</svg>
+					Refresh now					<kbd class="kbd-hint" aria-hidden="true">R</kbd>
+				</button>
+			</div>
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs"
+			   aria-current="page">
+				Dashboard			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   >
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="dashboard">
+
+					<div class="banner banner-risk fade-in" role="status">
+				<span class="banner-icon" aria-hidden="true">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+					     stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="12" cy="12" r="9" />
+						<path d="M12 8v5" />
+						<circle cx="12" cy="16" r="0.8" fill="currentColor" />
+					</svg>
+				</span>
+				<span class="banner-body">
+					The last scan didn&amp;rsquo;t complete. Nothing was changed.				</span>
+				<button type="button" class="linklike" data-dr-subs-retry-scan>Try again</button>
+				<span class="banner-sep" aria-hidden="true">·</span>
+				<a href="#admin.php?page=wc-status&tab=logs">
+					View logs				</a>
+			</div>
+		
+		<!-- Counters row -->
+		<div class="counters"
+		     role="group" aria-label="Subscription health counts">
+
+											<button type="button"
+				        class="counter"
+				        data-state="healthy"
+				        data-dr-subs-filter="healthy"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-healthy" aria-hidden="true"></span>
+						<span>Healthy</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">238</span>
+						<span class="hint">no problems</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="risk"
+				        data-dr-subs-filter="risk"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-risk" aria-hidden="true"></span>
+						<span>At risk</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">3</span>
+						<span class="hint">might need attention</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="broken"
+				        data-dr-subs-filter="broken"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-broken" aria-hidden="true"></span>
+						<span>Broken</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">3</span>
+						<span class="hint">needs you now</span>
+					</span>
+				</button>
+					</div>
+
+		
+			<!-- Needs attention table -->
+			<div class="table-region">
+				<div class="table-head">
+					<div class="left">
+						<h2>Needs attention</h2>
+						<span class="meta">
+							showing all broken and at-risk						</span>
+					</div>
+									</div>
+
+				<div class="table-wrap">
+					<table class="ds-table">
+						<thead>
+							<tr>
+								<th style="width: 40px;"><span class="screen-reader-text">Rule indicator</span></th>
+								<th>Customer</th>
+								<th>Subscription</th>
+								<th>Issue</th>
+								<th>Reason</th>
+								<th class="action-cell"><span class="screen-reader-text">Actions</span></th>
+							</tr>
+						</thead>
+						<tbody>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="4812"
+							    data-rule="ghost"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-broken" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Sarah Mendez								</td>
+								<td>
+									<span class="sub-id">#4812</span>
+																			<span class="amount">$29.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-broken">
+										Ghost									</span>
+								</td>
+								<td class="reason" title="Next payment didn&apos;t get rescheduled after the March 15 renewal.">
+									Next payment didn&apos;t get rescheduled after the March 15 renewal.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="4812">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="5104"
+							    data-rule="onhold"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Marcus Abernathy								</td>
+								<td>
+									<span class="sub-id">#5104</span>
+																			<span class="amount">$29.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Stuck on-hold									</span>
+								</td>
+								<td class="reason" title="Charged $29 in Stripe on Apr 8 but subscription stayed on-hold.">
+									Charged $29 in Stripe on Apr 8 but subscription stayed on-hold.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="5104">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="3918"
+							    data-rule="repfail"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Anya Volkova								</td>
+								<td>
+									<span class="sub-id">#3918</span>
+																			<span class="amount">$49.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Repeated fails									</span>
+								</td>
+								<td class="reason" title="4 failed renewal attempts since Mar 22 - looks like a gateway issue.">
+									4 failed renewal attempts since Mar 22 - looks like a gateway issue.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="3918">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="6230"
+							    data-rule="ghost"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-broken" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Jin-ho Park								</td>
+								<td>
+									<span class="sub-id">#6230</span>
+																			<span class="amount">$15.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-broken">
+										Ghost									</span>
+								</td>
+								<td class="reason" title="Renewal event for Apr 19 missing from the scheduler.">
+									Renewal event for Apr 19 missing from the scheduler.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="6230">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="6477"
+							    data-rule="repfail"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Beatrice Owoyemi								</td>
+								<td>
+									<span class="sub-id">#6477</span>
+																			<span class="amount">$79.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Repeated fails									</span>
+								</td>
+								<td class="reason" title="2 failed attempts in the last 36 hours - card may be declining.">
+									2 failed attempts in the last 36 hours - card may be declining.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="6477">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="2201"
+							    data-rule="onhold"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Theo Lindqvist								</td>
+								<td>
+									<span class="sub-id">#2201</span>
+																			<span class="amount">$12.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Stuck on-hold									</span>
+								</td>
+								<td class="reason" title="Last payment succeeded Apr 12, status has been on-hold since.">
+									Last payment succeeded Apr 12, status has been on-hold since.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="2201">
+										Fix									</button>
+								</td>
+							</tr>
+																		</tbody>
+					</table>
+				</div>
+			</div>
+
+			</div>
+</div>
+			</main>
+		</div>
+	</div>
+	</div>
+</section>
+
+<hr class="sep">
+
+<section class="preview-group">
+	<h1>Surface 3 - Fix preview modal</h1>
+	<p>The highest-trust moment in the product. Named diff. Two buttons. Never surprising.</p>
+</section>
+
+<section class="preview-section" id="s3">
+	<div class="preview-label">State: default (Ghost sub)</div>
+	<div class="preview-title">Sarah Mendez #4812</div>
+	<div class="preview-desc">Narrative in plain English. Every field that will change is shown side-by-side before commit. Reversibility is explicit.</div>
+	<div class="preview-frame preview-frame--modal">
+			<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+					<div class="plugin-meta">
+				<span>
+					Last scanned 2 hours ago				</span>
+				<span class="sep">·</span>
+				<button type="button" class="refresh" data-dr-subs-refresh
+				        aria-keyshortcuts="R"
+				        title="Keyboard shortcut: R">
+					<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+					     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+						<path d="M21 3v5h-5" />
+					</svg>
+					Refresh					<kbd class="kbd-hint" aria-hidden="true">R</kbd>
+				</button>
+			</div>
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs"
+			   aria-current="page">
+				Dashboard			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   >
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="dashboard">
+
+		
+		<!-- Counters row -->
+		<div class="counters"
+		     role="group" aria-label="Subscription health counts">
+
+											<button type="button"
+				        class="counter"
+				        data-state="healthy"
+				        data-dr-subs-filter="healthy"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-healthy" aria-hidden="true"></span>
+						<span>Healthy</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">238</span>
+						<span class="hint">no problems</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="risk"
+				        data-dr-subs-filter="risk"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-risk" aria-hidden="true"></span>
+						<span>At risk</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">3</span>
+						<span class="hint">might need attention</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="broken"
+				        data-dr-subs-filter="broken"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-broken" aria-hidden="true"></span>
+						<span>Broken</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">3</span>
+						<span class="hint">needs you now</span>
+					</span>
+				</button>
+					</div>
+
+		
+			<!-- Needs attention table -->
+			<div class="table-region">
+				<div class="table-head">
+					<div class="left">
+						<h2>Needs attention</h2>
+						<span class="meta">
+							showing all broken and at-risk						</span>
+					</div>
+									</div>
+
+				<div class="table-wrap">
+					<table class="ds-table">
+						<thead>
+							<tr>
+								<th style="width: 40px;"><span class="screen-reader-text">Rule indicator</span></th>
+								<th>Customer</th>
+								<th>Subscription</th>
+								<th>Issue</th>
+								<th>Reason</th>
+								<th class="action-cell"><span class="screen-reader-text">Actions</span></th>
+							</tr>
+						</thead>
+						<tbody>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="4812"
+							    data-rule="ghost"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-broken" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Sarah Mendez								</td>
+								<td>
+									<span class="sub-id">#4812</span>
+																			<span class="amount">$29.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-broken">
+										Ghost									</span>
+								</td>
+								<td class="reason" title="Next payment didn&apos;t get rescheduled after the March 15 renewal.">
+									Next payment didn&apos;t get rescheduled after the March 15 renewal.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="4812">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="5104"
+							    data-rule="onhold"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Marcus Abernathy								</td>
+								<td>
+									<span class="sub-id">#5104</span>
+																			<span class="amount">$29.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Stuck on-hold									</span>
+								</td>
+								<td class="reason" title="Charged $29 in Stripe on Apr 8 but subscription stayed on-hold.">
+									Charged $29 in Stripe on Apr 8 but subscription stayed on-hold.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="5104">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="3918"
+							    data-rule="repfail"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Anya Volkova								</td>
+								<td>
+									<span class="sub-id">#3918</span>
+																			<span class="amount">$49.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Repeated fails									</span>
+								</td>
+								<td class="reason" title="4 failed renewal attempts since Mar 22 - looks like a gateway issue.">
+									4 failed renewal attempts since Mar 22 - looks like a gateway issue.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="3918">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="6230"
+							    data-rule="ghost"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-broken" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Jin-ho Park								</td>
+								<td>
+									<span class="sub-id">#6230</span>
+																			<span class="amount">$15.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-broken">
+										Ghost									</span>
+								</td>
+								<td class="reason" title="Renewal event for Apr 19 missing from the scheduler.">
+									Renewal event for Apr 19 missing from the scheduler.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="6230">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="6477"
+							    data-rule="repfail"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Beatrice Owoyemi								</td>
+								<td>
+									<span class="sub-id">#6477</span>
+																			<span class="amount">$79.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Repeated fails									</span>
+								</td>
+								<td class="reason" title="2 failed attempts in the last 36 hours - card may be declining.">
+									2 failed attempts in the last 36 hours - card may be declining.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="6477">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="2201"
+							    data-rule="onhold"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Theo Lindqvist								</td>
+								<td>
+									<span class="sub-id">#2201</span>
+																			<span class="amount">$12.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Stuck on-hold									</span>
+								</td>
+								<td class="reason" title="Last payment succeeded Apr 12, status has been on-hold since.">
+									Last payment succeeded Apr 12, status has been on-hold since.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="2201">
+										Fix									</button>
+								</td>
+							</tr>
+																		</tbody>
+					</table>
+				</div>
+			</div>
+
+			</div>
+</div>
+			</main>
+		</div>
+	</div>
+			<div class="ds-root" data-dr-subs-modal-layer>
+<div class="modal-backdrop" data-dr-subs-modal-backdrop tabindex="-1"></div>
+<div class="modal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="dr-subs-modal-title"
+     data-dr-subs-modal
+     data-sub-id="4812">
+
+	<div class="modal-head">
+		<span class="sub-id">#4812</span>
+		<span class="customer" id="dr-subs-modal-title">
+			Sarah Mendez		</span>
+		<span class="rule">
+			<span class="pill pill-broken">
+				Ghost			</span>
+		</span>
+	</div>
+
+	<div class="modal-body">
+		<p class="narrative">
+			Sarah's monthly subscription was supposed to renew on <em>March 15 at 09:00</em>. WordPress didn't schedule the payment event, so nothing was charged. She hasn't been billed for April either.		</p>
+
+		<div class="section-label">What will change</div>
+
+		<div class="diff" role="list">
+							<div class="diff-row" role="listitem">
+					<span class="field">Next payment</span>
+					<span class="before">- (not scheduled)</span>
+					<span class="arrow" aria-hidden="true">→</span>
+					<span class="after emph">
+						Apr 23 · 09:00 UTC											</span>
+				</div>
+							<div class="diff-row" role="listitem">
+					<span class="field">AS event</span>
+					<span class="before">missing</span>
+					<span class="arrow" aria-hidden="true">→</span>
+					<span class="after emph">
+						woocommerce_scheduled_subscription_payment · id 1284921											</span>
+				</div>
+							<div class="diff-row" role="listitem">
+					<span class="field">Sub status</span>
+					<span class="before">active</span>
+					<span class="arrow" aria-hidden="true">→</span>
+					<span class="after">
+						active													<span class="unchanged">(unchanged)</span>
+											</span>
+				</div>
+					</div>
+
+		<p class="revert-note">
+			You can undo this from Fix history at any time.		</p>
+
+			</div>
+
+	<div class="modal-foot">
+		<button type="button" class="btn btn-ghost" data-dr-subs-modal-cancel>
+			Cancel		</button>
+		<button type="button" class="btn btn-primary" data-dr-subs-modal-apply data-sub-id="4812">
+			Fix subscription		</button>
+	</div>
+</div>
+</div><!-- /.ds-root modal layer -->
+	</div>
+</section>
+
+<section class="preview-section" id="s3-exec">
+	<div class="preview-label">State: already-executed warning (Stuck on-hold)</div>
+	<div class="preview-title">Marcus Abernathy #5104 - charge already ran</div>
+	<div class="preview-desc">
+		Resolves the <code>revert-silent-no-op</code> concern flagged in /plan-eng-review. When the plugin detects that the fix's scheduled action has already executed (the payment fired and charged the customer), the modal renders an explicit warning. Reverting this fix can't undo the charge, and now the merchant is told clearly.
+	</div>
+	<div class="preview-frame preview-frame--modal">
+			<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+					<div class="plugin-meta">
+				<span>
+					Last scanned 2 hours ago				</span>
+				<span class="sep">·</span>
+				<button type="button" class="refresh" data-dr-subs-refresh
+				        aria-keyshortcuts="R"
+				        title="Keyboard shortcut: R">
+					<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+					     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+						<path d="M21 3v5h-5" />
+					</svg>
+					Refresh					<kbd class="kbd-hint" aria-hidden="true">R</kbd>
+				</button>
+			</div>
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs"
+			   aria-current="page">
+				Dashboard			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   >
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="dashboard">
+
+		
+		<!-- Counters row -->
+		<div class="counters"
+		     role="group" aria-label="Subscription health counts">
+
+											<button type="button"
+				        class="counter"
+				        data-state="healthy"
+				        data-dr-subs-filter="healthy"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-healthy" aria-hidden="true"></span>
+						<span>Healthy</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">238</span>
+						<span class="hint">no problems</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="risk"
+				        data-dr-subs-filter="risk"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-risk" aria-hidden="true"></span>
+						<span>At risk</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">3</span>
+						<span class="hint">might need attention</span>
+					</span>
+				</button>
+							<div class="divider" aria-hidden="true"></div>				<button type="button"
+				        class="counter"
+				        data-state="broken"
+				        data-dr-subs-filter="broken"
+				        aria-pressed="false">
+					<span class="counter-label">
+						<span class="dot dot-broken" aria-hidden="true"></span>
+						<span>Broken</span>
+					</span>
+					<span class="counter-n">
+						<span class="num tnum">3</span>
+						<span class="hint">needs you now</span>
+					</span>
+				</button>
+					</div>
+
+		
+			<!-- Needs attention table -->
+			<div class="table-region">
+				<div class="table-head">
+					<div class="left">
+						<h2>Needs attention</h2>
+						<span class="meta">
+							showing all broken and at-risk						</span>
+					</div>
+									</div>
+
+				<div class="table-wrap">
+					<table class="ds-table">
+						<thead>
+							<tr>
+								<th style="width: 40px;"><span class="screen-reader-text">Rule indicator</span></th>
+								<th>Customer</th>
+								<th>Subscription</th>
+								<th>Issue</th>
+								<th>Reason</th>
+								<th class="action-cell"><span class="screen-reader-text">Actions</span></th>
+							</tr>
+						</thead>
+						<tbody>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="4812"
+							    data-rule="ghost"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-broken" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Sarah Mendez								</td>
+								<td>
+									<span class="sub-id">#4812</span>
+																			<span class="amount">$29.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-broken">
+										Ghost									</span>
+								</td>
+								<td class="reason" title="Next payment didn&apos;t get rescheduled after the March 15 renewal.">
+									Next payment didn&apos;t get rescheduled after the March 15 renewal.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="4812">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="5104"
+							    data-rule="onhold"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Marcus Abernathy								</td>
+								<td>
+									<span class="sub-id">#5104</span>
+																			<span class="amount">$29.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Stuck on-hold									</span>
+								</td>
+								<td class="reason" title="Charged $29 in Stripe on Apr 8 but subscription stayed on-hold.">
+									Charged $29 in Stripe on Apr 8 but subscription stayed on-hold.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="5104">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="3918"
+							    data-rule="repfail"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Anya Volkova								</td>
+								<td>
+									<span class="sub-id">#3918</span>
+																			<span class="amount">$49.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Repeated fails									</span>
+								</td>
+								<td class="reason" title="4 failed renewal attempts since Mar 22 - looks like a gateway issue.">
+									4 failed renewal attempts since Mar 22 - looks like a gateway issue.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="3918">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="6230"
+							    data-rule="ghost"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-broken" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Jin-ho Park								</td>
+								<td>
+									<span class="sub-id">#6230</span>
+																			<span class="amount">$15.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-broken">
+										Ghost									</span>
+								</td>
+								<td class="reason" title="Renewal event for Apr 19 missing from the scheduler.">
+									Renewal event for Apr 19 missing from the scheduler.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="6230">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="6477"
+							    data-rule="repfail"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Beatrice Owoyemi								</td>
+								<td>
+									<span class="sub-id">#6477</span>
+																			<span class="amount">$79.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Repeated fails									</span>
+								</td>
+								<td class="reason" title="2 failed attempts in the last 36 hours - card may be declining.">
+									2 failed attempts in the last 36 hours - card may be declining.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="6477">
+										Fix									</button>
+								</td>
+							</tr>
+													<tr class="clickable"
+							    data-dr-subs-row
+							    data-sub-id="2201"
+							    data-rule="onhold"
+							    tabindex="0">
+								<td>
+									<span class="dot dot-risk" aria-hidden="true"></span>
+								</td>
+								<td class="customer">
+									Theo Lindqvist								</td>
+								<td>
+									<span class="sub-id">#2201</span>
+																			<span class="amount">$12.00</span>
+																	</td>
+								<td>
+									<span class="pill pill-risk">
+										Stuck on-hold									</span>
+								</td>
+								<td class="reason" title="Last payment succeeded Apr 12, status has been on-hold since.">
+									Last payment succeeded Apr 12, status has been on-hold since.								</td>
+								<td class="action-cell">
+									<button type="button"
+									        class="btn btn-outline btn-sm"
+									        data-dr-subs-fix
+									        data-sub-id="2201">
+										Fix									</button>
+								</td>
+							</tr>
+																		</tbody>
+					</table>
+				</div>
+			</div>
+
+			</div>
+</div>
+			</main>
+		</div>
+	</div>
+			<div class="ds-root" data-dr-subs-modal-layer>
+<div class="modal-backdrop" data-dr-subs-modal-backdrop tabindex="-1"></div>
+<div class="modal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="dr-subs-modal-title"
+     data-dr-subs-modal
+     data-sub-id="5104">
+
+	<div class="modal-head">
+		<span class="sub-id">#5104</span>
+		<span class="customer" id="dr-subs-modal-title">
+			Marcus Abernathy		</span>
+		<span class="rule">
+			<span class="pill pill-broken">
+				Stuck on-hold			</span>
+		</span>
+	</div>
+
+	<div class="modal-body">
+		<p class="narrative">
+			Marcus's last renewal payment went through in Stripe on <em>April 8</em>. He was charged $29. But his subscription status stayed "on hold" instead of switching back to active.		</p>
+
+		<div class="section-label">What will change</div>
+
+		<div class="diff" role="list">
+							<div class="diff-row" role="listitem">
+					<span class="field">Sub status</span>
+					<span class="before">on-hold</span>
+					<span class="arrow" aria-hidden="true">→</span>
+					<span class="after emph">
+						active											</span>
+				</div>
+							<div class="diff-row" role="listitem">
+					<span class="field">Renewal #5105</span>
+					<span class="before">on-hold</span>
+					<span class="arrow" aria-hidden="true">→</span>
+					<span class="after emph">
+						completed											</span>
+				</div>
+							<div class="diff-row" role="listitem">
+					<span class="field">Next payment</span>
+					<span class="before">May 8 · 09:00</span>
+					<span class="arrow" aria-hidden="true">→</span>
+					<span class="after">
+						May 8 · 09:00													<span class="unchanged">(unchanged)</span>
+											</span>
+				</div>
+					</div>
+
+		<p class="revert-note">
+			You can undo this from Fix history at any time.		</p>
+
+					<!--
+				Executed-payment warning. Resolves the revert-silent-no-op UX concern.
+				Shown when the fix we are about to apply OR revert may have had side-effects
+				that already ran (e.g., the re-enqueued AS payment event already fired and
+				charged the customer). Explicit about what revert can and cannot undo.
+			-->
+			<div class="executed-warning" role="note">
+				<span class="icon" aria-hidden="true">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+					     stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="12" cy="12" r="9" />
+						<path d="M12 8v5" />
+						<circle cx="12" cy="16" r="0.8" fill="currentColor" />
+					</svg>
+				</span>
+				<span class="body">
+					<strong>Heads up:</strong>
+					the payment we re-scheduled already went through. Reverting this fix will not refund the customer - it only removes the fix from your history. If a refund is needed, handle it in the WooCommerce order directly.				</span>
+			</div>
+			</div>
+
+	<div class="modal-foot">
+		<button type="button" class="btn btn-ghost" data-dr-subs-modal-cancel>
+			Cancel		</button>
+		<button type="button" class="btn btn-primary" data-dr-subs-modal-apply data-sub-id="5104">
+			Fix subscription		</button>
+	</div>
+</div>
+</div><!-- /.ds-root modal layer -->
+	</div>
+</section>
+
+<hr class="sep">
+
+<section class="preview-group">
+	<h1>Surface 4 - Fix history</h1>
+	<p>Every applied fix lives here. Undoable until retention window closes. Mixes individual + batch fixes + reverted + past-retention.</p>
+</section>
+
+<section class="preview-section" id="s4">
+	<div class="preview-label">State: default (14 fixes)</div>
+	<div class="preview-title">Fix history - mixed entries</div>
+	<div class="preview-desc">Shows individual fixes, a grouped batch fix, a reverted entry, and one past the retention window. Filter tabs at top. Revert button on each.</div>
+	<div class="preview-frame">	<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs"
+			   >
+				Dashboard			</a>
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   aria-current="page">
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="history">
+
+		
+			<div class="history-head">
+				<h1>Fix history</h1>
+				<div class="meta">
+					14 fixes · showing most recent first				</div>
+			</div>
+
+			<div class="history-filters" role="group" aria-label="Filter fixes by rule">
+				<button type="button"
+				        class="filter active"
+				        data-dr-subs-history-filter="all"
+				        aria-pressed="true">
+					All					<span class="count">14</span>
+				</button>
+									<button type="button"
+					        class="filter"
+					        data-dr-subs-history-filter="ghost"
+					        aria-pressed="false">
+						Ghost						<span class="count">8</span>
+					</button>
+									<button type="button"
+					        class="filter"
+					        data-dr-subs-history-filter="onhold"
+					        aria-pressed="false">
+						Stuck on-hold						<span class="count">5</span>
+					</button>
+									<button type="button"
+					        class="filter"
+					        data-dr-subs-history-filter="repfail"
+					        aria-pressed="false">
+						Repeated fails						<span class="count">1</span>
+					</button>
+							</div>
+
+							<div class="entry"
+				     data-dr-subs-entry
+				     data-entry-id="f_001">
+
+					<div class="when">12 minutes ago</div>
+
+					
+						<div>
+							<div class="who">
+								<span class="name">Sarah Mendez</span>
+								<span class="sub">#4812</span>
+							</div>
+							<div class="summary">Rescheduled next payment for Apr 23, 09:00 UTC. AS event id 1284921.</div>
+						</div>
+
+						<div class="rule">
+							<span class="pill pill-broken">Ghost</span>						</div>
+
+					
+					<div class="action">
+													<button type="button" class="btn btn-ghost btn-sm"
+							        data-dr-subs-revert
+							        data-entry-id="f_001">
+								Revert							</button>
+											</div>
+				</div>
+							<div class="entry reverted"
+				     data-dr-subs-entry
+				     data-entry-id="f_002">
+
+					<div class="when">2 hours ago</div>
+
+					
+						<div>
+							<div class="who">
+								<span class="name">Marcus Abernathy</span>
+								<span class="sub">#5104</span>
+							</div>
+							<div class="summary">Flipped on-hold → active after matching renewal charge in Stripe (Apr 8, $29).</div>
+						</div>
+
+						<div class="rule">
+							<span class="pill pill-quiet">Reverted</span>						</div>
+
+					
+					<div class="action">
+													<span class="status">
+								Reverted 1h ago							</span>
+											</div>
+				</div>
+							<div class="entry batch"
+				     data-dr-subs-entry
+				     data-entry-id="f_003">
+
+					<div class="when">Yesterday · 16:40</div>
+
+					
+						<div>
+							<div class="batch-head">
+								Fixed 3 subscriptions in one batch							</div>
+							<div class="batch-meta">
+								<span class="batch-item-id">#6201</span>, <span class="batch-item-id">#6230</span>, <span class="batch-item-id">#6477</span>								· Ghost sub rule applied in batch																	· batch id									<span class="batch-id-value">b_4f21</span>
+															</div>
+						</div>
+
+					
+					<div class="action">
+													<button type="button" class="btn btn-ghost btn-sm"
+							        data-dr-subs-revert
+							        data-entry-id="f_003">
+								Revert all 3							</button>
+											</div>
+				</div>
+							<div class="entry"
+				     data-dr-subs-entry
+				     data-entry-id="f_004">
+
+					<div class="when">3 days ago</div>
+
+					
+						<div>
+							<div class="who">
+								<span class="name">Anya Volkova</span>
+								<span class="sub">#3918</span>
+							</div>
+							<div class="summary">Retried failed scheduled payment. Gateway accepted the retry, sub is now active.</div>
+						</div>
+
+						<div class="rule">
+							<span class="pill pill-risk">Repeated fails</span>						</div>
+
+					
+					<div class="action">
+													<button type="button" class="btn btn-ghost btn-sm"
+							        data-dr-subs-revert
+							        data-entry-id="f_004">
+								Revert							</button>
+											</div>
+				</div>
+							<div class="entry"
+				     data-dr-subs-entry
+				     data-entry-id="f_005">
+
+					<div class="when">Mar 28 · 11:02</div>
+
+					
+						<div>
+							<div class="who">
+								<span class="name">Jin-ho Park</span>
+								<span class="sub">#6230</span>
+							</div>
+							<div class="summary">Rescheduled next payment for Mar 29. Sub has renewed twice since (unreverted).</div>
+						</div>
+
+						<div class="rule">
+							<span class="pill pill-broken">Ghost</span>						</div>
+
+					
+					<div class="action">
+													<span class="status status--muted">
+								Too old to revert							</span>
+											</div>
+				</div>
+			
+			</div>
+</div>
+			</main>
+		</div>
+	</div>
+	</div>
+</section>
+
+<section class="preview-section" id="s4-empty">
+	<div class="preview-label">State: empty (fresh install)</div>
+	<div class="preview-title">No fixes yet</div>
+	<div class="preview-desc">Honest empty state. No cheer. Tells the merchant what this page is for so they don't wonder.</div>
+	<div class="preview-frame">	<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs"
+			   >
+				Dashboard			</a>
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   aria-current="page">
+				Fix history			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   >
+				Settings			</a>
+			</nav>
+</div>
+
+	<div class="history">
+
+		
+			<div class="history-head">
+				<h1>Fix history</h1>
+			</div>
+
+			<div class="history-empty">
+				<div class="kicker">Nothing here yet</div>
+				<h2>No fixes applied.</h2>
+				<p>
+					When you apply a fix from the dashboard, it&amp;rsquo;ll show up here so you can undo it. Fixes stay revertible for 180 days by default - change that in Settings.				</p>
+			</div>
+
+			</div>
+</div>
+			</main>
+		</div>
+	</div>
+	</div>
+</section>
+
+<hr class="sep">
+
+<section class="preview-group">
+	<h1>Surface 5 - Settings</h1>
+	<p>Three groups: Alerts, Retention, Telemetry. Unsaved-changes guard in JS. Telemetry off by default, explicit about what's sent.</p>
+</section>
+
+<section class="preview-section" id="s5">
+	<div class="preview-label">State: default</div>
+	<div class="preview-title">Settings - default values</div>
+	<div class="preview-desc">Alerts ON, retention 180 days, telemetry OFF. Each section explains what it does in plain language. Toggle state reflects in the visible label.</div>
+	<div class="preview-frame">	<div class="wp-shell">
+		<div class="wp-topbar">
+			<span class="wp-topbar-site">mercato · admin</span>
+			<span class="wp-topbar-dim">plugins</span>
+			<span class="wp-topbar-dim">updates (2)</span>
+			<span class="wp-topbar-spacer"></span>
+			<span class="wp-topbar-dim">howdy, rita</span>
+		</div>
+		<div class="wp-shell-body">
+			<aside class="wp-sidebar">
+				<div class="wp-sidebar-label">Admin</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▤</span>
+						<span>Overview</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▢</span>
+						<span>Orders</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">▧</span>
+						<span>Products</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◎</span>
+						<span>Customers</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">∞</span>
+						<span>Subscriptions</span>
+					</div>
+									<div class="wp-sidebar-item active">
+						<span class="wp-sidebar-icon">✚</span>
+						<span>Doctor Subs</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">◨</span>
+						<span>Analytics</span>
+					</div>
+									<div class="wp-sidebar-item">
+						<span class="wp-sidebar-icon">⚙</span>
+						<span>Settings</span>
+					</div>
+							</aside>
+			<main class="wp-main">
+				<div class="ds-root">
+	<div class="plugin-header">
+	<div class="plugin-header-inner">
+		<div class="plugin-brand">
+			<svg width="26" height="26"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" class="ds-mark">
+	<circle cx="12" cy="12" r="9.5" />
+	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
+</svg>
+			<div>
+				<div class="name">Doctor Subs</div>
+				<div class="tagline">Find and fix broken WooCommerce subscriptions.</div>
+			</div>
+		</div>
+
+			</div>
+
+	<nav class="tabs" aria-label="Doctor Subs sections">
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs"
+			   >
+				Dashboard			</a>
+					<a class="tab"
+			   href="#admin.php?page=doctor-subs&tab=history"
+			   >
+				Fix history			</a>
+					<a class="tab active"
+			   href="#admin.php?page=doctor-subs&tab=settings"
+			   aria-current="page">
+				Settings			</a>
+			</nav>
+</div>
+
+	<form method="post" class="settings" data-dr-subs-settings>
+		<input type="hidden" name="dr_subs_settings_nonce" value="NONCE_STUB">
+		<h1>Settings</h1>
+
+		<!-- Group 1 - Alerts -->
+		<div class="settings-group">
+			<h2>Alerts</h2>
+			<div class="blurb">
+				When something breaks between scans, we&amp;rsquo;ll email you a daily digest. Off by default.			</div>
+
+			<div class="field">
+				<label class="label" for="dr-subs-alerts-enabled">
+					Email alerts				</label>
+				<div>
+					<label class="toggle">
+						<input type="checkbox"
+						       name="alerts_enabled"
+						       id="dr-subs-alerts-enabled"
+						       value="1"
+						        checked						       aria-describedby="dr-subs-alerts-helper">
+						<span class="track" aria-hidden="true"></span>
+						<span class="toggle-state" data-on-label="On" data-off-label="Off">
+							On						</span>
+					</label>
+					<div class="helper" id="dr-subs-alerts-helper">
+						When new broken subscriptions appear, you&amp;rsquo;ll get a daily summary email.					</div>
+				</div>
+			</div>
+
+			<div class="field">
+				<label class="label" for="dr-subs-alert-email">
+					Send to				</label>
+				<div>
+					<input type="email"
+					       name="alert_email"
+					       id="dr-subs-alert-email"
+					       value="david@mercato.shop"
+					       aria-describedby="dr-subs-alert-email-helper"
+					       autocomplete="email">
+					<div class="helper" id="dr-subs-alert-email-helper">
+						Defaults to your WordPress admin email.					</div>
+									</div>
+			</div>
+		</div>
+
+		<!-- Group 2 - Retention -->
+		<div class="settings-group">
+			<h2>Fix history retention</h2>
+			<div class="blurb">
+				Older entries get pruned automatically. Recent entries stay revertible.			</div>
+
+			<div class="field">
+				<div class="label-with-help">
+					<label class="label" for="dr-subs-retention">
+						Keep fixes for					</label>
+					<span class="help-btn-wrap">
+						<button type="button" class="help-btn" aria-label="More about retention">?</button>
+						<span class="help-popover" role="tooltip">
+							Fixes older than this stay in your history for reference, but the Revert button is removed. They are not deleted from the database unless you prune manually.						</span>
+					</span>
+				</div>
+				<div>
+					<select name="journal_retention_days" id="dr-subs-retention" aria-describedby="dr-subs-retention-helper">
+													<option value="30"
+							        >
+								30 days							</option>
+													<option value="90"
+							        >
+								90 days							</option>
+													<option value="180"
+							         selected>
+								180 days							</option>
+													<option value="365"
+							        >
+								365 days							</option>
+													<option value="-1"
+							        >
+								Forever							</option>
+											</select>
+					<div class="helper" id="dr-subs-retention-helper">
+						Older fixes stay in your history but can&amp;rsquo;t be reverted anymore.					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Group 3 - Telemetry -->
+		<div class="settings-group">
+			<h2>Help us improve</h2>
+			<div class="blurb">
+				Anonymous telemetry helps us know which fixes are actually used. We only send the rule name and a timestamp when a fix is applied. Nothing else - no customer data, no subscription details, no identifying information.			</div>
+
+			<div class="field">
+				<div class="label-with-help">
+					<label class="label" for="dr-subs-telemetry">
+						Send anonymous fix stats					</label>
+					<span class="help-btn-wrap">
+						<button type="button" class="help-btn" aria-label="What exactly gets sent">?</button>
+						<span class="help-popover" role="tooltip">
+							Three fields only: (1) the rule name (e.g. ghost_sub), (2) an anonymous install hash, (3) a timestamp. We never see your store URL, customer data, subscription details, or store name.						</span>
+					</span>
+				</div>
+				<div>
+					<label class="toggle">
+						<input type="checkbox"
+						       name="telemetry_enabled"
+						       id="dr-subs-telemetry"
+						       value="1"
+						       						       aria-describedby="dr-subs-telemetry-helper">
+						<span class="track" aria-hidden="true"></span>
+						<span class="toggle-state" data-on-label="On" data-off-label="Off">
+							Off						</span>
+					</label>
+					<div class="helper" id="dr-subs-telemetry-helper">
+						Off by default. Turn it on if you want to help us build the plugin better.					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="settings-foot">
+			<button type="submit" class="btn btn-primary">
+				Save changes			</button>
+			<button type="reset" class="btn btn-ghost">
+				Discard			</button>
+							<span class="status">
+					Last saved 3 days ago.				</span>
+					</div>
+	</form>
+</div>
+			</main>
+		</div>
+	</div>
+	</div>
+</section>
+
+</body>
+</html>

@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Security {
+class DR_Subs_Security {
 
 	/**
 	 * Verify nonce for AJAX requests.
@@ -97,7 +97,7 @@ class WCST_Security {
 	 */
 	public static function check_rate_limit( $action, $limit = 10, $time_window = 60 ) {
 		$user_id   = get_current_user_id();
-		$cache_key = "wcst_rate_limit_{$action}_{$user_id}";
+		$cache_key = "dr_subs_rate_limit_{$action}_{$user_id}";
 
 		$current_count = get_transient( $cache_key );
 

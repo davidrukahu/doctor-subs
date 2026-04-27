@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WCST_Subscription_Anatomy {
+class DR_Subs_Subscription_Anatomy {
 
 	/**
 	 * Safely format a date that might be a DateTime object or string (HPOS compatibility).

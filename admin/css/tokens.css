@@ -1,0 +1,433 @@
+/* Doctor Subs - Design Tokens (v2)
+   Aesthetic: Calm · Clinical · Confident
+   Accent: deep desaturated teal. Neutrals tinted cool/green.
+   Type: Switzer (body grotesque), Source Serif 4 (hero moment),
+         JetBrains Mono (numerics + sub IDs).
+   All fonts self-hosted per WP.org plugin directory rules.
+   Font files live at: admin/fonts/*.woff2
+*/
+
+/* ===========================================================
+   Self-hosted fonts - WP.org compliant (no external fetches)
+   =========================================================== */
+
+/* Switzer - body grotesque, 3 weights */
+@font-face {
+  font-family: 'Switzer';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/switzer-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Switzer';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/switzer-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Switzer';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/switzer-600.woff2') format('woff2');
+}
+
+/* Source Serif 4 - display moment, regular + italic, latin + latin-ext subsets.
+   Replaces Instrument Serif (too contrasty / editorial-romantic for a clinical tool). */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/source-serif-4-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/source-serif-4-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/source-serif-4-400-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/source-serif-4-400-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* JetBrains Mono - numerics + sub IDs. Variable font, same file for 400/500. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('../fonts/jetbrains-mono-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('../fonts/jetbrains-mono-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ===========================================================
+   Design tokens (scoped to .ds-root so they can't leak into WP admin)
+   =========================================================== */
+
+.ds-root {
+  /* ---- Neutrals (tinted toward accent, oklch) ---- */
+  --bg-0: oklch(99% 0.004 200);
+  --bg-1: oklch(97.8% 0.006 200);
+  --bg-2: oklch(95.5% 0.008 200);
+  --bg-3: oklch(93% 0.01 200);
+
+  --ink-0: oklch(18% 0.015 210);
+  --ink-1: oklch(38% 0.012 210);
+  --ink-2: oklch(55% 0.01 210);
+  --ink-3: oklch(72% 0.008 210);
+
+  --line-0: oklch(92% 0.008 200);
+  --line-1: oklch(87% 0.01 200);
+
+  /* Overlays + special inks */
+  --bg-overlay: oklch(18% 0.015 210 / 0.42); /* modal backdrop, drawer dim */
+  --ink-strike: oklch(55% 0.01 210 / 0.6);   /* diff before-value strikethrough */
+
+  /* ---- Accent ---- */
+  --accent: oklch(48% 0.06 195);
+  --accent-hover: oklch(42% 0.065 195);
+  --accent-weak: oklch(94% 0.02 195);
+  --accent-ink: oklch(28% 0.05 195);
+  --accent-line: oklch(85% 0.02 195);
+
+  /* ---- States ---- */
+  --healthy: oklch(55% 0.07 160);
+  --healthy-weak: oklch(95% 0.02 160);
+  --healthy-ink: oklch(32% 0.06 160);
+  --healthy-line: oklch(88% 0.03 160);
+
+  --risk: oklch(65% 0.09 75);
+  --risk-weak: oklch(95.5% 0.025 75);
+  --risk-ink: oklch(38% 0.08 75);
+  --risk-line: oklch(88% 0.04 75);
+
+  --broken: oklch(55% 0.09 25);
+  --broken-weak: oklch(95% 0.022 25);
+  --broken-ink: oklch(36% 0.08 25);
+  --broken-line: oklch(88% 0.04 25);
+
+  /* ---- Type ---- */
+  --font-body: 'Switzer', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Source Serif 4', ui-serif, Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* ---- Scale ---- */
+  --t-xs: 12px;
+  --t-sm: 13.5px;
+  --t-md: 15px;
+  --t-lg: 18px;
+  --t-xl: 23px;
+  --t-2xl: 30px;
+  --t-3xl: 44px;
+  --t-hero: 56px;
+
+  /* ---- Radius ---- */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 10px;
+
+  /* ---- Shadow ---- */
+  --sh-1: 0 1px 0 oklch(18% 0.015 210 / 0.04), 0 1px 2px oklch(18% 0.015 210 / 0.04);
+  --sh-2: 0 2px 8px oklch(18% 0.015 210 / 0.06), 0 8px 28px oklch(18% 0.015 210 / 0.05);
+  --sh-modal: 0 2px 8px oklch(18% 0.015 210 / 0.08), 0 20px 56px oklch(18% 0.015 210 / 0.18);
+
+  /* ---- Motion (exponential ease-out, reduced-motion respected below) ---- */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-fast: 140ms;
+  --t-med: 220ms;
+  --t-slow: 400ms;
+}
+
+/* ===========================================================
+   Base
+   =========================================================== */
+
+.ds-root {
+  font-family: var(--font-body);
+  color: var(--ink-0);
+  background: var(--bg-0);
+  font-size: var(--t-md);
+  line-height: 1.5;
+  font-feature-settings: "ss01", "ss02", "cv11";
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+.ds-root *, .ds-root *::before, .ds-root *::after { box-sizing: border-box; }
+.ds-root .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.ds-root .tnum { font-variant-numeric: tabular-nums; }
+.ds-root .display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.015em; }
+.ds-root .ital { font-style: italic; }
+
+.ds-root h1, .ds-root h2, .ds-root h3 { margin: 0; font-weight: 500; }
+.ds-root p { margin: 0; }
+.ds-root a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; text-decoration-color: var(--ink-3); }
+.ds-root a:hover { text-decoration-color: var(--ink-0); }
+.ds-root button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+/* ===========================================================
+   Focus - visible, distinct from hover, WCAG 2.1 AA
+   =========================================================== */
+
+.ds-root :focus { outline: none; }
+.ds-root :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+.ds-root .btn:focus-visible,
+.ds-root .toggle:focus-within,
+.ds-root input:focus-visible,
+.ds-root select:focus-visible,
+.ds-root textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ===========================================================
+   Primitives
+   =========================================================== */
+
+.ds-root .hairline { height: 1px; background: var(--line-0); width: 100%; }
+
+.ds-root .btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--r-md);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  letter-spacing: -0.003em;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  cursor: pointer;
+  border: 1px solid transparent;
+  min-height: 36px;
+  white-space: nowrap;
+}
+.ds-root .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ds-root .btn-primary { background: var(--accent); color: oklch(99% 0.004 200); }
+.ds-root .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+.ds-root .btn-ghost { background: transparent; color: var(--ink-1); border-color: var(--line-1); }
+.ds-root .btn-ghost:hover { background: var(--bg-2); color: var(--ink-0); }
+.ds-root .btn-outline { background: transparent; color: var(--accent-ink); border-color: var(--accent-line); }
+.ds-root .btn-outline:hover { background: var(--accent-weak); border-color: oklch(78% 0.03 195); }
+.ds-root .btn-sm { padding: 6px 12px; min-height: 28px; font-size: 12.5px; }
+.ds-root .btn-danger { background: var(--broken); color: oklch(99% 0.004 25); border-color: var(--broken); }
+.ds-root .btn-danger:hover:not(:disabled) { background: oklch(48% 0.1 25); border-color: oklch(48% 0.1 25); }
+
+.ds-root .pill {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.ds-root .pill-healthy { background: var(--healthy-weak); color: var(--healthy-ink); border-color: var(--healthy-line); }
+.ds-root .pill-risk { background: var(--risk-weak); color: var(--risk-ink); border-color: var(--risk-line); }
+.ds-root .pill-broken { background: var(--broken-weak); color: var(--broken-ink); border-color: var(--broken-line); }
+.ds-root .pill-quiet { background: var(--bg-2); color: var(--ink-1); border-color: var(--line-0); }
+
+.ds-root .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ds-root .dot-healthy { background: var(--healthy); }
+.ds-root .dot-risk { background: var(--risk); }
+.ds-root .dot-broken { background: var(--broken); }
+
+/* ===========================================================
+   Table
+   =========================================================== */
+
+.ds-root table.ds-table { width: 100%; border-collapse: collapse; font-size: var(--t-sm); }
+.ds-root table.ds-table th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line-0);
+}
+.ds-root table.ds-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--line-0);
+  vertical-align: middle;
+  color: var(--ink-0);
+}
+.ds-root table.ds-table tr:last-child td { border-bottom: 0; }
+.ds-root table.ds-table tr.clickable { cursor: pointer; transition: background 120ms var(--ease); }
+.ds-root table.ds-table tr.clickable:hover { background: var(--bg-1); }
+.ds-root table.ds-table tr.clickable:focus-within { background: var(--bg-1); }
+
+/* ===========================================================
+   Banner (replaces the border-left stripe pattern)
+   Background tint + leading icon; no left stripe.
+   =========================================================== */
+
+.ds-root .banner {
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  border-radius: var(--r-md);
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid transparent;
+}
+.ds-root .banner-risk {
+  background: var(--risk-weak);
+  color: var(--risk-ink);
+  border-color: var(--risk-line);
+}
+.ds-root .banner-broken {
+  background: var(--broken-weak);
+  color: var(--broken-ink);
+  border-color: var(--broken-line);
+}
+.ds-root .banner-healthy {
+  background: var(--healthy-weak);
+  color: var(--healthy-ink);
+  border-color: var(--healthy-line);
+}
+.ds-root .banner .banner-icon {
+  flex: 0 0 auto;
+  width: 16px; height: 16px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.ds-root .banner .banner-body { flex: 1; }
+.ds-root .banner .banner-sep { color: oklch(75% 0.04 75); }
+.ds-root .banner a { color: inherit; font-weight: 500; text-decoration-color: currentColor; text-decoration-thickness: 1px; }
+
+/* ===========================================================
+   State transitions (apply/revert/success)
+   =========================================================== */
+
+.ds-root .fade-in {
+  animation: ds-fade-in var(--t-med) var(--ease) both;
+}
+.ds-root .fade-out {
+  animation: ds-fade-out var(--t-med) var(--ease) both;
+}
+.ds-root .row-exit {
+  animation: ds-row-exit var(--t-med) var(--ease) both;
+}
+.ds-root .skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-1) 0%,
+    var(--bg-2) 50%,
+    var(--bg-1) 100%
+  );
+  background-size: 200% 100%;
+  animation: ds-skeleton 1.4s linear infinite;
+  border-radius: var(--r-sm);
+}
+
+@keyframes ds-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ds-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes ds-row-exit {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(12px); }
+}
+@keyframes ds-skeleton {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ===========================================================
+   Utilities
+   =========================================================== */
+
+/* Screen-reader-only content. Self-contained (does not rely on
+   WordPress admin's global .screen-reader-text being available
+   when our stylesheet is loaded). */
+.ds-root .screen-reader-text {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  word-wrap: normal !important;
+}
+.ds-root .screen-reader-text:focus {
+  background-color: var(--bg-0);
+  clip: auto !important;
+  clip-path: none;
+  color: var(--ink-0);
+  display: block;
+  font-size: 14px;
+  height: auto;
+  left: 5px;
+  line-height: normal;
+  padding: 15px 23px 14px;
+  text-decoration: none;
+  top: 5px;
+  width: auto;
+  z-index: 100000;
+}
+
+/* ===========================================================
+   Brand mark
+   =========================================================== */
+
+.ds-root .ds-mark {
+  color: var(--accent-ink);
+  transform-origin: center center;
+  animation: ds-mark-breath 2.8s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes ds-mark-breath {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+
+/* ===========================================================
+   Reduced motion
+   =========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-root *,
+  .ds-root *::before,
+  .ds-root *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

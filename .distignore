@@ -1,0 +1,44 @@
+# Patterns excluded from the WP.org SVN trunk by 10up/action-wordpress-plugin-deploy.
+# Mirrors scripts/build-zip.sh + .github/workflows/release.yml exclusion lists.
+
+/.git
+/.github
+/.claude
+/.taskmaster
+/.cursor
+/.gstack
+/.impeccable.md
+/.env.example
+/.gitignore
+/.distignore
+/.DS_Store
+
+/branding
+/build
+/composer.json
+/composer.lock
+/design-brief
+/dev
+/node_modules
+/phpcs.xml
+/scripts
+/tests
+/tools
+/wp-org
+
+/TODOS.md
+/v2-STATUS.md
+/_review.md
+/README.md
+
+/vendor
+
+*.zip
+*.tar.gz
+*.log
+
+# Editor / OS noise
+.idea
+.vscode
+*.swp
+*~
