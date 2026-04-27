@@ -102,3 +102,5 @@ dev-debug.log
 # tasks.json
 # tasks/ 
 .claude/
+.gstack/
+wp-org/

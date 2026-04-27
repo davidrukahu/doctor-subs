@@ -179,7 +179,7 @@ class DR_Subs_Skipped_Cycle_Detector {
 						'severity'            => 'warning',
 						'description'         => sprintf(
 							/* translators: 1: expected payment date, 2: actual next payment date */
-							__( 'Payment cycle skipped — expected payment around %1$s, next payment was %2$s', 'doctor-subs' ),
+							__( 'Payment cycle skipped - expected payment around %1$s, next payment was %2$s', 'doctor-subs' ),
 							gmdate( 'Y-m-d', $expected_timestamp ),
 							gmdate( 'Y-m-d', $next_payment )
 						),
@@ -221,7 +221,7 @@ class DR_Subs_Skipped_Cycle_Detector {
 						'severity'            => 'warning',
 						'description'         => sprintf(
 							/* translators: 1: expected payment date, 2: current date */
-							__( 'Payment overdue — expected payment around %1$s, now %2$s', 'doctor-subs' ),
+							__( 'Payment overdue - expected payment around %1$s, now %2$s', 'doctor-subs' ),
 							gmdate( 'Y-m-d', $expected_timestamp ),
 							gmdate( 'Y-m-d', $current_time )
 						),

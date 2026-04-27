@@ -54,6 +54,8 @@ rsync -a \
 	--exclude="phpcs.xml" \
 	--exclude="scripts/" \
 	--exclude="tests/" \
+	--exclude="tools/" \
+	--exclude="dev/" \
 	--exclude="TODOS.md" \
 	--exclude="v2-STATUS.md" \
 	--exclude="_review.md" \

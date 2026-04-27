@@ -27,9 +27,17 @@ $rule_counts = isset( $rule_counts ) ? $rule_counts : array();
 $filter      = isset( $filter ) ? $filter : 'all';
 
 $rule_meta = array(
-	'ghost'   => array( 'label' => __( 'Ghost', 'doctor-subs' ),          'pill' => 'pill-broken' ),
-	'onhold'  => array( 'label' => __( 'Stuck on-hold', 'doctor-subs' ),  'pill' => 'pill-broken' ),
-	'repfail' => array( 'label' => __( 'Repeated fails', 'doctor-subs' ), 'pill' => 'pill-risk'   ),
+	// Canonical rule ids written by the journal.
+	'manual_renewal_drift' => array( 'label' => __( 'Manual-renewal drift', 'doctor-subs' ), 'pill' => 'pill-broken' ),
+	'ghost_sub'            => array( 'label' => __( 'Ghost', 'doctor-subs' ),                'pill' => 'pill-broken' ),
+	'mass_hold'            => array( 'label' => __( 'Mass hold', 'doctor-subs' ),            'pill' => 'pill-broken' ),
+	'onhold_paid'          => array( 'label' => __( 'Stuck on-hold', 'doctor-subs' ),        'pill' => 'pill-broken' ),
+	'repeated_failures'    => array( 'label' => __( 'Repeated fails', 'doctor-subs' ),       'pill' => 'pill-risk'   ),
+	'total_drift'          => array( 'label' => __( 'Total drift', 'doctor-subs' ),          'pill' => 'pill-risk'   ),
+	// Legacy short-name fallbacks for any pre-existing journal rows.
+	'ghost'                => array( 'label' => __( 'Ghost', 'doctor-subs' ),                'pill' => 'pill-broken' ),
+	'onhold'               => array( 'label' => __( 'Stuck on-hold', 'doctor-subs' ),        'pill' => 'pill-broken' ),
+	'repfail'              => array( 'label' => __( 'Repeated fails', 'doctor-subs' ),       'pill' => 'pill-risk'   ),
 );
 
 $is_empty = empty( $entries );
@@ -74,39 +82,43 @@ $is_empty = empty( $entries );
 
 			<div class="history-filters" role="group" aria-label="<?php esc_attr_e( 'Filter fixes by rule', 'doctor-subs' ); ?>">
 				<button type="button"
-				        class="filter<?php echo 'all' === $filter ? ' active' : ''; ?>"
-				        data-dr-subs-history-filter="all"
-				        aria-pressed="<?php echo 'all' === $filter ? 'true' : 'false'; ?>">
+						class="filter<?php echo 'all' === $filter ? ' active' : ''; ?>"
+						data-dr-subs-history-filter="all"
+						aria-pressed="<?php echo 'all' === $filter ? 'true' : 'false'; ?>">
 					<?php esc_html_e( 'All', 'doctor-subs' ); ?>
 					<span class="count"><?php echo esc_html( (string) $total_count ); ?></span>
 				</button>
-				<?php foreach ( $rule_meta as $rid => $meta ) :
+				<?php
+				foreach ( $rule_meta as $rid => $meta ) :
 					$count = isset( $rule_counts[ $rid ] ) ? (int) $rule_counts[ $rid ] : 0;
 					if ( 0 === $count ) {
 						continue;
 					}
 					?>
 					<button type="button"
-					        class="filter<?php echo $filter === $rid ? ' active' : ''; ?>"
-					        data-dr-subs-history-filter="<?php echo esc_attr( $rid ); ?>"
-					        aria-pressed="<?php echo $filter === $rid ? 'true' : 'false'; ?>">
+							class="filter<?php echo $filter === $rid ? ' active' : ''; ?>"
+							data-dr-subs-history-filter="<?php echo esc_attr( $rid ); ?>"
+							aria-pressed="<?php echo $filter === $rid ? 'true' : 'false'; ?>">
 						<?php echo esc_html( $meta['label'] ); ?>
 						<span class="count"><?php echo esc_html( (string) $count ); ?></span>
 					</button>
 				<?php endforeach; ?>
 			</div>
 
-			<?php foreach ( $entries as $entry ) :
-				$is_batch          = ! empty( $entry['batch'] );
-				$is_reverted       = ( $entry['status'] ?? '' ) === 'reverted';
-				$past_retention    = ! empty( $entry['past_retention'] );
-				$classes           = array( 'entry' );
-				if ( $is_batch ) { $classes[] = 'batch'; }
-				if ( $is_reverted ) { $classes[] = 'reverted'; }
+			<?php
+			foreach ( $entries as $entry ) :
+				$is_batch       = ! empty( $entry['batch'] );
+				$is_reverted    = ( $entry['status'] ?? '' ) === 'reverted';
+				$past_retention = ! empty( $entry['past_retention'] );
+				$classes        = array( 'entry' );
+				if ( $is_batch ) {
+					$classes[] = 'batch'; }
+				if ( $is_reverted ) {
+					$classes[] = 'reverted'; }
 				?>
 				<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"
-				     data-dr-subs-entry
-				     data-entry-id="<?php echo esc_attr( $entry['id'] ?? '' ); ?>">
+					data-dr-subs-entry
+					data-entry-id="<?php echo esc_attr( $entry['id'] ?? '' ); ?>">
 
 					<div class="when"><?php echo esc_html( $entry['when'] ?? '' ); ?></div>
 
@@ -150,15 +162,30 @@ $is_empty = empty( $entries );
 						<div>
 							<div class="who">
 								<span class="name"><?php echo esc_html( $entry['customer'] ?? '' ); ?></span>
-								<span class="sub">#<?php echo esc_html( (string) ( $entry['sub_id'] ?? '' ) ); ?></span>
+								<?php if ( ! empty( $entry['sub_edit_url'] ) ) : ?>
+									<a class="sub has-ext"
+										href="<?php echo esc_url( $entry['sub_edit_url'] ); ?>"
+										target="_blank" rel="noopener noreferrer"
+										title="<?php esc_attr_e( 'Open subscription in WooCommerce (new tab)', 'doctor-subs' ); ?>">
+										<span class="num">#<?php echo esc_html( (string) ( $entry['sub_id'] ?? '' ) ); ?></span>
+										<svg class="ext-icon" width="9" height="9" viewBox="0 0 12 12" fill="none"
+											stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"
+											aria-hidden="true">
+											<path d="M4.5 7.5 8 4" />
+											<path d="M5 4h3v3" />
+										</svg>
+									</a>
+								<?php else : ?>
+									<span class="sub">#<?php echo esc_html( (string) ( $entry['sub_id'] ?? '' ) ); ?></span>
+								<?php endif; ?>
 							</div>
 							<div class="summary"><?php echo esc_html( $entry['summary'] ?? '' ); ?></div>
 						</div>
 
 						<div class="rule">
 							<?php
-							$rid = $entry['rule'] ?? 'ghost';
-							$rmeta = $rule_meta[ $rid ] ?? $rule_meta['ghost'];
+							$rid   = $entry['rule'] ?? 'ghost_sub';
+							$rmeta = $rule_meta[ $rid ] ?? $rule_meta['ghost_sub'];
 							if ( $is_reverted ) {
 								echo '<span class="pill pill-quiet">' . esc_html__( 'Reverted', 'doctor-subs' ) . '</span>';
 							} else {
@@ -183,8 +210,9 @@ $is_empty = empty( $entries );
 							</span>
 						<?php else : ?>
 							<button type="button" class="btn btn-ghost btn-sm"
-							        data-dr-subs-revert
-							        data-entry-id="<?php echo esc_attr( $entry['id'] ?? '' ); ?>">
+									data-dr-subs-revert
+									data-entry-id="<?php echo esc_attr( $entry['id'] ?? '' ); ?>"
+									data-executed="<?php echo ! empty( $entry['has_executed_side_effect'] ) ? '1' : '0'; ?>">
 								<?php
 								if ( $is_batch ) {
 									printf(

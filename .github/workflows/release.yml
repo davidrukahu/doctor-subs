@@ -88,6 +88,8 @@ jobs:
           phpcs.xml
           scripts/
           tests/
+          tools/
+          dev/
           TODOS.md
           v2-STATUS.md
           _review.md

@@ -88,14 +88,23 @@ class DR_Subs_Rule_Ghost_Sub implements DR_Subs_Rule_Interface {
 				continue;
 			}
 
+			// Manual-renewal subs aren't ghosts - either they're correctly
+			// set to manual (merchant invoices manually, no AS event
+			// expected) or they hit the silent-manual-flag class of bugs
+			// disclosed in April 2026, in which case manual_renewal_drift
+			// is the right rule (with the right fix).
+			if ( method_exists( $sub, 'get_requires_manual_renewal' ) && $sub->get_requires_manual_renewal() ) {
+				continue;
+			}
+
 			$next_payment = $sub->get_date( 'next_payment' );
 			$next_ts      = $next_payment ? (int) strtotime( $next_payment . ' UTC' ) : 0;
 
 			// Two ghost flavours:
-			//   A) next_payment set but in the past (WCS scheduled it then
-			//      dropped the AS event).
-			//   B) next_payment not set at all on an active recurring sub
-			//      (WCS never scheduled it; silent ghost from activation).
+			// A) next_payment set but in the past (WCS scheduled it then
+			// dropped the AS event).
+			// B) next_payment not set at all on an active recurring sub
+			// (WCS never scheduled it; silent ghost from activation).
 			// Both are broken iff there's no pending AS payment event for
 			// this sub. A sub with next_payment in the future is healthy.
 			if ( $next_ts > 0 && $next_ts >= $now ) {
@@ -114,10 +123,10 @@ class DR_Subs_Rule_Ghost_Sub implements DR_Subs_Rule_Interface {
 				$sub_id,
 				$this->bucket(),
 				array(
-					'expected_payment_ts'    => $next_ts,
-					'expected_payment_date'  => $next_payment ?: '',
-					'days_overdue'           => $days_overdue,
-					'next_payment_missing'   => 0 === $next_ts,
+					'expected_payment_ts'     => $next_ts,
+					'expected_payment_date'   => $next_payment ?: '',
+					'days_overdue'            => $days_overdue,
+					'next_payment_missing'    => 0 === $next_ts,
 					'tracked_fields_snapshot' => $this->snapshot_fields( $sub ),
 				)
 			);
@@ -134,7 +143,7 @@ class DR_Subs_Rule_Ghost_Sub implements DR_Subs_Rule_Interface {
 		$diff = array(
 			array(
 				'field'  => __( 'Next payment', 'doctor-subs' ),
-				'before' => __( '— (not scheduled)', 'doctor-subs' ),
+				'before' => __( '- (not scheduled)', 'doctor-subs' ),
 				'after'  => $reschedule_str . ' ' . __( '(UTC)', 'doctor-subs' ),
 				'emph'   => true,
 			),
@@ -193,6 +202,15 @@ class DR_Subs_Rule_Ghost_Sub implements DR_Subs_Rule_Interface {
 			throw new RuntimeException( 'Failed to schedule payment action.' );
 		}
 
+		$sub->add_order_note(
+			sprintf(
+				/* translators: 1: scheduled time (site timezone), 2: Action Scheduler action id */
+				__( 'Doctor Subs: rescheduled missed renewal payment for %1$s (AS action #%2$d).', 'doctor-subs' ),
+				wp_date( 'M j H:i', $reschedule_ts ),
+				(int) $action_id
+			)
+		);
+
 		$side_effects = array(
 			array(
 				'type'          => 'as_action',
@@ -220,6 +238,7 @@ class DR_Subs_Rule_Ghost_Sub implements DR_Subs_Rule_Interface {
 		$side_effects     = is_array( $side_effects ) ? $side_effects : array();
 		$already_executed = false;
 		$messages         = array();
+		$sub              = function_exists( 'wcs_get_subscription' ) ? wcs_get_subscription( (int) $entry->sub_id ) : null;
 
 		foreach ( array_reverse( $side_effects ) as $effect ) {
 			if ( ! is_array( $effect ) || 'as_action' !== ( $effect['type'] ?? '' ) ) {
@@ -267,6 +286,13 @@ class DR_Subs_Rule_Ghost_Sub implements DR_Subs_Rule_Interface {
 			}
 
 			$messages[] = sprintf( 'Unscheduled AS action %d.', $action_id );
+		}
+
+		if ( $sub ) {
+			$note = $already_executed
+				? __( 'Doctor Subs: revert requested but the rescheduled payment had already executed; nothing to unschedule.', 'doctor-subs' )
+				: __( 'Doctor Subs: reverted ghost-sub fix - unscheduled the re-queued payment event.', 'doctor-subs' );
+			$sub->add_order_note( $note );
 		}
 
 		return array(

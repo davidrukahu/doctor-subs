@@ -85,9 +85,16 @@ class DR_Subs_Rules_Registry {
 		self::$bootstrapped = true;
 
 		$core = array(
+			// Manual-renewal-drift runs BEFORE ghost_sub so that subs flipped
+			// to manual by the X-disclosure bugs match here (with the right
+			// fix) instead of getting the ghost-sub fix that doesn't address
+			// root cause.
+			'DR_Subs_Rule_Manual_Renewal_Drift',
 			'DR_Subs_Rule_Ghost_Sub',
 			'DR_Subs_Rule_On_Hold_Paid',
 			'DR_Subs_Rule_Repeated_Failures',
+			'DR_Subs_Rule_Mass_Hold',
+			'DR_Subs_Rule_Total_Drift',
 		);
 
 		foreach ( $core as $cls ) {

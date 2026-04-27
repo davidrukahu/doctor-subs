@@ -51,8 +51,8 @@ class DR_Subs_Narrator {
 				DR_Subs_Logger::error(
 					'Narrator failed for rule ' . $rule->id(),
 					array(
-						'error'   => $t->getMessage(),
-						'sub_id'  => $match->sub_id,
+						'error'  => $t->getMessage(),
+						'sub_id' => $match->sub_id,
 					)
 				);
 			}

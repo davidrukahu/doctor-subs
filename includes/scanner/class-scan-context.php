@@ -156,7 +156,7 @@ class DR_Subs_Scan_Context {
 			$args   = $action->get_args();
 			$sub_id = (int) ( $args[0] ?? 0 );
 			if ( $sub_id > 0 ) {
-				$this->failed_as_ids_by_sub[ $sub_id ][]    = (int) $action_id;
+				$this->failed_as_ids_by_sub[ $sub_id ][] = (int) $action_id;
 				$this->failed_as_count_by_sub[ $sub_id ] = ( $this->failed_as_count_by_sub[ $sub_id ] ?? 0 ) + 1;
 			}
 		}

@@ -68,13 +68,13 @@ if ( $is_scanning && $scan_total > 0 ) {
 				<button type="button" class="btn btn-primary" data-dr-subs-scan>
 					<?php esc_html_e( 'Scan my subscriptions', 'doctor-subs' ); ?>
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-					     stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-					     aria-hidden="true">
+						stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+						aria-hidden="true">
 						<path d="M9 18l6-6-6-6" />
 					</svg>
 				</button>
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=doctor-subs&tab=settings' ) ); ?>"
-				   class="secondary">
+					class="secondary">
 					<em><?php esc_html_e( 'or', 'doctor-subs' ); ?></em>
 					<?php esc_html_e( 'configure settings first', 'doctor-subs' ); ?>
 				</a>
@@ -102,9 +102,9 @@ if ( $is_scanning && $scan_total > 0 ) {
 
 			<div class="scanning-bar">
 				<div class="progress" role="progressbar"
-				     aria-valuenow="<?php echo esc_attr( (int) $pct ); ?>"
-				     aria-valuemin="0" aria-valuemax="100"
-				     aria-label="<?php esc_attr_e( 'Scan progress', 'doctor-subs' ); ?>">
+					aria-valuenow="<?php echo esc_attr( (int) $pct ); ?>"
+					aria-valuemin="0" aria-valuemax="100"
+					aria-label="<?php esc_attr_e( 'Scan progress', 'doctor-subs' ); ?>">
 					<div class="thumb" style="width: <?php echo esc_attr( $pct ); ?>%;"></div>
 				</div>
 				<div class="scanning-meta">

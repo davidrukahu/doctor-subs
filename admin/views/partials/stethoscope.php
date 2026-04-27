@@ -23,9 +23,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 $size = isset( $size ) ? absint( $size ) : 22;
 ?>
 <svg width="<?php echo esc_attr( $size ); ?>" height="<?php echo esc_attr( $size ); ?>"
-     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-     stroke-linecap="round" stroke-linejoin="round"
-     aria-hidden="true" class="ds-mark">
+	viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+	stroke-linecap="round" stroke-linejoin="round"
+	aria-hidden="true" class="ds-mark">
 	<circle cx="12" cy="12" r="9.5" />
 	<path d="M6.5 12 H9 L10.5 8.5 L13 15.5 L14.5 11 L16 12 H17.5" />
 </svg>

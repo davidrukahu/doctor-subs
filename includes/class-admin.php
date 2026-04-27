@@ -113,13 +113,21 @@ class DR_Subs_Admin {
 				'nonce'   => wp_create_nonce( 'dr_subs_admin' ),
 				'strings' => array(
 					'showingAll'     => __( 'showing all broken and at-risk', 'doctor-subs' ),
-					/* translators: 1: count of filtered subs, 2: rule label (e.g. "ghost subs") */
-					'filtering'      => __( 'filtering to %1$d %2$s', 'doctor-subs' ),
+					'filtering'      => array(
+						/* translators: %d: number of broken subs filtered */
+						'broken'  => __( 'filtering to %d broken', 'doctor-subs' ),
+						/* translators: %d: number of at-risk subs filtered */
+						'risk'    => __( 'filtering to %d at-risk', 'doctor-subs' ),
+						/* translators: %d: number of healthy subs filtered */
+						'healthy' => __( 'filtering to %d healthy', 'doctor-subs' ),
+					),
 					'modalLoadError' => __( 'Could not load the fix preview. Try again in a moment.', 'doctor-subs' ),
 					'applying'       => __( 'Applying…', 'doctor-subs' ),
 					'applyError'     => __( 'Something went wrong - nothing was changed.', 'doctor-subs' ),
 					'reverting'      => __( 'Reverting…', 'doctor-subs' ),
 					'confirmRevert'  => __( 'Revert this fix? The subscription will return to its previous state.', 'doctor-subs' ),
+					'confirmRevertExecuted' => __( 'The renewal payment for this fix has already gone through. Reverting will undo the status change but will NOT refund the customer. Continue?', 'doctor-subs' ),
+					'confirmBulkFix' => __( 'Apply the fix to all {n} matching subscriptions? Each can be reverted individually from Fix history.', 'doctor-subs' ),
 					'saving'         => __( 'Saving…', 'doctor-subs' ),
 					'saved'          => __( 'Saved.', 'doctor-subs' ),
 					'saveError'      => __( 'Could not save. Check your connection and try again.', 'doctor-subs' ),
@@ -169,7 +177,7 @@ class DR_Subs_Admin {
 			return $column_content;
 		}
 
-		$doctor_subs_url = admin_url( 'admin.php?page=' . self::PAGE_SLUG );
+		$doctor_subs_url  = admin_url( 'admin.php?page=' . self::PAGE_SLUG );
 		$doctor_subs_link = sprintf(
 			'<span class="doctor-subs"><a href="%s">%s</a></span>',
 			esc_url( $doctor_subs_url ),
@@ -235,12 +243,12 @@ class DR_Subs_Admin {
 			return;
 		}
 
-		$counts        = $this->fetch_health_counts();
-		$filter        = $this->current_filter();
-		$subs          = $this->fetch_attention_rows( $filter );
-		$state         = ( 0 === $counts['broken'] && 0 === $counts['risk'] ) ? 'healthy' : 'mixed';
-		$last_scanned  = $this->relative_last_scanned();
-		$stale         = $this->is_stale();
+		$counts       = $this->fetch_health_counts();
+		$filter       = $this->current_filter();
+		$subs         = $this->fetch_attention_rows( $filter );
+		$state        = ( 0 === $counts['broken'] && 0 === $counts['risk'] ) ? 'healthy' : 'mixed';
+		$last_scanned = $this->relative_last_scanned();
+		$stale        = $this->is_stale();
 
 		$this->load_view( 'dashboard.php', compact( 'state', 'counts', 'subs', 'filter', 'last_scanned', 'stale' ) );
 	}
@@ -270,9 +278,9 @@ class DR_Subs_Admin {
 	 * @return void
 	 */
 	private function render_settings(): void {
-		$defaults  = DR_Subs_Migration::default_settings();
-		$raw       = get_option( 'dr_subs_settings', $defaults );
-		$settings  = is_array( $raw ) ? wp_parse_args( $raw, $defaults ) : $defaults;
+		$defaults = DR_Subs_Migration::default_settings();
+		$raw      = get_option( 'dr_subs_settings', $defaults );
+		$settings = is_array( $raw ) ? wp_parse_args( $raw, $defaults ) : $defaults;
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only query flag.
 		$just_saved  = isset( $_GET['saved'] ) && '1' === $_GET['saved'];
@@ -357,7 +365,7 @@ class DR_Subs_Admin {
 		}
 		$subs = wcs_get_subscriptions(
 			array(
-				'subscription_status' => 'active',
+				'subscription_status'    => 'active',
 				'subscriptions_per_page' => 1,
 			)
 		);
@@ -435,12 +443,14 @@ class DR_Subs_Admin {
 			}
 
 			$subs[] = array(
-				'id'     => (int) $row->sub_id,
-				'name'   => $sub->get_formatted_billing_full_name(),
-				'rule'   => $primary_rule,
-				'reason' => (string) $row->narration,
-				'bucket' => (string) $row->bucket,
-				'amount' => $sub->get_formatted_order_total(),
+				'id'       => (int) $row->sub_id,
+				'name'     => $this->customer_for_sub( (int) $row->sub_id ),
+				'email'    => (string) $sub->get_billing_email(),
+				'rule'     => $primary_rule,
+				'reason'   => (string) $row->narration,
+				'bucket'   => (string) $row->bucket,
+				'amount'   => $sub->get_formatted_order_total(),
+				'edit_url' => method_exists( $sub, 'get_edit_order_url' ) ? $sub->get_edit_order_url() : '',
 			);
 		}
 
@@ -483,15 +493,23 @@ class DR_Subs_Admin {
 			$is_batch    = ! empty( $row->batch_id );
 			$is_reverted = 'reverted' === $row->status;
 
+			$sub_for_url = function_exists( 'wcs_get_subscription' ) ? wcs_get_subscription( (int) $row->sub_id ) : null;
+
 			$entry = array(
 				'id'             => (string) $row->entry_id,
 				'when'           => $this->relative_time( $row->created_at ),
 				'customer'       => $this->customer_for_sub( (int) $row->sub_id ),
 				'sub_id'         => (int) $row->sub_id,
+				'sub_edit_url'   => ( $sub_for_url && method_exists( $sub_for_url, 'get_edit_order_url' ) ) ? $sub_for_url->get_edit_order_url() : '',
 				'rule'           => (string) $row->rule_id,
 				'summary'        => $this->journal_summary( $row ),
 				'status'         => (string) $row->status,
 				'past_retention' => $this->is_past_retention( $row->created_at ),
+				// Flag rows whose side-effect (typically a scheduled AS
+				// payment) may already have executed. The revert UI uses
+				// this to escalate the confirm copy from "are you sure?"
+				// to "this won't refund the customer."
+				'has_executed_side_effect' => $this->journal_has_executed_side_effect( $row ),
 			);
 
 			if ( $is_batch ) {
@@ -611,7 +629,39 @@ class DR_Subs_Admin {
 			return '';
 		}
 		$sub = wcs_get_subscription( $sub_id );
-		return $sub ? $sub->get_formatted_billing_full_name() : '';
+		if ( ! $sub ) {
+			return '';
+		}
+
+		// Fallback chain: billing name -> WP user display_name -> billing
+		// email -> WP user email -> generic placeholder. Test-fixture subs
+		// often have no billing name set, so without this chain the
+		// Customer column renders empty.
+		$name = trim( (string) $sub->get_formatted_billing_full_name() );
+		if ( '' !== $name ) {
+			return $name;
+		}
+
+		$user_id = (int) $sub->get_user_id();
+		if ( $user_id > 0 ) {
+			$user = get_userdata( $user_id );
+			if ( $user ) {
+				if ( ! empty( $user->display_name ) ) {
+					return (string) $user->display_name;
+				}
+				if ( ! empty( $user->user_email ) ) {
+					return (string) $user->user_email;
+				}
+			}
+		}
+
+		$email = (string) $sub->get_billing_email();
+		if ( '' !== $email ) {
+			return $email;
+		}
+
+		/* translators: %d: subscription ID */
+		return sprintf( __( 'Customer #%d', 'doctor-subs' ), $sub_id );
 	}
 
 	/**
@@ -620,10 +670,59 @@ class DR_Subs_Admin {
 	 * @param object $row Journal row.
 	 * @return string
 	 */
+	/**
+	 * Has any AS action recorded on this journal row already executed?
+	 * Used to decide whether the revert UI needs to re-warn the merchant
+	 * that the payment has already run and revert won't refund.
+	 *
+	 * @param object $row Journal row.
+	 * @return bool
+	 */
+	private function journal_has_executed_side_effect( $row ): bool {
+		if ( ! class_exists( 'ActionScheduler_Store' ) ) {
+			return false;
+		}
+		$side_effects = json_decode( (string) $row->side_effects, true );
+		if ( ! is_array( $side_effects ) ) {
+			return false;
+		}
+		foreach ( $side_effects as $effect ) {
+			if ( ! is_array( $effect ) || 'as_action' !== ( $effect['type'] ?? '' ) ) {
+				continue;
+			}
+			$action_id = (int) ( $effect['id'] ?? 0 );
+			if ( $action_id <= 0 ) {
+				continue;
+			}
+			try {
+				$status = ActionScheduler_Store::instance()->get_status( $action_id );
+				if ( ActionScheduler_Store::STATUS_COMPLETE === $status ) {
+					return true;
+				}
+			} catch ( \Throwable $t ) {
+				// Action purged - treat as executed-or-gone (safer to warn).
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private function journal_summary( $row ): string {
+		$rule_id = (string) $row->rule_id;
+
+		// Prefer the catalog's plain-English summary so the history reads
+		// like a story instead of a debug dump. Fall back to a key:value
+		// snapshot of after_state for legacy / unknown rule ids.
+		if ( class_exists( 'DR_Subs_Rule_Catalog' ) ) {
+			$summary = DR_Subs_Rule_Catalog::journal_summary( $rule_id );
+			if ( '' !== $summary ) {
+				return $summary;
+			}
+		}
+
 		$after = json_decode( (string) $row->after_state, true );
 		if ( ! is_array( $after ) || empty( $after ) ) {
-			return (string) $row->rule_id;
+			return $rule_id;
 		}
 		$pairs = array();
 		foreach ( $after as $k => $v ) {
