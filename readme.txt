@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, troubleshooting, diagnostics, payment issues
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -88,6 +88,16 @@ Yes. Implement `DR_Subs_Rule_Interface` and register on the `dr_subs_register_ru
 
 Required. Doctor Subs declares High-Performance Order Storage compatibility and requires WooCommerce 9.0 or higher.
 
+= How is this different from WooCommerce's built-in Subscriptions Health Check tool? =
+
+WooCommerce ships a [Subscriptions Health Check tool](https://woocommerce.com/document/woocommerce-subscriptions-health-check/) that flags two conditions: subs on manual renewal that have a valid saved payment token, and subs with a missing or overdue next-payment date. It surfaces them as a list and points you at the relevant order so you can act manually.
+
+Doctor Subs overlaps on those two patterns (Manual-renewal drift, Ghost subscription) and adds four more the built-in tool doesn't cover: mass on-hold cascade after a product edit, stuck on-hold despite a captured Stripe renewal, repeated payment failures within 30 days, and total drift between the stored total and line items.
+
+It also wraps every detection in a preview-before-apply modal, one-click fixes, a per-entry revert journal, bulk-fix across N matches, state-guarded apply (aborts if the sub changed between detection and apply), and an optional email digest when something new breaks between scans.
+
+Short version: WC's tool is a flagger. Doctor Subs is a flagger plus a reversible repair surface. Running both is fine - they don't conflict.
+
 == Screenshots ==
 
 1. Dashboard: X-of-Y healthy stat, At risk + Broken counters, search, rule chips, and the Needs attention table with the "Fix all" CTA next to the active filter
@@ -97,6 +107,10 @@ Required. Doctor Subs declares High-Performance Order Storage compatibility and 
 5. Detection rules: six rule cards with on/off toggles plus Detects + Fix descriptions for every rule
 
 == Changelog ==
+
+= 2.1.1 =
+
+Docs only. New FAQ entry comparing Doctor Subs to WooCommerce's built-in Subscriptions Health Check tool, with link to the official WooCommerce documentation. No code changes.
 
 = 2.1.0 =
 
@@ -179,6 +193,10 @@ Major rewrite. Single breaking change moment: every PHP class renamed from WCST_
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.1.1 =
+
+Docs-only release. Adds an FAQ comparing Doctor Subs to WooCommerce's new built-in Subscriptions Health Check tool. No code changes.
 
 = 2.1.0 =
 

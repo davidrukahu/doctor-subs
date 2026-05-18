@@ -44,6 +44,28 @@ All fixes are **state-guarded**: if the subscription changed between detection a
 - **Fix history** with per-entry Revert. Configurable retention (30 days - forever).
 - **Per-rule on/off** in Settings.
 
+## How this compares to WooCommerce's built-in health check
+
+WooCommerce shipped a [Subscriptions Health Check tool](https://woocommerce.com/document/woocommerce-subscriptions-health-check/) that flags two conditions: subscriptions on manual renewal despite a valid saved token, and subscriptions with a missing or overdue next-payment date. It surfaces them as a list and points you at the relevant order so you can act manually.
+
+Doctor Subs overlaps on those two patterns (**Manual-renewal drift**, **Ghost subscription**) but goes further:
+
+| | WC built-in health check | Doctor Subs |
+|---|---|---|
+| Manual-renewal drift on token-backed subs | yes | yes (scoped to the April 2026 subscriptions-core regressions) |
+| Missing / overdue next payment | yes | yes (**Ghost subscription**) |
+| Mass on-hold cascade after product edit | — | yes |
+| Stuck on-hold despite captured Stripe renewal | — | yes |
+| Repeated payment failures (2+ in 30 days) | — | yes |
+| Total drift between stored total and line items | — | yes (flag-only) |
+| Preview-before-apply modal | — | yes |
+| One-click fix + per-entry revert journal | — | yes |
+| Bulk fix across N matches | — | yes |
+| State-guard (abort if sub changed mid-flight) | — | yes |
+| Email digest when something new breaks | — | yes |
+
+Short version: WC's tool is a flagger. Doctor Subs is a flagger plus a reversible repair surface, plus four detection patterns the built-in tool doesn't cover. Running both is fine — they don't conflict.
+
 ## Install
 
 ### From WordPress.org
