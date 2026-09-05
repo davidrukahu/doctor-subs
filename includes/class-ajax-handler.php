@@ -525,12 +525,14 @@ class DR_Subs_Ajax_Handler {
 	 * @return string Empty string when absent or malformed.
 	 */
 	private function post_batch_id(): string {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- guard() validated nonce first.
-		$raw = isset( $_POST['batch_id'] ) ? wp_unslash( $_POST['batch_id'] ) : '';
-		if ( ! is_string( $raw ) ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- guard() validated the nonce before any handler runs.
+		if ( ! isset( $_POST['batch_id'] ) ) {
 			return '';
 		}
-		$raw = trim( $raw );
+		$raw = sanitize_text_field( wp_unslash( $_POST['batch_id'] ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		// Whitelist the exact charset wp_generate_password( 32, false, false )
+		// produces, which also rejects anything sanitize_text_field let through.
 		return preg_match( '/^[A-Za-z0-9]{1,40}$/', $raw ) ? $raw : '';
 	}
 

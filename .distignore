@@ -21,6 +21,7 @@
 /dev
 /node_modules
 /phpcs.xml
+/screenshots
 /scripts
 /tests
 /tools
@@ -42,3 +43,6 @@
 .vscode
 *.swp
 *~
+
+# Untracked working notes that must never ship
+/atari-p2-doctor-subs-v2.md
