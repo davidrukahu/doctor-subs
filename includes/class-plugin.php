@@ -115,6 +115,16 @@ class DR_Subs_Plugin {
 	 * `init` callback.
 	 */
 	public function init() {
+		// WordPress 6.7+ finds the bundled languages/ directory on its own via
+		// just-in-time loading, so this is redundant there. It is kept because
+		// the declared floor is 6.4, where JIT only looked in WP_LANG_DIR and
+		// the bundled .mo files would never load.
+		load_plugin_textdomain(
+			'doctor-subs',
+			false,
+			dirname( plugin_basename( DR_SUBS_PLUGIN_FILE ) ) . '/languages'
+		);
+
 		// Pick up new schema (e.g. dr_subs_status_transitions in 2.1.0)
 		// after an in-place upgrade where the activation hook didn't run.
 		if ( class_exists( 'DR_Subs_Migration' ) ) {

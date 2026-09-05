@@ -61,7 +61,7 @@ if ( $is_scanning && $scan_total > 0 ) {
 			</h1>
 
 			<p class="lede">
-				<?php esc_html_e( 'We&rsquo;ll scan your active subscriptions for three common renewal failures. Takes about 30 seconds. Runs entirely on your server - nothing sent anywhere.', 'doctor-subs' ); ?>
+				<?php esc_html_e( 'We&rsquo;ll scan your active subscriptions for the renewal failures listed below. Runs entirely on your server - nothing is sent anywhere.', 'doctor-subs' ); ?>
 			</p>
 
 			<div class="actions">
@@ -143,29 +143,30 @@ if ( $is_scanning && $scan_total > 0 ) {
 
 		<?php endif; ?>
 
-		<div class="detects">
-			<div class="detects-head">
-				<span class="count">03</span>
-				<h2><?php esc_html_e( 'What this detects', 'doctor-subs' ); ?></h2>
-			</div>
+		<?php
+		// Driven off the rule catalog so this list cannot drift out of sync
+		// with the rules that actually ship.
+		$dr_subs_detects = class_exists( 'DR_Subs_Rule_Catalog' ) ? DR_Subs_Rule_Catalog::all() : array();
+		?>
+		<?php if ( ! empty( $dr_subs_detects ) ) : ?>
+			<div class="detects">
+				<div class="detects-head">
+					<span class="count"><?php echo esc_html( str_pad( (string) count( $dr_subs_detects ), 2, '0', STR_PAD_LEFT ) ); ?></span>
+					<h2><?php esc_html_e( 'What this detects', 'doctor-subs' ); ?></h2>
+				</div>
 
-			<div class="detect-row">
-				<span class="n">01</span>
-				<span class="name"><?php esc_html_e( 'Ghost subscriptions', 'doctor-subs' ); ?></span>
-				<span class="desc"><?php esc_html_e( 'Active subscriptions that won&rsquo;t renew because the payment didn&rsquo;t get scheduled.', 'doctor-subs' ); ?></span>
+				<?php
+				$dr_subs_n = 0;
+				foreach ( $dr_subs_detects as $dr_subs_rule ) :
+					++$dr_subs_n;
+					?>
+					<div class="detect-row">
+						<span class="n"><?php echo esc_html( str_pad( (string) $dr_subs_n, 2, '0', STR_PAD_LEFT ) ); ?></span>
+						<span class="name"><?php echo esc_html( $dr_subs_rule['label'] ?? '' ); ?></span>
+						<span class="desc"><?php echo esc_html( $dr_subs_rule['summary'] ?? '' ); ?></span>
+					</div>
+				<?php endforeach; ?>
 			</div>
-
-			<div class="detect-row">
-				<span class="n">02</span>
-				<span class="name"><?php esc_html_e( 'Stuck on-hold', 'doctor-subs' ); ?></span>
-				<span class="desc"><?php esc_html_e( 'Payment went through, but the subscription never switched back to active.', 'doctor-subs' ); ?></span>
-			</div>
-
-			<div class="detect-row">
-				<span class="n">03</span>
-				<span class="name"><?php esc_html_e( 'Repeated payment failures', 'doctor-subs' ); ?></span>
-				<span class="desc"><?php esc_html_e( 'Something has been failing to process a payment for a while.', 'doctor-subs' ); ?></span>
-			</div>
-		</div>
+		<?php endif; ?>
 	</div>
 </div>

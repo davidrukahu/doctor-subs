@@ -2,9 +2,9 @@
 Contributors: davidrukahu
 Tags: woocommerce, subscriptions, troubleshooting, diagnostics, payment issues
 Requires at least: 6.4
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.1
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 

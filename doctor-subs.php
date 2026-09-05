@@ -10,17 +10,17 @@ declare( strict_types=1 );
 /**
  * Plugin Name: Doctor Subs
  * Plugin URI: https://github.com/davidrukahu/doctor-subs
- * Description: Find and fix broken WooCommerce subscriptions. Detects ghost subs, stuck-on-hold renewals, and repeated payment failures, with one-click reversible fixes.
- * Version: 2.1.1
+ * Description: Finds the subscriptions that quietly stopped renewing, and fixes them in bulk with a preview before and an undo after.
+ * Version: 2.2.0
  * Author: DavidR
  * Author URI: https://github.com/davidrukahu
  * Text Domain: doctor-subs
  * Domain Path: /languages
  * Requires at least: 6.4
- * Tested up to: 6.9
+ * Tested up to: 7.1
  * Requires PHP: 7.4
  * WC requires at least: 9.0
- * WC tested up to: 9.9.5
+ * WC tested up to: 10.9
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'DR_SUBS_PLUGIN_FILE', __FILE__ );
 define( 'DR_SUBS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'DR_SUBS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'DR_SUBS_PLUGIN_VERSION', '2.1.1' );
+define( 'DR_SUBS_PLUGIN_VERSION', '2.2.0' );
 define( 'DR_SUBS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
