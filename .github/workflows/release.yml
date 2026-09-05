@@ -93,8 +93,14 @@ jobs:
           TODOS.md
           v2-STATUS.md
           _review.md
+          README.md
+          screenshots/
+          wp-org/
+          atari-p2-doctor-subs-v2.md
           vendor/
           *.zip
+          *.tar.gz
+          *.log
           EOF
           ) . "$BUILD_DIR/"
           cd /tmp/build

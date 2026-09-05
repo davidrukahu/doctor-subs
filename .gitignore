@@ -121,3 +121,7 @@ scripts/
 .env.example
 config/dictionaries/
 phpcs.xml
+
+# Working notes with internal links. Never belongs in a public repo.
+/atari-p2-doctor-subs-v2.md
+/screenshots
