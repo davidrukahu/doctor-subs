@@ -156,16 +156,10 @@ function dr_subs_autoloader( $class_name ) {
 
 	// Define class file mappings.
 	$class_directories = array(
-		// v1 legacy classes (kept during v2 transition for back-compat shims).
+		// Core classes.
 		'plugin'                    => 'includes/',
 		'admin'                     => 'includes/',
 		'ajax-handler'              => 'includes/',
-		'subscription-anatomy'      => 'includes/analyzers/',
-		'expected-behavior'         => 'includes/analyzers/',
-		'timeline-builder'          => 'includes/analyzers/',
-		'discrepancy-detector'      => 'includes/analyzers/',
-		'skipped-cycle-detector'    => 'includes/analyzers/',
-		'subscription-data'         => 'includes/collectors/',
 		'logger'                    => 'includes/utilities/',
 		'security'                  => 'includes/utilities/',
 		// v2 new classes (populated as tasks ship).
