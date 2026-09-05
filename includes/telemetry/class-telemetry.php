@@ -54,6 +54,11 @@ class DR_Subs_Telemetry {
 	const HOSTNAME = 'doctor-subs.plugin';
 
 	/**
+	 * Option holding this install's anonymous identifier.
+	 */
+	const INSTALL_HASH_OPTION = 'dr_subs_install_hash';
+
+	/**
 	 * Register action hooks. Called once from DR_Subs_Plugin::init_hooks.
 	 *
 	 * @return void
@@ -130,6 +135,26 @@ class DR_Subs_Telemetry {
 	 * @param array  $props Custom event properties. rule, applied, etc.
 	 * @return void
 	 */
+	/**
+	 * A stable, anonymous identifier for this install.
+	 *
+	 * Random bytes generated once and stored locally. It is not derived from
+	 * the site URL, the admin email, or anything else that could be reversed
+	 * back to the store: it only lets one install be told apart from another
+	 * so unique-install and retention counts are possible.
+	 *
+	 * @return string 32 hex characters.
+	 */
+	private static function install_hash(): string {
+		$hash = get_option( self::INSTALL_HASH_OPTION, '' );
+		if ( is_string( $hash ) && 32 === strlen( $hash ) && ctype_xdigit( $hash ) ) {
+			return $hash;
+		}
+		$hash = bin2hex( random_bytes( 16 ) );
+		update_option( self::INSTALL_HASH_OPTION, $hash, false );
+		return $hash;
+	}
+
 	private static function send( string $name, array $props = array() ): void {
 		if ( ! self::is_enabled() ) {
 			return;
@@ -148,6 +173,7 @@ class DR_Subs_Telemetry {
 		$data = array_merge(
 			$props,
 			array(
+				'install_hash'   => self::install_hash(),
 				'plugin_version' => defined( 'DR_SUBS_PLUGIN_VERSION' ) ? DR_SUBS_PLUGIN_VERSION : 'unknown',
 				'wp_version'     => get_bloginfo( 'version' ),
 				'php_version'    => PHP_VERSION,
@@ -183,11 +209,13 @@ class DR_Subs_Telemetry {
 				'redirection' => 0,
 				'headers'     => array(
 					'Content-Type' => 'application/json',
-					// Umami drops non-browser User-Agents as bots (returns
-					// {"beep":"boop"}). Use a browser-shaped UA so events
-					// register. We still identify the source via the
-					// custom 'plugin_version' prop in the payload.
-					'User-Agent'   => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+					// Umami's bot filter drops User-Agents that do not look
+					// like a browser, so this is browser-shaped, but it names
+					// the plugin honestly rather than impersonating Chrome.
+					'User-Agent'   => sprintf(
+						'Mozilla/5.0 (compatible; DoctorSubs/%s; +https://wordpress.org/plugins/doctor-subs/)',
+						defined( 'DR_SUBS_PLUGIN_VERSION' ) ? DR_SUBS_PLUGIN_VERSION : '0'
+					),
 				),
 				'body'        => $body,
 			)

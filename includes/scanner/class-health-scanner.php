@@ -187,6 +187,7 @@ class DR_Subs_Health_Scanner {
 
 			$batch_size = defined( 'DR_SUBS_SCAN_BATCH_SIZE' ) ? (int) DR_SUBS_SCAN_BATCH_SIZE : 100;
 			$page       = 1;
+			$offset     = 0;
 
 			// Non-terminal statuses. on-hold needed for onhold_paid +
 			// mass_hold rules; pending-cancel kept so a sub still in its
@@ -194,11 +195,15 @@ class DR_Subs_Health_Scanner {
 			$statuses = array( 'active', 'on-hold', 'pending-cancel' );
 
 			while ( $page <= self::PAGE_CAP ) {
+				// Page with 'offset', not 'paged'. wcs_get_subscriptions()
+				// lists 'paged' among its defaults but only ever forwards
+				// 'limit' and 'offset' to the order query, so a paged loop
+				// silently re-reads the first page until it hits PAGE_CAP.
 				$subs = wcs_get_subscriptions(
 					array(
 						'subscription_status'    => $statuses,
 						'subscriptions_per_page' => $batch_size,
-						'paged'                  => $page,
+						'offset'                 => $offset,
 					)
 				);
 				if ( empty( $subs ) ) {
@@ -247,6 +252,14 @@ class DR_Subs_Health_Scanner {
 				}
 
 				$summary['total_processed'] += count( $subs );
+
+				// A short page means we have reached the end; stop rather than
+				// issuing one more query that returns nothing.
+				if ( count( $subs ) < $batch_size ) {
+					break;
+				}
+
+				$offset += $batch_size;
 				++$page;
 			}
 

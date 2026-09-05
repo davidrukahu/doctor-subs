@@ -125,9 +125,14 @@ class DR_Subs_Admin {
 					'applying'       => __( 'Applying…', 'doctor-subs' ),
 					'applyError'     => __( 'Something went wrong - nothing was changed.', 'doctor-subs' ),
 					'reverting'      => __( 'Reverting…', 'doctor-subs' ),
-					'confirmRevert'  => __( 'Revert this fix? The subscription will return to its previous state.', 'doctor-subs' ),
-					'confirmRevertExecuted' => __( 'The renewal payment for this fix has already gone through. Reverting will undo the status change but will NOT refund the customer. Continue?', 'doctor-subs' ),
-					'confirmBulkFix' => __( 'Apply the fix to all {n} matching subscriptions? Each can be reverted individually from Fix history.', 'doctor-subs' ),
+					'revert'         => __( 'Revert', 'doctor-subs' ),
+					'revertTitle'    => __( 'Revert this fix?', 'doctor-subs' ),
+					'revertBody'     => __( 'The subscription will return to its previous state.', 'doctor-subs' ),
+					'revertExecutedBody' => __( 'The renewal payment for this fix has already gone through. Reverting will undo the status change.', 'doctor-subs' ),
+					'revertNoRefund' => __( 'This will NOT refund the customer. If a refund is needed, handle it in the WooCommerce order directly.', 'doctor-subs' ),
+					'revertBatchTitle' => __( 'Revert this batch?', 'doctor-subs' ),
+					/* translators: %d: number of subscriptions in the batch */
+					'revertBatchBody'  => __( 'All %d subscriptions in this batch will return to their previous state. They are reverted newest first.', 'doctor-subs' ),
 					'saving'         => __( 'Saving…', 'doctor-subs' ),
 					'saved'          => __( 'Saved.', 'doctor-subs' ),
 					'saveError'      => __( 'Could not save. Check your connection and try again.', 'doctor-subs' ),
@@ -340,14 +345,51 @@ class DR_Subs_Admin {
 	}
 
 	/**
-	 * Read, validate, and return the current bucket filter from the URL.
+	 * Canonical rule ids accepted as filter values, plus the legacy short
+	 * names still present on journal rows written before 2.1.0.
 	 *
-	 * @return string 'all' | 'broken' | 'risk' | 'healthy' | 'ghost' | 'onhold' | 'repfail'
+	 * @return string[]
+	 */
+	private function rule_filter_values(): array {
+		return array(
+			// Canonical ids, as written by the rules registry.
+			'manual_renewal_drift',
+			'ghost_sub',
+			'mass_hold',
+			'onhold_paid',
+			'repeated_failures',
+			'total_drift',
+			// Legacy short names, kept so old journal rows stay filterable.
+			'ghost',
+			'onhold',
+			'repfail',
+		);
+	}
+
+	/**
+	 * Map a legacy short rule name to its canonical id, or return it unchanged.
+	 *
+	 * @param string $rule_id Rule id from a journal row or a filter value.
+	 * @return string
+	 */
+	private function canonical_rule_id( string $rule_id ): string {
+		$aliases = array(
+			'ghost'   => 'ghost_sub',
+			'onhold'  => 'onhold_paid',
+			'repfail' => 'repeated_failures',
+		);
+		return $aliases[ $rule_id ] ?? $rule_id;
+	}
+
+	/**
+	 * Read, validate, and return the current bucket or rule filter from the URL.
+	 *
+	 * @return string 'all' | 'broken' | 'risk' | 'healthy' | a canonical rule id | a legacy short name
 	 */
 	private function current_filter(): string {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter switch.
 		$raw   = isset( $_GET['filter'] ) ? sanitize_key( wp_unslash( $_GET['filter'] ) ) : 'all';
-		$valid = array( 'all', 'broken', 'risk', 'healthy', 'ghost', 'onhold', 'repfail' );
+		$valid = array_merge( array( 'all', 'broken', 'risk', 'healthy' ), $this->rule_filter_values() );
 		return in_array( $raw, $valid, true ) ? $raw : 'all';
 	}
 
@@ -478,20 +520,62 @@ class DR_Subs_Admin {
 		);
 		// phpcs:enable
 
+		// Fold legacy short names into their canonical id so the chip counts
+		// match the chips the template renders.
 		$counts_map = array();
 		foreach ( (array) $rule_counts as $rc ) {
-			$counts_map[ $rc->rule_id ] = (int) $rc->n;
+			$key                 = $this->canonical_rule_id( (string) $rc->rule_id );
+			$counts_map[ $key ]  = ( $counts_map[ $key ] ?? 0 ) + (int) $rc->n;
 		}
 
-		$entries = array();
-		$filter  = $this->current_filter();
+		// A bulk fix writes one journal row per subscription, all sharing a
+		// batch_id. Collapse each batch to a single entry so the history shows
+		// "Fixed 42 subscriptions in one batch" once, not 42 identical rows.
+		$batch_meta = array();
 		foreach ( (array) $rows as $row ) {
-			if ( in_array( $filter, array( 'ghost', 'onhold', 'repfail' ), true ) && $row->rule_id !== $filter ) {
+			if ( empty( $row->batch_id ) ) {
+				continue;
+			}
+			$bid = (string) $row->batch_id;
+			if ( ! isset( $batch_meta[ $bid ] ) ) {
+				$batch_meta[ $bid ] = array(
+					'count'        => 0,
+					'sub_ids'      => array(),
+					'all_reverted' => true,
+					'first_row'    => $row->entry_id,
+				);
+			}
+			++$batch_meta[ $bid ]['count'];
+			$batch_meta[ $bid ]['sub_ids'][] = (int) $row->sub_id;
+			if ( 'reverted' !== $row->status ) {
+				$batch_meta[ $bid ]['all_reverted'] = false;
+			}
+		}
+
+		$entries    = array();
+		$filter     = $this->current_filter();
+		$seen_batch = array();
+		foreach ( (array) $rows as $row ) {
+			if ( in_array( $filter, $this->rule_filter_values(), true )
+				&& $this->canonical_rule_id( (string) $row->rule_id ) !== $this->canonical_rule_id( $filter )
+			) {
 				continue;
 			}
 
-			$is_batch    = ! empty( $row->batch_id );
-			$is_reverted = 'reverted' === $row->status;
+			$is_batch = ! empty( $row->batch_id );
+
+			// Emit a batch only on its newest row; skip the rest.
+			if ( $is_batch ) {
+				$bid = (string) $row->batch_id;
+				if ( isset( $seen_batch[ $bid ] ) ) {
+					continue;
+				}
+				$seen_batch[ $bid ] = true;
+			}
+
+			$is_reverted = $is_batch
+				? $batch_meta[ (string) $row->batch_id ]['all_reverted']
+				: 'reverted' === $row->status;
 
 			$sub_for_url = function_exists( 'wcs_get_subscription' ) ? wcs_get_subscription( (int) $row->sub_id ) : null;
 
@@ -513,10 +597,11 @@ class DR_Subs_Admin {
 			);
 
 			if ( $is_batch ) {
+				$meta                 = $batch_meta[ (string) $row->batch_id ];
 				$entry['batch']       = true;
 				$entry['batch_id']    = (string) $row->batch_id;
-				$entry['batch_items'] = array(); // Populated in Phase 5 when batch queries land.
-				$entry['batch_count'] = 1;
+				$entry['batch_items'] = $meta['sub_ids'];
+				$entry['batch_count'] = (int) $meta['count'];
 			}
 
 			if ( $is_reverted ) {

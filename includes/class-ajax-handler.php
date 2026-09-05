@@ -333,7 +333,10 @@ class DR_Subs_Ajax_Handler {
 	 */
 	public function revert_batch(): void {
 		$this->guard();
-		$batch_id = $this->post_string( 'batch_id' );
+		// Batch ids are mixed-case alphanumerics from wp_generate_password(),
+		// so sanitize_key() would lowercase them. Match the generated charset
+		// exactly instead.
+		$batch_id = $this->post_batch_id();
 		if ( '' === $batch_id ) {
 			wp_send_json_error( array( 'message' => __( 'Missing batch_id.', 'doctor-subs' ) ), 400 );
 		}
@@ -510,6 +513,27 @@ class DR_Subs_Ajax_Handler {
 	private function post_string( string $key ): string {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- guard() validated nonce first.
 		return isset( $_POST[ $key ] ) ? sanitize_key( wp_unslash( $_POST[ $key ] ) ) : '';
+	}
+
+	/**
+	 * Read a batch id from POST, preserving case.
+	 *
+	 * generate_batch_id() uses wp_generate_password( 32, false, false ), which
+	 * yields mixed-case alphanumerics. sanitize_key() lowercases, so it cannot
+	 * be used here without corrupting the lookup on case-sensitive collations.
+	 *
+	 * @return string Empty string when absent or malformed.
+	 */
+	private function post_batch_id(): string {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- guard() validated the nonce before any handler runs.
+		if ( ! isset( $_POST['batch_id'] ) ) {
+			return '';
+		}
+		$raw = sanitize_text_field( wp_unslash( $_POST['batch_id'] ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		// Whitelist the exact charset wp_generate_password( 32, false, false )
+		// produces, which also rejects anything sanitize_text_field let through.
+		return preg_match( '/^[A-Za-z0-9]{1,40}$/', $raw ) ? $raw : '';
 	}
 
 	/**

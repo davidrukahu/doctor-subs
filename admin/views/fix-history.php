@@ -118,6 +118,7 @@ $is_empty = empty( $entries );
 				?>
 				<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"
 					data-dr-subs-entry
+					data-rule-id="<?php echo esc_attr( $entry['rule'] ?? '' ); ?>"
 					data-entry-id="<?php echo esc_attr( $entry['id'] ?? '' ); ?>">
 
 					<div class="when"><?php echo esc_html( $entry['when'] ?? '' ); ?></div>
@@ -212,6 +213,10 @@ $is_empty = empty( $entries );
 							<button type="button" class="btn btn-ghost btn-sm"
 									data-dr-subs-revert
 									data-entry-id="<?php echo esc_attr( $entry['id'] ?? '' ); ?>"
+									<?php if ( $is_batch && ! empty( $entry['batch_id'] ) ) : ?>
+										data-batch-id="<?php echo esc_attr( $entry['batch_id'] ); ?>"
+										data-batch-count="<?php echo esc_attr( (string) ( $entry['batch_count'] ?? 0 ) ); ?>"
+									<?php endif; ?>
 									data-executed="<?php echo ! empty( $entry['has_executed_side_effect'] ) ? '1' : '0'; ?>">
 								<?php
 								if ( $is_batch ) {

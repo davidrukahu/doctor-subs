@@ -1,14 +1,15 @@
 === Doctor Subs ===
 Contributors: davidrukahu
-Tags: woocommerce, subscriptions, troubleshooting, diagnostics, payment issues
+Tags: subscription renewals, failed renewals, recurring payments, renewal, woocommerce subscriptions
 Requires at least: 6.4
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.1
+Requires Plugins: woocommerce
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Spot the broken WooCommerce subscriptions you didn't know about, and fix them with one click you can undo.
+Find the subscriptions that quietly stopped renewing. Fix them in bulk, with a preview before and an undo after.
 
 == Description ==
 
@@ -76,9 +77,11 @@ No. Doctor Subs fixes structural issues (missing AS events, stuck-on-hold status
 
 v2.1: Stripe fully supported across all rules that need a gateway signal (stuck on-hold, manual-renewal drift). The remaining rules are gateway-agnostic. PayPal, Authorize.net, Square, and WooPayments variants land in a future release.
 
-= Will it work on stores with 10,000+ subscriptions? =
+= How big a store can it handle? =
 
-Yes. The scanner uses a shared pre-built index so every rule is O(1) per sub (no N+1 queries). The `DR_SUBS_SCAN_BATCH_SIZE` constant lets you tune the batch size in wp-config.php for very large stores.
+It is built and tested for the 20 to 500 active subscription range. The scanner pages through subscriptions rather than loading them all at once, and `DR_SUBS_SCAN_BATCH_SIZE` in wp-config.php lets you lower the batch size on a constrained host.
+
+Above roughly a thousand subscriptions the scan can take long enough to hit a PHP time limit, because it currently runs in one pass rather than resuming across requests. If that happens the scan reports a failure and you can re-run it; nothing is left half-fixed, since fixes are separate and explicit. Making large scans resumable is the next thing being worked on.
 
 = Can I extend it with my own rules? =
 
@@ -100,13 +103,27 @@ Short version: WC's tool is a flagger. Doctor Subs is a flagger plus a reversibl
 
 == Screenshots ==
 
-1. Dashboard: X-of-Y healthy stat, At risk + Broken counters, search, rule chips, and the Needs attention table with the "Fix all" CTA next to the active filter
+1. Dashboard: X-of-Y healthy stat, At risk + Broken counters, search, a filter chip per rule, and the Needs attention table with a plain-English reason and a Fix button on every row
 2. Fix preview modal: plain-English narrative, named diff (before -> after), and the "you can undo this" reassurance line
 3. Fix history: per-rule filter chips along the top, plain-English summary per row, individual Revert buttons
 4. Settings: alerts toggle + email recipient, fix-history retention selector, anonymous telemetry opt-in
 5. Detection rules: six rule cards with on/off toggles plus Detects + Fix descriptions for every rule
 
 == Changelog ==
+
+= 2.2.0 =
+
+Fixes, honesty, and a compatibility pass.
+
+* Fixed: the rule filters on Fix history matched only legacy rule names, so clicking any chip hid every row.
+* Fixed: a bulk fix wrote one history row per subscription and each claimed "Fixed 1 subscription in one batch". Batches now collapse into a single entry with the real count and the subscription IDs, and Revert undoes the whole batch.
+* Fixed: batch IDs were lowercased before lookup, so batch revert could miss on case-sensitive databases.
+* Changed: email alerts are now off by default, which is what the settings screen always said. Existing sites keep whatever they have set.
+* Changed: the telemetry note now lists exactly what is sent, the anonymous install ID it promised is now real, and the request identifies itself as Doctor Subs instead of imitating a browser.
+* Changed: the first-run screen lists every rule that ships, read from the rule catalogue, instead of a hardcoded three.
+* Changed: tested against WordPress 7.1 and WooCommerce 10.9.
+* Fixed: uninstall with the purge constant set now removes every option, the scan lock, and the scheduled jobs, rather than one legacy option.
+* Fixed: the scanner paged with an argument WooCommerce Subscriptions ignores, so every scan re-read the same first page up to 500 times. On a small store a scan now processes 15 subscriptions instead of 7,500, and the counts it reports are the real ones.
 
 = 2.1.1 =
 
@@ -193,6 +210,10 @@ Major rewrite. Single breaking change moment: every PHP class renamed from WCST_
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.2.0 =
+
+Fixes two bugs on the Fix history screen: the rule filters hid every row, and bulk fixes all displayed as "1 subscription". Email alerts are now off by default, matching what the settings screen has always said.
 
 = 2.1.1 =
 
