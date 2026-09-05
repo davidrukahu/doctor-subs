@@ -103,7 +103,7 @@ Short version: WC's tool is a flagger. Doctor Subs is a flagger plus a reversibl
 
 == Screenshots ==
 
-1. Dashboard: X-of-Y healthy stat, At risk + Broken counters, search, rule chips, and the Needs attention table with the "Fix all" CTA next to the active filter
+1. Dashboard: X-of-Y healthy stat, At risk + Broken counters, search, a filter chip per rule, and the Needs attention table with a plain-English reason and a Fix button on every row
 2. Fix preview modal: plain-English narrative, named diff (before -> after), and the "you can undo this" reassurance line
 3. Fix history: per-rule filter chips along the top, plain-English summary per row, individual Revert buttons
 4. Settings: alerts toggle + email recipient, fix-history retention selector, anonymous telemetry opt-in
