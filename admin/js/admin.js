@@ -679,34 +679,44 @@
 		$$( '[data-dr-subs-revert]' ).forEach( function ( btn ) {
 			btn.addEventListener( 'click', function ( e ) {
 				e.preventDefault();
-				var entryId = btn.getAttribute( 'data-entry-id' );
-				if ( ! entryId ) return;
+				var entryId    = btn.getAttribute( 'data-entry-id' );
+				var batchId    = btn.getAttribute( 'data-batch-id' ) || '';
+				var batchCount = parseInt( btn.getAttribute( 'data-batch-count' ) || '0', 10 );
+				if ( ! entryId && ! batchId ) return;
 				var executed = btn.getAttribute( 'data-executed' ) === '1';
+				var isBatch  = !! batchId;
 
 				openConfirmModal( {
-					title: 'Revert this fix?',
-					body: executed
-						? 'The renewal payment for this fix has already gone through. Reverting will undo the status change.'
-						: 'The subscription will return to its previous state.',
+					title: isBatch
+						? ( ajax.strings && ajax.strings.revertBatchTitle ) || 'Revert this batch?'
+						: ( ajax.strings && ajax.strings.revertTitle ) || 'Revert this fix?',
+					body: isBatch
+						? ( ( ajax.strings && ajax.strings.revertBatchBody ) || 'All %d subscriptions in this batch will return to their previous state. They are reverted newest first.' ).replace( '%d', batchCount )
+						: ( executed
+							? ( ajax.strings && ajax.strings.revertExecutedBody ) || 'The renewal payment for this fix has already gone through. Reverting will undo the status change.'
+							: ( ajax.strings && ajax.strings.revertBody ) || 'The subscription will return to its previous state.' ),
 					warning: executed
-						? 'This will NOT refund the customer. If a refund is needed, handle it in the WooCommerce order directly.'
+						? ( ajax.strings && ajax.strings.revertNoRefund ) || 'This will NOT refund the customer. If a refund is needed, handle it in the WooCommerce order directly.'
 						: '',
-					primaryLabel: 'Revert',
+					primaryLabel: ( ajax.strings && ajax.strings.revert ) || 'Revert',
 					dangerous: executed,
 				} ).then( function ( confirmed ) {
 					if ( ! confirmed ) return;
-					doRevert( btn, entryId );
+					doRevert( btn, entryId, batchId );
 				} );
 			} );
 		} );
 	}
 
-	function doRevert( btn, entryId ) {
+	function doRevert( btn, entryId, batchId ) {
 		var originalLabel = btn.textContent;
 		btn.disabled = true;
 		btn.textContent = ( ajax.strings && ajax.strings.reverting ) || 'Reverting…';
 
-		postForm( 'dr_subs_revert_fix', { entry_id: entryId } )
+		var action  = batchId ? 'dr_subs_revert_batch' : 'dr_subs_revert_fix';
+		var payload = batchId ? { batch_id: batchId } : { entry_id: entryId };
+
+		postForm( action, payload )
 			.then( function ( resp ) {
 				var data = {};
 				try { data = JSON.parse( resp ); } catch ( e ) { data = { success: false, message: resp }; }
@@ -732,20 +742,23 @@
 			b.classList.toggle( 'active', isActive );
 			b.setAttribute( 'aria-pressed', isActive ? 'true' : 'false' );
 		} );
+		// Legacy short ids written by journal rows created before 2.1.0.
+		var LEGACY_RULE_ALIASES = {
+			ghost_sub: 'ghost',
+			onhold_paid: 'onhold',
+			repeated_failures: 'repfail'
+		};
+
 		$$( '[data-dr-subs-entry]' ).forEach( function ( row ) {
-			// Rule class on batch entries is trickier; batch entries show on 'all' always.
+			// Batch entries span several rules, so they only show under 'all'.
 			var isBatch = row.classList.contains( 'batch' );
 			if ( filter === 'all' ) {
 				row.style.display = '';
 			} else if ( isBatch ) {
 				row.style.display = 'none';
 			} else {
-				var pill = row.querySelector( '.pill' );
-				var match = false;
-				if ( pill ) {
-					match = pill.classList.contains( 'pill-broken' ) && ( filter === 'ghost' || filter === 'onhold' )
-					     || pill.classList.contains( 'pill-risk' )   &&   filter === 'repfail';
-				}
+				var ruleId = row.getAttribute( 'data-rule-id' ) || '';
+				var match  = ruleId === filter || LEGACY_RULE_ALIASES[ ruleId ] === filter;
 				row.style.display = match ? '' : 'none';
 			}
 		} );

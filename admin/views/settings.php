@@ -163,7 +163,7 @@ $retention_label   = static function ( $days ) {
 					<span class="help-btn-wrap">
 						<button type="button" class="help-btn" aria-label="<?php esc_attr_e( 'What exactly gets sent', 'doctor-subs' ); ?>">?</button>
 						<span class="help-popover" role="tooltip">
-							<?php esc_html_e( 'Three fields only: (1) the rule name (e.g. ghost_sub), (2) an anonymous install hash, (3) a timestamp. We never see your store URL, customer data, subscription details, or store name.', 'doctor-subs' ); ?>
+							<?php esc_html_e( 'Sent only when you apply or revert a fix: the rule name (e.g. ghost_sub), how many subscriptions a bulk fix touched, an anonymous install id made from random bytes, and the Doctor Subs, WordPress and PHP version numbers. We never see your store URL, store name, customer data, or subscription details.', 'doctor-subs' ); ?>
 						</span>
 					</span>
 				</div>

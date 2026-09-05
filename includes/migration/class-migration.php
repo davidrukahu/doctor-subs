@@ -186,7 +186,10 @@ class DR_Subs_Migration {
 	 */
 	public static function default_settings(): array {
 		return array(
-			'alerts_enabled'         => true,
+			// Off by default. The plugin must not send mail the merchant did
+			// not ask for; the Alerts blurb on the settings page says "Off by
+			// default" and this is what makes that true.
+			'alerts_enabled'         => false,
 			'alert_email'            => get_option( 'admin_email', '' ),
 			'journal_retention_days' => 180,
 			'telemetry_enabled'      => false,
