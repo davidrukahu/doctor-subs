@@ -159,15 +159,10 @@ class DR_Subs_Rule_Manual_Renewal_Drift implements DR_Subs_Rule_Interface {
 			throw new RuntimeException( 'State drift: subscription changed since detection. Re-scan and try again.' );
 		}
 
-		// 1. Clear the flag via CRUD (writes to whichever store is canonical).
-		$sub->set_requires_manual_renewal( false );
-		$sub->save();
-
-		// 2. Belt-and-braces: also write postmeta directly. With HPOS the
-		// canonical store is the orders table; backfill to postmeta is
-		// broken in some WC versions (the X-disclosure bug #2). Writing
-		// both ensures any code reading postmeta sees the correct value.
-		update_post_meta( (int) $match->sub_id, '_requires_manual_renewal', 'no' );
+		// 1 and 2. Clear the flag through the CRUD, then mirror it to postmeta
+		// to cover the HPOS backfill gap. Both writes go through one helper so
+		// they can never disagree about how the value is spelled.
+		$this->write_manual_renewal_flag( $sub, false );
 
 		// 3. Re-stamp next_payment if past-due or unset.
 		$old_next     = (string) $sub->get_date( 'next_payment' );
@@ -304,9 +299,7 @@ class DR_Subs_Rule_Manual_Renewal_Drift implements DR_Subs_Rule_Interface {
 				$key  = (string) ( $effect['key'] ?? '' );
 				$from = $effect['from'] ?? '';
 				if ( '_requires_manual_renewal' === $key ) {
-					$sub->set_requires_manual_renewal( 'yes' === $from || true === $from || 1 === (int) $from );
-					$sub->save();
-					update_post_meta( $sub_id, '_requires_manual_renewal', $from );
+					$this->write_manual_renewal_flag( $sub, $this->flag_was_set( $from ) );
 					$messages[] = 'Restored manual-renewal flag.';
 				}
 			}
@@ -392,6 +385,54 @@ class DR_Subs_Rule_Manual_Renewal_Drift implements DR_Subs_Rule_Interface {
 		}
 		$ts = strtotime( $mysql_dt . ' UTC' );
 		return $ts ? wp_date( 'M j H:i', $ts ) . ' ' . __( '(UTC)', 'doctor-subs' ) : $mysql_dt;
+	}
+
+	/**
+	 * Write the manual-renewal flag through the CRUD and mirror it to postmeta.
+	 *
+	 * WooCommerce Subscriptions does not use WooCommerce's usual 'yes'/'no'
+	 * convention for this one property. WC_Subscription::set_requires_manual_
+	 * renewal() treats only the exact string 'false' and the empty string as
+	 * false and, in its own comment, defaults "to require manual renewal for
+	 * all other values". Writing 'no' therefore reads back as TRUE, which
+	 * silently re-broke the subscription this rule had just repaired on any
+	 * store where postmeta is canonical.
+	 *
+	 * The postmeta mirror is still worth doing: under HPOS the orders table is
+	 * canonical and the backfill to postmeta is broken in some WooCommerce
+	 * versions, which is one of the bugs this rule exists to clean up after.
+	 * It just has to be spelled the way Subscriptions spells it.
+	 *
+	 * @param WC_Subscription $sub    Subscription to write to.
+	 * @param bool            $manual Whether manual renewal should be on.
+	 */
+	private function write_manual_renewal_flag( $sub, bool $manual ): void {
+		$sub->set_requires_manual_renewal( $manual );
+		$sub->save();
+
+		update_post_meta(
+			(int) $sub->get_id(),
+			'_requires_manual_renewal',
+			$manual ? 'true' : 'false'
+		);
+	}
+
+	/**
+	 * Read a recorded before-value for the manual-renewal flag as a boolean.
+	 *
+	 * Entries written by earlier versions recorded the flag as 'yes'/'no', so
+	 * both spellings have to be understood on the way back in or an old
+	 * journal entry would revert to the wrong state.
+	 *
+	 * @param mixed $from Recorded value from the side effect.
+	 * @return bool
+	 */
+	private function flag_was_set( $from ): bool {
+		if ( is_bool( $from ) ) {
+			return $from;
+		}
+
+		return in_array( strtolower( trim( (string) $from ) ), array( 'yes', 'true', '1' ), true );
 	}
 
 	/**

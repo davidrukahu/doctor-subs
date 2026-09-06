@@ -21,6 +21,7 @@
 /dev
 /node_modules
 /phpcs.xml
+/phpunit.xml.dist
 /screenshots
 /scripts
 /tests

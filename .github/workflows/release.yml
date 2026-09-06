@@ -86,6 +86,7 @@ jobs:
           design-brief/
           node_modules/
           phpcs.xml
+          phpunit.xml.dist
           scripts/
           tests/
           tools/
