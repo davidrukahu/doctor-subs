@@ -182,6 +182,7 @@ function dr_subs_autoloader( $class_name ) {
 		'alert-dispatcher'          => 'includes/alerts/',
 		'telemetry'                 => 'includes/telemetry/',
 		'status-transition-log'     => 'includes/observers/',
+		'bulk-runner'               => 'includes/bulk/',
 	);
 
 	// Explicit ambiguous-short-name overrides that can't be inferred from

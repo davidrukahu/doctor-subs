@@ -301,6 +301,25 @@ class DR_Subs_Rule_On_Hold_Paid implements DR_Subs_Rule_Interface {
 	// ---------------------------------------------------------------------
 
 	/**
+	 * {@inheritDoc}
+	 *
+	 * This rule's tracked state spans the subscription and its latest renewal
+	 * order, so the order has to be looked up again rather than passed in.
+	 */
+	public function current_state( int $sub_id ): array {
+		$sub = function_exists( 'wcs_get_subscription' ) ? wcs_get_subscription( $sub_id ) : null;
+		if ( ! $sub ) {
+			return array();
+		}
+
+		$context          = new DR_Subs_Scan_Context();
+		$renewal_order_id = $context->latest_renewal_order_for( $sub_id );
+		$renewal_order    = $renewal_order_id ? wc_get_order( $renewal_order_id ) : null;
+
+		return $this->snapshot_fields( $sub, $renewal_order ?: null );
+	}
+
+	/**
 	 * Read the tracked-field snapshot off the live sub + renewal order.
 	 *
 	 * @param WC_Subscription $sub

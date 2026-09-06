@@ -25,6 +25,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DR_Subs_Admin {
 
 	/**
+	 * Rows per page in the Needs attention table.
+	 *
+	 * Was a hard LIMIT 50 with no pagination, so on any store with more than
+	 * fifty broken subscriptions the rest were simply invisible.
+	 */
+	const ROWS_PER_PAGE = 25;
+
+
+	/**
 	 * Admin page slug.
 	 */
 	const PAGE_SLUG = 'doctor-subs';
@@ -133,6 +142,9 @@ class DR_Subs_Admin {
 					'revertBatchTitle' => __( 'Revert this batch?', 'doctor-subs' ),
 					/* translators: %d: number of subscriptions in the batch */
 					'revertBatchBody'  => __( 'All %d subscriptions in this batch will return to their previous state. They are reverted newest first.', 'doctor-subs' ),
+					'bulkStarting'   => __( 'Starting…', 'doctor-subs' ),
+					/* translators: 1: number of subscriptions fixed so far, 2: total in the run */
+					'bulkProgress'   => __( 'Fixed %1$s of %2$s', 'doctor-subs' ),
 					'saving'         => __( 'Saving…', 'doctor-subs' ),
 					'saved'          => __( 'Saved.', 'doctor-subs' ),
 					'saveError'      => __( 'Could not save. Check your connection and try again.', 'doctor-subs' ),
@@ -248,14 +260,22 @@ class DR_Subs_Admin {
 			return;
 		}
 
-		$counts       = $this->fetch_health_counts();
-		$filter       = $this->current_filter();
-		$subs         = $this->fetch_attention_rows( $filter );
+		$counts    = $this->fetch_health_counts();
+		$filter    = $this->current_filter();
+		$page      = $this->current_page();
+		$attention = $this->fetch_attention_rows( $filter, $page );
+
+		$subs         = $attention['rows'];
+		$total_rows   = $attention['total'];
+		$total_pages  = $attention['pages'];
 		$state        = ( 0 === $counts['broken'] && 0 === $counts['risk'] ) ? 'healthy' : 'mixed';
 		$last_scanned = $this->relative_last_scanned();
 		$stale        = $this->is_stale();
 
-		$this->load_view( 'dashboard.php', compact( 'state', 'counts', 'subs', 'filter', 'last_scanned', 'stale' ) );
+		$this->load_view(
+			'dashboard.php',
+			compact( 'state', 'counts', 'subs', 'filter', 'last_scanned', 'stale', 'page', 'total_rows', 'total_pages' )
+		);
 	}
 
 	/**
@@ -382,6 +402,30 @@ class DR_Subs_Admin {
 	}
 
 	/**
+	 * Every spelling of a rule id that may appear in stored rows.
+	 *
+	 * Rows written by older versions carry the legacy short names, so a filter
+	 * on the canonical id has to match both or the older rows disappear.
+	 *
+	 * @param string $canonical Canonical rule id.
+	 * @return array<int, string>
+	 */
+	private function rule_id_aliases( string $canonical ): array {
+		$legacy = array(
+			'ghost_sub'         => 'ghost',
+			'onhold_paid'       => 'onhold',
+			'repeated_failures' => 'repfail',
+		);
+
+		$ids = array( $canonical );
+		if ( isset( $legacy[ $canonical ] ) ) {
+			$ids[] = $legacy[ $canonical ];
+		}
+
+		return $ids;
+	}
+
+	/**
 	 * Read, validate, and return the current bucket or rule filter from the URL.
 	 *
 	 * @return string 'all' | 'broken' | 'risk' | 'healthy' | a canonical rule id | a legacy short name
@@ -391,6 +435,17 @@ class DR_Subs_Admin {
 		$raw   = isset( $_GET['filter'] ) ? sanitize_key( wp_unslash( $_GET['filter'] ) ) : 'all';
 		$valid = array_merge( array( 'all', 'broken', 'risk', 'healthy' ), $this->rule_filter_values() );
 		return in_array( $raw, $valid, true ) ? $raw : 'all';
+	}
+
+	/**
+	 * Current page number for the Needs attention table.
+	 *
+	 * @return int
+	 */
+	private function current_page(): int {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only paging.
+		$raw = isset( $_GET['ds_page'] ) ? absint( wp_unslash( $_GET['ds_page'] ) ) : 1;
+		return max( 1, $raw );
 	}
 
 	/**
@@ -450,38 +505,75 @@ class DR_Subs_Admin {
 	 * @param string $filter Bucket / rule filter from the URL.
 	 * @return array Rows shaped for dashboard.php.
 	 */
-	private function fetch_attention_rows( string $filter = 'all' ): array {
+	private function fetch_attention_rows( string $filter = 'all', int $page = 1, int $per_page = self::ROWS_PER_PAGE ): array {
 		global $wpdb;
 		$table = DR_Subs_Migration::sub_health_table();
 
-		$allowed = array( 'broken', 'risk' );
-		if ( in_array( $filter, array( 'broken', 'risk' ), true ) ) {
-			$allowed = array( $filter );
-		}
-		$placeholders = implode( ',', array_fill( 0, count( $allowed ), '%s' ) );
+		$page     = max( 1, $page );
+		$per_page = max( 1, min( 200, $per_page ) );
+		$offset   = ( $page - 1 ) * $per_page;
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- placeholder count is controlled (one %s per allowed bucket); %i escapes the table identifier. Static analyser can't count the interpolated placeholder string.
+		// Build the WHERE in SQL, including the rule filter. This used to be
+		// a fixed LIMIT 50 with the rule filter applied in PHP afterwards,
+		// which meant a filtered view could show nothing at all while matching
+		// rows sat below the cut, and every count was wrong.
+		$where  = array( 'bucket IN ( %s, %s )' );
+		$params = array( 'broken', 'risk' );
+
+		if ( in_array( $filter, array( 'broken', 'risk' ), true ) ) {
+			$where  = array( 'bucket = %s' );
+			$params = array( $filter );
+		} elseif ( in_array( $filter, $this->rule_filter_values(), true ) ) {
+			$canonical = $this->canonical_rule_id( $filter );
+			$aliases   = $this->rule_id_aliases( $canonical );
+
+			$where[]    = 'primary_rule IN ( ' . implode( ', ', array_fill( 0, count( $aliases ), '%s' ) ) . ' )';
+			$params     = array_merge( $params, $aliases );
+		}
+
+		// $where_sql is assembled only from the literal fragments above. Every
+		// merchant-supplied value is a %s placeholder bound through prepare(),
+		// and $filter itself was whitelisted by current_filter() before it got
+		// here, so no caller input reaches the SQL string.
+		$where_sql = implode( ' AND ', $where );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber,PluginCheck.Security.DirectDB.UnescapedDBParameter -- placeholders are generated one per bound value; %i escapes the table identifier; the interpolated fragment is literal (see above).
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM %i WHERE {$where_sql}",
+				array_merge( array( $table ), $params )
+			)
+		);
+
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT sub_id, bucket, matched_rules, narration, last_scanned_at FROM %i WHERE bucket IN ({$placeholders}) ORDER BY last_scanned_at DESC LIMIT 50",
-				array_merge( array( $table ), $allowed )
+				"SELECT sub_id, bucket, matched_rules, primary_rule, narration, last_scanned_at
+					FROM %i
+					WHERE {$where_sql}
+					ORDER BY last_scanned_at DESC, sub_id DESC
+					LIMIT %d OFFSET %d",
+				array_merge( array( $table ), $params, array( $per_page, $offset ) )
 			)
 		);
 		// phpcs:enable
 
-		$subs = array();
+		$subs    = array();
+		$missing = array();
+
 		foreach ( (array) $rows as $row ) {
 			$sub = function_exists( 'wcs_get_subscription' ) ? wcs_get_subscription( (int) $row->sub_id ) : null;
 			if ( ! $sub ) {
+				// The subscription is gone but its health row survived. Collect
+				// them so the table does not show a short page and the counts
+				// do not drift further every time one is deleted.
+				$missing[] = (int) $row->sub_id;
 				continue;
 			}
 
-			$rules        = json_decode( (string) $row->matched_rules, true );
-			$primary_rule = ( is_array( $rules ) && isset( $rules[0]['rule_id'] ) ) ? (string) $rules[0]['rule_id'] : 'ghost';
-
-			// Filter by specific rule id if filter matches.
-			if ( in_array( $filter, array( 'ghost', 'onhold', 'repfail' ), true ) && $primary_rule !== $filter ) {
-				continue;
+			$primary_rule = (string) $row->primary_rule;
+			if ( '' === $primary_rule ) {
+				$rules        = json_decode( (string) $row->matched_rules, true );
+				$primary_rule = ( is_array( $rules ) && isset( $rules[0]['rule_id'] ) ) ? (string) $rules[0]['rule_id'] : 'ghost';
 			}
 
 			$subs[] = array(
@@ -496,7 +588,49 @@ class DR_Subs_Admin {
 			);
 		}
 
-		return $subs;
+		if ( ! empty( $missing ) ) {
+			$this->purge_health_rows( $missing );
+			$total = max( 0, $total - count( $missing ) );
+		}
+
+		return array(
+			'rows'      => $subs,
+			'total'     => $total,
+			'page'      => $page,
+			'per_page'  => $per_page,
+			'pages'     => (int) ceil( $total / $per_page ),
+		);
+	}
+
+	/**
+	 * Delete health rows whose subscription no longer exists.
+	 *
+	 * Health rows were never cleaned up, so a deleted or trashed subscription
+	 * left a row behind forever: it inflated every counter and ate into the
+	 * page limit, pushing real rows off the table.
+	 *
+	 * @param array<int, int> $sub_ids Subscription ids to drop.
+	 * @return void
+	 */
+	private function purge_health_rows( array $sub_ids ): void {
+		global $wpdb;
+
+		$sub_ids = array_values( array_filter( array_map( 'absint', $sub_ids ) ) );
+		if ( empty( $sub_ids ) ) {
+			return;
+		}
+
+		$table        = DR_Subs_Migration::sub_health_table();
+		$placeholders = implode( ', ', array_fill( 0, count( $sub_ids ), '%d' ) );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- cleanup of orphaned rows.
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM %i WHERE sub_id IN ( {$placeholders} )",
+				array_merge( array( $table ), $sub_ids )
+			)
+		);
+		// phpcs:enable
 	}
 
 	/**

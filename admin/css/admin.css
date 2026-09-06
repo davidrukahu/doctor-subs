@@ -1169,3 +1169,87 @@
 
 .ds-root .hide-mobile { display: initial; }
 .ds-root .mobile-only { display: none; }
+
+/* ===========================================================
+   Pagination - Needs attention table
+   =========================================================== */
+
+.ds-root .ds-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 2px 2px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.ds-root .ds-pagination-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ds-root .ds-pagination-position {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  padding: 0 4px;
+}
+
+.ds-root .ds-page-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border: 1px solid var(--line-0);
+  border-radius: 999px;
+  color: var(--ink-1);
+  text-decoration: none;
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+
+.ds-root .ds-page-link:hover,
+.ds-root .ds-page-link:focus-visible {
+  border-color: var(--line-1);
+  color: var(--ink-0);
+}
+
+.ds-root .ds-page-link.is-disabled {
+  color: var(--ink-3);
+  border-color: var(--line-0);
+  pointer-events: none;
+}
+
+/* ===========================================================
+   Bulk fix progress
+   =========================================================== */
+
+.ds-root .ds-bulk-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 12px;
+  font-size: 13px;
+  color: var(--ink-2);
+  animation: ds-fade-in var(--t-med) var(--ease) both;
+}
+
+.ds-root .ds-bulk-progress-bar {
+  width: 120px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line-0);
+  overflow: hidden;
+}
+
+.ds-root .ds-bulk-progress-fill {
+  width: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--t-med) var(--ease);
+}
+
+.ds-root .ds-bulk-progress-label {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

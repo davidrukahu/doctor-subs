@@ -131,7 +131,7 @@ class DR_Subs_Fix_Journal {
 	 * @param int $entry_id
 	 * @return array Result from the rule + ['entry_id' => int, 'success' => bool]
 	 */
-	public static function revert( int $entry_id ): array {
+	public static function revert( int $entry_id, bool $force = false ): array {
 		$entry = self::get( $entry_id );
 		if ( ! $entry ) {
 			return array(
@@ -160,6 +160,26 @@ class DR_Subs_Fix_Journal {
 					$entry->rule_id
 				),
 			);
+		}
+
+		// Cross-request state guard. The rules already refuse to apply a fix
+		// when the subscription moved between detection and apply, but until
+		// now nothing checked the other end: an undo restored before_state
+		// blindly, however long ago the fix ran. If the merchant has edited
+		// the subscription since, that silently discards their change. Compare
+		// what the fix left behind with what is there now, and refuse if they
+		// no longer agree.
+		if ( ! $force ) {
+			$drift = self::detect_post_apply_drift( $rule, $entry );
+			if ( ! empty( $drift ) ) {
+				return array(
+					'entry_id' => $entry_id,
+					'success'  => false,
+					'drifted'  => true,
+					'drift'    => $drift,
+					'message'  => __( 'This subscription has changed since the fix was applied, so undoing it would overwrite that change. Review the differences and confirm to undo anyway.', 'doctor-subs' ),
+				);
+			}
 		}
 
 		try {
@@ -198,6 +218,60 @@ class DR_Subs_Fix_Journal {
 	}
 
 	/**
+	 * Compare the state a fix left behind with the subscription as it stands.
+	 *
+	 * Returns a per-field list of what moved, or an empty array when nothing
+	 * did. An entry with no recorded after_state cannot be checked (entries
+	 * written before this guard existed), and is treated as no drift so old
+	 * journal rows stay revertable.
+	 *
+	 * @param DR_Subs_Rule_Interface $rule  Rule that owns the entry.
+	 * @param object                 $entry Journal row.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function detect_post_apply_drift( $rule, $entry ): array {
+		if ( ! method_exists( $rule, 'current_state' ) ) {
+			return array();
+		}
+
+		$after_state = json_decode( (string) $entry->after_state, true );
+		if ( ! is_array( $after_state ) || empty( $after_state ) ) {
+			return array();
+		}
+
+		$current = $rule->current_state( (int) $entry->sub_id );
+		if ( empty( $current ) ) {
+			// The subscription is gone. Reverting cannot restore it and would
+			// only throw further down, so report that as drift.
+			return array(
+				array(
+					'field'  => 'subscription',
+					'was'    => (string) $entry->sub_id,
+					'is_now' => __( 'deleted', 'doctor-subs' ),
+				),
+			);
+		}
+
+		if ( DR_Subs_Rule_Match::hash_state( $current ) === DR_Subs_Rule_Match::hash_state( $after_state ) ) {
+			return array();
+		}
+
+		$drift = array();
+		foreach ( $after_state as $field => $expected ) {
+			$actual = $current[ $field ] ?? null;
+			if ( (string) $actual !== (string) $expected ) {
+				$drift[] = array(
+					'field'  => (string) $field,
+					'was'    => (string) $expected,
+					'is_now' => (string) $actual,
+				);
+			}
+		}
+
+		return $drift;
+	}
+
+	/**
 	 * Revert all entries in a batch atomically.
 	 *
 	 * Order of revert matches journal insertion order so rule-level
@@ -207,11 +281,11 @@ class DR_Subs_Fix_Journal {
 	 * @param string $batch_id
 	 * @return array Summary of per-entry results.
 	 */
-	public static function revert_batch( string $batch_id ): array {
+	public static function revert_batch( string $batch_id, bool $force = false ): array {
 		$rows    = self::get_batch( $batch_id );
 		$results = array();
 		foreach ( array_reverse( $rows ) as $row ) {
-			$results[] = self::revert( (int) $row->entry_id );
+			$results[] = self::revert( (int) $row->entry_id, $force );
 		}
 		return array(
 			'batch_id'      => $batch_id,

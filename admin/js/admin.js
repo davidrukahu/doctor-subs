@@ -313,15 +313,21 @@
 			bulkBtn.classList.add( 'is-busy' );
 
 			var ruleIds = Object.keys( byRule );
-			var allOk   = true;
 			var errors  = [];
+			var progress = createBulkProgress( bulkBtn );
 
-			function postOne( ruleId ) {
+			// Kick off one queued run per rule and follow it to completion.
+			// The server no longer applies the fixes inside this request: it
+			// returns a batch id straight away and works through the cohort on
+			// Action Scheduler, so a large store no longer depends on the
+			// browser holding a request open.
+			function startOne( ruleId ) {
 				var body = new URLSearchParams();
 				body.set( 'action', 'dr_subs_bulk_fix' );
 				body.set( '_ajax_nonce', ajax.nonce || '' );
 				body.set( 'rule_id', ruleId );
 				byRule[ ruleId ].forEach( function ( id ) { body.append( 'sub_ids[]', id ); } );
+
 				return fetch( ajax.ajaxUrl, {
 					method: 'POST',
 					credentials: 'same-origin',
@@ -329,33 +335,141 @@
 					body: body,
 				} ).then( function ( r ) { return r.json(); } )
 					.then( function ( res ) {
-						if ( ! res || ! res.success ) {
-							allOk = false;
+						if ( ! res || ! res.success || ! res.data || ! res.data.batch_id ) {
 							errors.push( ruleId + ': ' + ( ( res && res.data && res.data.message ) || 'failed' ) );
+							return null;
 						}
+						return pollBatch( res.data.batch_id, ruleId );
 					} )
 					.catch( function ( err ) {
-						allOk = false;
 						errors.push( ruleId + ': ' + err.message );
 					} );
 			}
 
-			// Sequence the per-rule POSTs (parallel would be fine too, but
-			// scanner concurrency lock prefers serial).
+			function pollBatch( batchId, ruleId ) {
+				return new Promise( function ( resolve ) {
+					var stalledPolls = 0;
+					var lastDone     = -1;
+
+					function tick() {
+						var body = new URLSearchParams();
+						body.set( 'action', 'dr_subs_bulk_progress' );
+						body.set( '_ajax_nonce', ajax.nonce || '' );
+						body.set( 'batch_id', batchId );
+
+						fetch( ajax.ajaxUrl, {
+							method: 'POST',
+							credentials: 'same-origin',
+							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+							body: body,
+						} ).then( function ( r ) { return r.json(); } )
+							.then( function ( res ) {
+								var data = ( res && res.data ) || {};
+
+								if ( ! res || ! res.success || data.status === 'unknown' ) {
+									errors.push( ruleId + ': lost track of the bulk run' );
+									resolve();
+									return;
+								}
+
+								progress.update( data );
+
+								if ( data.status !== 'running' ) {
+									if ( data.failed ) {
+										errors.push( ruleId + ': ' + data.failed + ' could not be fixed' );
+									}
+									resolve();
+									return;
+								}
+
+								// Action Scheduler may not have picked the queue
+								// up yet. Give it a generous but finite window
+								// rather than polling forever.
+								if ( data.processed === lastDone ) {
+									stalledPolls++;
+								} else {
+									stalledPolls = 0;
+									lastDone     = data.processed;
+								}
+
+								if ( stalledPolls > 60 ) {
+									errors.push( ruleId + ': the bulk run stalled. It will resume on the next scheduled pass.' );
+									resolve();
+									return;
+								}
+
+								window.setTimeout( tick, 1000 );
+							} )
+							.catch( function ( err ) {
+								errors.push( ruleId + ': ' + err.message );
+								resolve();
+							} );
+					}
+
+					tick();
+				} );
+			}
+
 			var chain = Promise.resolve();
 			ruleIds.forEach( function ( rid ) {
-				chain = chain.then( function () { return postOne( rid ); } );
+				chain = chain.then( function () { return startOne( rid ); } );
 			} );
+
 			chain.then( function () {
+				progress.remove();
 				bulkBtn.disabled = false;
 				bulkBtn.classList.remove( 'is-busy' );
-				if ( allOk ) {
-					window.location.reload();
-				} else {
-					alert( 'Some bulk fixes failed:\n' + errors.join( '\n' ) );
-					window.location.reload();
+				if ( errors.length ) {
+					alert( 'Some bulk fixes did not complete:\n' + errors.join( '\n' ) );
 				}
+				window.location.reload();
 			} );
+	}
+
+	/**
+	 * A small progress readout next to the bulk button, so a long run shows
+	 * what it is doing instead of a spinner that never changes.
+	 */
+	function createBulkProgress( bulkBtn ) {
+		var wrap = document.createElement( 'div' );
+		wrap.className = 'ds-bulk-progress';
+		wrap.setAttribute( 'role', 'status' );
+		wrap.setAttribute( 'aria-live', 'polite' );
+
+		var bar = document.createElement( 'div' );
+		bar.className = 'ds-bulk-progress-bar';
+
+		var fill = document.createElement( 'div' );
+		fill.className = 'ds-bulk-progress-fill';
+		bar.appendChild( fill );
+
+		var label = document.createElement( 'span' );
+		label.className = 'ds-bulk-progress-label';
+		label.textContent = ( ajax.i18n && ajax.i18n.bulkStarting ) || 'Starting…';
+
+		wrap.appendChild( bar );
+		wrap.appendChild( label );
+
+		if ( bulkBtn.parentNode ) {
+			bulkBtn.parentNode.insertBefore( wrap, bulkBtn.nextSibling );
+		}
+
+		return {
+			update: function ( data ) {
+				var pct = typeof data.percent === 'number' ? data.percent : 0;
+				fill.style.width = pct + '%';
+
+				var template = ( ajax.i18n && ajax.i18n.bulkProgress ) || 'Fixed %1$s of %2$s';
+				label.textContent = template
+					.replace( '%1$s', data.applied || 0 )
+					.replace( '%2$s', data.total || 0 );
+			},
+			remove: function () {
+				if ( wrap.parentNode ) {
+					wrap.parentNode.removeChild( wrap );
+				}
+			},
+		};
 	}
 
 	/* ============================================================

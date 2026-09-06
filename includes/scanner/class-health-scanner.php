@@ -351,17 +351,34 @@ class DR_Subs_Health_Scanner {
 			}
 		}
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- intentional scanner write.
-		$wpdb->replace(
-			$table,
-			array(
-				'sub_id'          => $sub_id,
-				'bucket'          => $bucket,
-				'matched_rules'   => (string) wp_json_encode( $matched_rules ),
-				'narration'       => $narration,
-				'last_scanned_at' => current_time( 'mysql', true ),
-			),
-			array( '%d', '%s', '%s', '%s', '%s' )
+		// The rule the dashboard leads with. Stored in its own column so the
+		// rule filter and its counts can be done in SQL. Reading it out of the
+		// JSON in PHP meant the filter ran after the query's LIMIT had already
+		// discarded rows, which silently under-reported.
+		$primary_rule = isset( $matched_rules[0]['rule_id'] ) ? (string) $matched_rules[0]['rule_id'] : '';
+
+		// INSERT ... ON DUPLICATE KEY UPDATE rather than REPLACE. REPLACE
+		// deletes the row and inserts a new one, so every scan wiped
+		// suppressed_until and alert suppression never survived a scan.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- intentional scanner write.
+		$wpdb->query(
+			$wpdb->prepare(
+				"INSERT INTO %i ( sub_id, bucket, matched_rules, primary_rule, narration, last_scanned_at )
+					VALUES ( %d, %s, %s, %s, %s, %s )
+					ON DUPLICATE KEY UPDATE
+						bucket = VALUES( bucket ),
+						matched_rules = VALUES( matched_rules ),
+						primary_rule = VALUES( primary_rule ),
+						narration = VALUES( narration ),
+						last_scanned_at = VALUES( last_scanned_at )",
+				$table,
+				$sub_id,
+				$bucket,
+				(string) wp_json_encode( $matched_rules ),
+				$primary_rule,
+				$narration,
+				current_time( 'mysql', true )
+			)
 		);
 		// phpcs:enable
 

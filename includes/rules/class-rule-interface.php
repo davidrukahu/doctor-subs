@@ -79,6 +79,23 @@ interface DR_Subs_Rule_Interface {
 	public function detect_batch( array $sub_ids, DR_Subs_Scan_Context $context ): array;
 
 	/**
+	 * Read this rule's tracked fields off a subscription as it stands now.
+	 *
+	 * The counterpart to the snapshot taken at detection time. The journal
+	 * uses it to tell whether a subscription has moved since a fix was
+	 * applied, so an undo cannot silently overwrite a change the merchant
+	 * made afterwards. Returns an empty array when the subscription is gone.
+	 *
+	 * The keys and value spellings must match the snapshot the rule records
+	 * in apply_fix()'s after_state, or every revert will look like drift.
+	 *
+	 * @since 2.3.0
+	 * @param int $sub_id Subscription id.
+	 * @return array<string, mixed>
+	 */
+	public function current_state( int $sub_id ): array;
+
+	/**
 	 * Build a preview payload for the fix modal.
 	 *
 	 * Returns an array with:

@@ -30,7 +30,7 @@ class DR_Subs_Migration {
 	 * activation hook re-runs dbDelta every time; only option backfills are
 	 * guarded by the version comparison.
 	 */
-	const SCHEMA_VERSION = '2.1.0';
+	const SCHEMA_VERSION = '2.3.0';
 
 	/**
 	 * Option name storing the currently installed schema version.
@@ -55,6 +55,7 @@ class DR_Subs_Migration {
 	 */
 	public static function activate(): void {
 		self::create_tables();
+		self::backfill_primary_rule();
 		self::migrate_settings();
 		update_option( self::VERSION_OPTION, self::SCHEMA_VERSION );
 	}
@@ -75,6 +76,7 @@ class DR_Subs_Migration {
 		$installed = (string) get_option( self::VERSION_OPTION, '' );
 		if ( '' === $installed || version_compare( $installed, self::SCHEMA_VERSION, '<' ) ) {
 			self::create_tables();
+			self::backfill_primary_rule();
 			update_option( self::VERSION_OPTION, self::SCHEMA_VERSION );
 		}
 	}
@@ -104,11 +106,13 @@ class DR_Subs_Migration {
 			sub_id BIGINT UNSIGNED NOT NULL,
 			bucket VARCHAR(20) NOT NULL DEFAULT 'healthy',
 			matched_rules LONGTEXT NULL,
+			primary_rule VARCHAR(64) NOT NULL DEFAULT '',
 			narration LONGTEXT NULL,
 			last_scanned_at DATETIME NOT NULL,
 			suppressed_until DATETIME NULL,
 			PRIMARY KEY  (sub_id),
 			KEY bucket_scanned (bucket, last_scanned_at),
+			KEY rule_scanned (primary_rule, last_scanned_at),
 			KEY last_scanned (last_scanned_at)
 		) {$charset_collate};";
 
@@ -161,6 +165,51 @@ class DR_Subs_Migration {
 	 * @since 2.0.0
 	 * @return void
 	 */
+	/**
+	 * Fill in primary_rule for rows written before the column existed.
+	 *
+	 * The dashboard used to read the first matched rule out of the JSON in
+	 * PHP, which meant the rule filter could only be applied after the SQL
+	 * LIMIT had already thrown rows away. The column makes the filter and the
+	 * count exact. A scan would repopulate it anyway, but backfilling here
+	 * means the dashboard is right immediately after the upgrade rather than
+	 * after the next nightly run.
+	 *
+	 * Uses string functions rather than JSON_EXTRACT so it works the same on
+	 * older MySQL and on MariaDB.
+	 *
+	 * @return void
+	 */
+	private static function backfill_primary_rule(): void {
+		global $wpdb;
+
+		$table = self::sub_health_table();
+
+		// Take the text after the FIRST '"rule_id":"' and stop at the closing
+		// quote. LOCATE finds that first occurrence; SUBSTRING_INDEX with a
+		// count of 2 would return the whole string whenever there is only one
+		// match, which is the common case of a single matched rule.
+		$needle = '"rule_id":"';
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- one-off schema backfill.
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE %i
+					SET primary_rule = SUBSTRING_INDEX(
+						SUBSTRING( matched_rules, LOCATE( %s, matched_rules ) + CHAR_LENGTH( %s ) ),
+						'\"',
+						1
+					)
+					WHERE LOCATE( %s, matched_rules ) > 0",
+				$table,
+				$needle,
+				$needle,
+				$needle
+			)
+		);
+		// phpcs:enable
+	}
+
 	public static function migrate_settings(): void {
 		// If v2 settings already exist, leave them alone (idempotent on re-activation).
 		if ( false !== get_option( self::SETTINGS_OPTION, false ) ) {

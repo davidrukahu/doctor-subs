@@ -84,6 +84,12 @@ class DR_Subs_Plugin {
 		// Journal cleanup hook.
 		add_action( DR_Subs_Fix_Journal::CLEANUP_HOOK, array( 'DR_Subs_Fix_Journal', 'run_cleanup' ) );
 
+		// Chunked bulk repair. Registered here rather than in admin_init
+		// because the chunks run from Action Scheduler, which has no admin
+		// context.
+		DR_Subs_Bulk_Runner::init();
+		add_action( 'dr_subs_bulk_state_cleanup', array( 'DR_Subs_Bulk_Runner', 'cleanup_state' ), 10, 1 );
+
 		// Alert dispatcher (listens on dr_subs_after_scan).
 		if ( class_exists( 'DR_Subs_Alert_Dispatcher' ) ) {
 			DR_Subs_Alert_Dispatcher::register();

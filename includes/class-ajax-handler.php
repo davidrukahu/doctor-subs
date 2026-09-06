@@ -50,6 +50,8 @@ class DR_Subs_Ajax_Handler {
 			'dr_subs_apply_fix'       => 'apply_fix',
 			'dr_subs_revert_fix'      => 'revert_fix',
 			'dr_subs_bulk_fix'        => 'bulk_fix',
+			'dr_subs_bulk_progress'   => 'bulk_progress',
+			'dr_subs_bulk_cancel'     => 'bulk_cancel',
 			'dr_subs_revert_batch'    => 'revert_batch',
 			'dr_subs_run_scan'        => 'run_scan',
 			'dr_subs_cancel_scan'     => 'cancel_scan',
@@ -246,84 +248,71 @@ class DR_Subs_Ajax_Handler {
 			wp_send_json_error( array( 'message' => __( 'Unknown rule.', 'doctor-subs' ) ), 404 );
 		}
 
-		// Accept explicit sub_ids from the client, or auto-collect from
-		// the dashboard's current set of broken-matched subs.
+		// Accept explicit sub_ids from the client, or let the runner walk every
+		// subscription currently matching the rule.
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- guard() verified nonce above.
 		$posted_sub_ids = ( isset( $_POST['sub_ids'] ) && is_array( $_POST['sub_ids'] ) )
 			? array_map( 'absint', wp_unslash( $_POST['sub_ids'] ) )
 			: array();
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		$sub_ids = array_values( array_filter( $posted_sub_ids ) );
-		if ( empty( $sub_ids ) ) {
-			$sub_ids = $this->collect_matching_sub_ids( $rule_id );
-		}
-		if ( empty( $sub_ids ) ) {
+
+		// The work runs on Action Scheduler in chunks rather than inside this
+		// request. A cohort of any size now returns immediately, reports
+		// progress, and survives a timeout: only the chunk in flight is lost,
+		// and the cursor picks up from where it stopped.
+		$run = DR_Subs_Bulk_Runner::start( $rule_id, $sub_ids );
+
+		if ( 0 === $run['total'] ) {
 			wp_send_json_error( array( 'message' => __( 'No matching subscriptions to fix.', 'doctor-subs' ) ), 404 );
 		}
 
-		$context  = new DR_Subs_Scan_Context();
-		$batch_id = self::generate_batch_id();
-
-		$applied  = 0;
-		$failed   = 0;
-		$errors   = array();
-		$affected = array();
-
-		foreach ( $sub_ids as $sub_id ) {
-			$matches = $rule->detect_batch( array( (int) $sub_id ), $context );
-			$match   = $matches[0] ?? null;
-			if ( ! $match ) {
-				++$failed;
-				$errors[] = array(
-					'sub_id'  => (int) $sub_id,
-					'message' => __( 'No longer matches rule; skipped.', 'doctor-subs' ),
-				);
-				continue;
-			}
-
-			try {
-				$payload = $rule->apply_fix( $match );
-				DR_Subs_Fix_Journal::record( (int) $sub_id, $rule_id, $payload, $batch_id );
-				++$applied;
-				$affected[] = (int) $sub_id;
-			} catch ( \Throwable $t ) {
-				++$failed;
-				$errors[] = array(
-					'sub_id'  => (int) $sub_id,
-					'message' => $t->getMessage(),
-				);
-				DR_Subs_Logger::error( 'bulk_fix entry failed: ' . $t->getMessage(), array( 'sub' => $sub_id ) );
-			}
-		}
-
-		// Refresh sub_health for every successfully-fixed sub so the
-		// dashboard reflects the new state without waiting for a scan.
-		if ( ! empty( $affected ) ) {
-			$scanner = new DR_Subs_Health_Scanner();
-			foreach ( $affected as $fixed_sub_id ) {
-				$scanner->rescan_sub( $fixed_sub_id );
-			}
-		}
-
-		/**
-		 * Fires after a bulk fix batch completes.
-		 *
-		 * @since 2.0.0
-		 * @param string $batch_id
-		 * @param string $rule_id
-		 * @param int    $applied
-		 * @param int    $failed
-		 */
-		do_action( 'dr_subs_after_bulk_fix', $batch_id, $rule_id, $applied, $failed );
-
 		wp_send_json_success(
 			array(
-				'batch_id' => $batch_id,
-				'applied'  => $applied,
-				'failed'   => $failed,
-				'errors'   => $errors,
+				'batch_id' => $run['batch_id'],
+				'total'    => $run['total'],
+				'status'   => 'running',
+				'queued'   => true,
 			)
 		);
+	}
+
+	/**
+	 * Report how far a queued bulk fix has got.
+	 *
+	 * @return void
+	 */
+	public function bulk_progress(): void {
+		$this->guard();
+
+		$batch_id = $this->post_batch_id();
+		if ( '' === $batch_id ) {
+			wp_send_json_error( array( 'message' => __( 'Missing batch_id.', 'doctor-subs' ) ), 400 );
+		}
+
+		wp_send_json_success( DR_Subs_Bulk_Runner::progress( $batch_id ) );
+	}
+
+	/**
+	 * Stop a queued bulk fix.
+	 *
+	 * Anything already applied stays applied, and stays revertable as a batch.
+	 *
+	 * @return void
+	 */
+	public function bulk_cancel(): void {
+		$this->guard();
+
+		$batch_id = $this->post_batch_id();
+		if ( '' === $batch_id ) {
+			wp_send_json_error( array( 'message' => __( 'Missing batch_id.', 'doctor-subs' ) ), 400 );
+		}
+
+		if ( ! DR_Subs_Bulk_Runner::cancel( $batch_id ) ) {
+			wp_send_json_error( array( 'message' => __( 'That bulk run was not found.', 'doctor-subs' ) ), 404 );
+		}
+
+		wp_send_json_success( DR_Subs_Bulk_Runner::progress( $batch_id ) );
 	}
 
 	/**
@@ -544,44 +533,6 @@ class DR_Subs_Ajax_Handler {
 	 */
 	private static function generate_batch_id(): string {
 		return 'b_' . wp_generate_password( 32, false, false );
-	}
-
-	/**
-	 * Collect all currently-broken sub_ids whose primary matched rule
-	 * equals $rule_id.
-	 *
-	 * @param string $rule_id
-	 * @return array<int, int>
-	 */
-	private function collect_matching_sub_ids( string $rule_id ): array {
-		global $wpdb;
-		$table = DR_Subs_Migration::sub_health_table();
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- bulk collect.
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT sub_id, matched_rules FROM %i WHERE bucket IN ('broken', 'risk')",
-				$table
-			)
-		);
-		// phpcs:enable
-
-		$sub_ids = array();
-		foreach ( (array) $rows as $row ) {
-			$decoded = json_decode( (string) $row->matched_rules, true );
-			if ( ! is_array( $decoded ) ) {
-				continue;
-			}
-			foreach ( $decoded as $entry ) {
-				if ( ! is_array( $entry ) ) {
-					continue;
-				}
-				if ( ( $entry['rule_id'] ?? '' ) === $rule_id ) {
-					$sub_ids[] = (int) $row->sub_id;
-					break;
-				}
-			}
-		}
-		return $sub_ids;
 	}
 
 	/**

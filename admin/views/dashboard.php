@@ -11,6 +11,9 @@
  * @var string $filter        Current bucket filter: 'all' | 'broken' | 'risk' | 'healthy'
  * @var string $last_scanned  Relative string.
  * @var bool   $stale         If last scan is older than stale threshold.
+ * @var int    $page          Current page of the Needs attention table (1-based).
+ * @var int    $total_rows    Total rows matching the current filter, across all pages.
+ * @var int    $total_pages   Number of pages at the current page size.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -95,21 +98,36 @@ $rule_meta = array(
 	),
 );
 
-// Filter visible rows per current filter.
+// The query already applied the filter and the page window, so the rows handed
+// to this view are exactly the rows to draw. Filtering again here is what made
+// the old table drop rows that the SQL LIMIT had already truncated.
 $visible = $subs;
-if ( 'all' !== $filter ) {
-	$visible = array_values(
-		array_filter(
-			$subs,
-			static function ( $s ) use ( $filter ) {
-				return isset( $s['bucket'] ) && $s['bucket'] === $filter;
-			}
-		)
-	);
-}
 
-$broken_count = count( array_filter( $subs, static fn( $s ) => ( $s['bucket'] ?? '' ) === 'broken' ) );
-$risk_count   = count( array_filter( $subs, static fn( $s ) => ( $s['bucket'] ?? '' ) === 'risk' ) );
+$page        = isset( $page ) ? max( 1, (int) $page ) : 1;
+$total_rows  = isset( $total_rows ) ? (int) $total_rows : count( $subs );
+$total_pages = isset( $total_pages ) ? (int) $total_pages : 1;
+
+// Bucket tallies for the filter chips. These describe the whole result set,
+// not just this page, so they come from the counters rather than the rows.
+$broken_count = isset( $counts['broken'] ) ? (int) $counts['broken'] : 0;
+$risk_count   = isset( $counts['risk'] ) ? (int) $counts['risk'] : 0;
+
+/**
+ * Build a dashboard URL preserving the current filter.
+ *
+ * @param int $target_page Page to link to.
+ * @return string
+ */
+$dr_subs_page_url = static function ( int $target_page ) use ( $filter ): string {
+	$args = array( 'page' => 'doctor-subs' );
+	if ( 'all' !== $filter ) {
+		$args['filter'] = $filter;
+	}
+	if ( $target_page > 1 ) {
+		$args['ds_page'] = $target_page;
+	}
+	return add_query_arg( $args, admin_url( 'admin.php' ) );
+};
 
 // Collect distinct rule ids present in the table for the chip row,
 // preserving the registry order (most-impactful first).
@@ -417,6 +435,52 @@ $rule_summaries = class_exists( 'DR_Subs_Rule_Catalog' ) ? DR_Subs_Rule_Catalog:
 						</tbody>
 					</table>
 				</div>
+
+				<?php if ( $total_pages > 1 ) : ?>
+					<nav class="ds-pagination" aria-label="<?php esc_attr_e( 'Needs attention pages', 'doctor-subs' ); ?>">
+						<span class="ds-pagination-count">
+							<?php
+							$dr_subs_first = ( ( $page - 1 ) * count( $visible ) ) + 1;
+							printf(
+								/* translators: 1: first row number on this page, 2: last row number, 3: total rows */
+								esc_html__( 'Showing %1$s to %2$s of %3$s', 'doctor-subs' ),
+								esc_html( number_format_i18n( max( 1, $dr_subs_first ) ) ),
+								esc_html( number_format_i18n( min( $total_rows, $dr_subs_first + count( $visible ) - 1 ) ) ),
+								esc_html( number_format_i18n( $total_rows ) )
+							);
+							?>
+						</span>
+
+						<span class="ds-pagination-links">
+							<?php if ( $page > 1 ) : ?>
+								<a class="ds-page-link" href="<?php echo esc_url( $dr_subs_page_url( $page - 1 ) ); ?>" rel="prev">
+									<?php esc_html_e( 'Previous', 'doctor-subs' ); ?>
+								</a>
+							<?php else : ?>
+								<span class="ds-page-link is-disabled"><?php esc_html_e( 'Previous', 'doctor-subs' ); ?></span>
+							<?php endif; ?>
+
+							<span class="ds-pagination-position">
+								<?php
+								printf(
+									/* translators: 1: current page number, 2: total number of pages */
+									esc_html__( 'Page %1$s of %2$s', 'doctor-subs' ),
+									esc_html( number_format_i18n( $page ) ),
+									esc_html( number_format_i18n( $total_pages ) )
+								);
+								?>
+							</span>
+
+							<?php if ( $page < $total_pages ) : ?>
+								<a class="ds-page-link" href="<?php echo esc_url( $dr_subs_page_url( $page + 1 ) ); ?>" rel="next">
+									<?php esc_html_e( 'Next', 'doctor-subs' ); ?>
+								</a>
+							<?php else : ?>
+								<span class="ds-page-link is-disabled"><?php esc_html_e( 'Next', 'doctor-subs' ); ?></span>
+							<?php endif; ?>
+						</span>
+					</nav>
+				<?php endif; ?>
 			</div>
 
 		<?php endif; ?>

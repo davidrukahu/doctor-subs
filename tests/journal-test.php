@@ -163,6 +163,74 @@ class DR_Subs_Journal_Test extends DR_Subs_Test_Case {
 	}
 
 	/**
+	 * Undo refuses when the subscription moved after the fix was applied.
+	 *
+	 * Without this, an undo restores before_state however long ago the fix
+	 * ran, silently discarding whatever the merchant changed in between.
+	 */
+	public function test_revert_refuses_when_the_subscription_changed_after_the_fix() {
+		$sub = $this->make_subscription( 'active' );
+		$this->clear_payment_actions( $sub->get_id() );
+		$sub->update_dates( array( 'next_payment' => gmdate( 'Y-m-d H:i:s', time() - ( 5 * DAY_IN_SECONDS ) ) ) );
+
+		$match    = $this->detect( 'ghost_sub', $sub->get_id() );
+		$payload  = $this->rule( 'ghost_sub' )->apply_fix( $match );
+		$entry_id = DR_Subs_Fix_Journal::record( $sub->get_id(), 'ghost_sub', $payload );
+
+		// The merchant moves the subscription on after the fix.
+		$moved = wcs_get_subscription( $sub->get_id() );
+		$moved->update_status( 'on-hold', 'Merchant put this on hold afterwards.' );
+
+		$result = DR_Subs_Fix_Journal::revert( $entry_id );
+
+		$this->assertFalse( (bool) $result['success'], 'revert went ahead over a changed subscription' );
+		$this->assertTrue( (bool) ( $result['drifted'] ?? false ) );
+		$this->assertNotEmpty( $result['drift'] );
+
+		$entry = DR_Subs_Fix_Journal::get( $entry_id );
+		$this->assertSame( 'applied', $entry->status, 'a refused revert must leave the entry applied' );
+	}
+
+	/**
+	 * The merchant can still force the undo through once warned.
+	 */
+	public function test_revert_can_be_forced_over_drift() {
+		$sub = $this->make_subscription( 'active' );
+		$this->clear_payment_actions( $sub->get_id() );
+		$sub->update_dates( array( 'next_payment' => gmdate( 'Y-m-d H:i:s', time() - ( 5 * DAY_IN_SECONDS ) ) ) );
+
+		$match    = $this->detect( 'ghost_sub', $sub->get_id() );
+		$payload  = $this->rule( 'ghost_sub' )->apply_fix( $match );
+		$entry_id = DR_Subs_Fix_Journal::record( $sub->get_id(), 'ghost_sub', $payload );
+
+		wcs_get_subscription( $sub->get_id() )->update_status( 'on-hold', 'Changed afterwards.' );
+
+		$result = DR_Subs_Fix_Journal::revert( $entry_id, true );
+
+		$this->assertTrue( (bool) $result['success'], $result['message'] ?? '' );
+		$this->assertSame( 0, $this->pending_payment_actions( $sub->get_id() ) );
+	}
+
+	/**
+	 * Entries written before the guard existed carry no after_state and must
+	 * stay revertable rather than being permanently blocked.
+	 */
+	public function test_revert_allows_an_entry_with_no_recorded_after_state() {
+		$sub = $this->make_subscription( 'active' );
+		$this->clear_payment_actions( $sub->get_id() );
+		$sub->update_dates( array( 'next_payment' => gmdate( 'Y-m-d H:i:s', time() - ( 5 * DAY_IN_SECONDS ) ) ) );
+
+		$match   = $this->detect( 'ghost_sub', $sub->get_id() );
+		$payload = $this->rule( 'ghost_sub' )->apply_fix( $match );
+		unset( $payload['after_state'] );
+
+		$entry_id = DR_Subs_Fix_Journal::record( $sub->get_id(), 'ghost_sub', $payload );
+		$result   = DR_Subs_Fix_Journal::revert( $entry_id );
+
+		$this->assertTrue( (bool) $result['success'], $result['message'] ?? '' );
+	}
+
+	/**
 	 * Reverting a batch reverts every entry in it.
 	 */
 	public function test_revert_batch_reverts_every_entry() {

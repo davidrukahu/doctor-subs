@@ -78,6 +78,7 @@ jobs:
           .impeccable.md
           .env.example
           .gitignore
+          .distignore
           .DS_Store
           branding/
           build/

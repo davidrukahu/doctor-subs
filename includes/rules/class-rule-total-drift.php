@@ -265,6 +265,18 @@ class DR_Subs_Rule_Total_Drift implements DR_Subs_Rule_Interface {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function current_state( int $sub_id ): array {
+		$sub = function_exists( 'wcs_get_subscription' ) ? wcs_get_subscription( $sub_id ) : null;
+		if ( ! $sub ) {
+			return array();
+		}
+
+		return $this->snapshot_fields( $sub );
+	}
+
+	/**
 	 * Tracked-field snapshot.
 	 *
 	 * @param WC_Subscription $sub
