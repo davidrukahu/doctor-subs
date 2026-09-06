@@ -305,14 +305,19 @@ class DR_Subs_Health_Scanner {
 	 * @param int $sub_id
 	 * @return string Final bucket ('healthy'|'risk'|'broken').
 	 */
-	public function rescan_sub( int $sub_id ): string {
+	public function rescan_sub( int $sub_id, ?DR_Subs_Scan_Context $context = null ): string {
 		if ( $sub_id <= 0 ) {
 			return 'healthy';
 		}
 
 		DR_Subs_Rules_Registry::bootstrap();
-		$rules   = DR_Subs_Rules_Registry::all();
-		$context = new DR_Subs_Scan_Context();
+		$rules = DR_Subs_Rules_Registry::all();
+
+		// Building a scan context indexes the whole Action Scheduler store, so
+		// doing it per subscription turns a bulk fix of 200 subscriptions into
+		// 200 full index builds. Callers that rescan more than one subscription
+		// pass a shared context in.
+		$context = $context ?? new DR_Subs_Scan_Context();
 		$matches = array();
 
 		foreach ( $rules as $rule ) {

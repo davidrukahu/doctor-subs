@@ -110,18 +110,11 @@ class DR_Subs_Scan_Context {
 				'per_page' => -1,
 			)
 		);
-		foreach ( (array) $ids as $action_id ) {
-			$action = $store->fetch_action( $action_id );
-			if ( ! $action ) {
-				continue;
-			}
-			$args   = $action->get_args();
-			$sub_id = (int) ( $args[0] ?? 0 );
-			if ( $sub_id > 0 ) {
-				// First one wins (AS query returns ordered; keep earliest-pending).
-				if ( ! isset( $this->pending_as_by_sub[ $sub_id ] ) ) {
-					$this->pending_as_by_sub[ $sub_id ] = (int) $action_id;
-				}
+		foreach ( $this->sub_ids_for_actions( $store, (array) $ids ) as $action_id => $sub_id ) {
+			if ( $sub_id > 0 && ! isset( $this->pending_as_by_sub[ $sub_id ] ) ) {
+				// First one wins: the query is ordered, so this keeps the
+				// earliest pending action for each subscription.
+				$this->pending_as_by_sub[ $sub_id ] = (int) $action_id;
 			}
 		}
 	}
@@ -148,18 +141,105 @@ class DR_Subs_Scan_Context {
 				'per_page'     => -1,
 			)
 		);
-		foreach ( (array) $ids as $action_id ) {
-			$action = $store->fetch_action( $action_id );
-			if ( ! $action ) {
-				continue;
-			}
-			$args   = $action->get_args();
-			$sub_id = (int) ( $args[0] ?? 0 );
+		foreach ( $this->sub_ids_for_actions( $store, (array) $ids ) as $action_id => $sub_id ) {
 			if ( $sub_id > 0 ) {
 				$this->failed_as_ids_by_sub[ $sub_id ][] = (int) $action_id;
 				$this->failed_as_count_by_sub[ $sub_id ] = ( $this->failed_as_count_by_sub[ $sub_id ] ?? 0 ) + 1;
 			}
 		}
+	}
+
+	/**
+	 * Map action ids to the subscription id in their first argument.
+	 *
+	 * The docblocks above promised one query, but the loops underneath called
+	 * fetch_action() once per action, so a store with 5,000 scheduled renewals
+	 * ran 5,000 extra queries before a single rule had looked at anything.
+	 *
+	 * Action Scheduler's own API hydrates one action at a time however it is
+	 * called, so the only way to read these in bulk is to read its table. That
+	 * table only exists for the DB store, so the per-action path is kept as a
+	 * fallback for the legacy post store and for anyone running a custom one.
+	 *
+	 * @param object          $store      Active Action Scheduler store.
+	 * @param array<int, int> $action_ids Action ids to resolve.
+	 * @return array<int, int> action_id => sub_id, in the order given.
+	 */
+	private function sub_ids_for_actions( $store, array $action_ids ): array {
+		$action_ids = array_values( array_filter( array_map( 'absint', $action_ids ) ) );
+		if ( empty( $action_ids ) ) {
+			return array();
+		}
+
+		if ( $store instanceof ActionScheduler_DBStore ) {
+			$bulk = $this->sub_ids_from_as_table( $action_ids );
+			if ( null !== $bulk ) {
+				return $bulk;
+			}
+		}
+
+		$map = array();
+		foreach ( $action_ids as $action_id ) {
+			$action = $store->fetch_action( $action_id );
+			if ( ! $action ) {
+				continue;
+			}
+			$args              = $action->get_args();
+			$map[ $action_id ] = (int) ( $args[0] ?? 0 );
+		}
+
+		return $map;
+	}
+
+	/**
+	 * Read the first argument of many actions in one query.
+	 *
+	 * @param array<int, int> $action_ids Action ids.
+	 * @return array<int, int>|null Map of action_id => sub_id, or null if the
+	 *                              table is not there to read.
+	 */
+	private function sub_ids_from_as_table( array $action_ids ): ?array {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'actionscheduler_actions';
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- schema probe.
+		if ( $table !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) {
+			return null;
+		}
+		// phpcs:enable
+
+		$map = array();
+
+		// Chunked so a store with tens of thousands of scheduled renewals does
+		// not build one enormous IN clause.
+		foreach ( array_chunk( $action_ids, 500 ) as $chunk ) {
+			$placeholders = implode( ', ', array_fill( 0, count( $chunk ), '%d' ) );
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber,PluginCheck.Security.DirectDB.UnescapedDBParameter -- one %d placeholder per id; the interpolated fragment is generated, not caller input.
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT action_id, args FROM %i WHERE action_id IN ( {$placeholders} )",
+					array_merge( array( $table ), $chunk )
+				)
+			);
+			// phpcs:enable
+
+			foreach ( (array) $rows as $row ) {
+				$args                         = json_decode( (string) $row->args, true );
+				$map[ (int) $row->action_id ] = is_array( $args ) ? (int) ( $args[0] ?? 0 ) : 0;
+			}
+		}
+
+		// Preserve the caller's ordering, which the pending index relies on.
+		$ordered = array();
+		foreach ( $action_ids as $action_id ) {
+			if ( isset( $map[ $action_id ] ) ) {
+				$ordered[ $action_id ] = $map[ $action_id ];
+			}
+		}
+
+		return $ordered;
 	}
 
 	/**

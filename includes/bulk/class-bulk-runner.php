@@ -205,9 +205,15 @@ class DR_Subs_Bulk_Runner {
 		// Refresh health rows for what changed so the dashboard keeps up with
 		// the run rather than waiting for the next scan.
 		if ( ! empty( $affected ) ) {
-			$scanner = new DR_Subs_Health_Scanner();
+			// One context for the whole chunk. Each rescan would otherwise
+			// rebuild the entire Action Scheduler index from scratch, so a
+			// chunk of 20 meant 20 full rebuilds. The fixes have just changed
+			// the scheduled actions, so this is built fresh rather than reusing
+			// the detection context above.
+			$scanner       = new DR_Subs_Health_Scanner();
+			$after_context = new DR_Subs_Scan_Context();
 			foreach ( $affected as $fixed_sub_id ) {
-				$scanner->rescan_sub( $fixed_sub_id );
+				$scanner->rescan_sub( $fixed_sub_id, $after_context );
 			}
 		}
 
