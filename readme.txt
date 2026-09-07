@@ -229,7 +229,7 @@ Major rewrite. Single breaking change moment: every PHP class renamed from WCST_
 
 = 2.3.0 =
 
-Manual-renewal drift did not actually repair anything on stores using the classic posts table. If you ran that fix in 2.2.0, re-scan and run it again. Bulk fix now runs in the background with progress and resume, the subscription table pages instead of stopping at 50, and undo warns you before overwriting a change you made after the fix.
+Manual-renewal drift repaired nothing on classic posts-table stores. If you ran it in 2.2.0, re-scan and run it again. Bulk fix now runs in the background with progress and resume, and the table pages instead of stopping at 50.
 
 = 2.2.0 =
 
