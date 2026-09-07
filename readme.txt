@@ -5,7 +5,7 @@ Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,7 +81,9 @@ v2.1: Stripe fully supported across all rules that need a gateway signal (stuck 
 
 It is built and tested for the 20 to 500 active subscription range. The scanner pages through subscriptions rather than loading them all at once, and `DR_SUBS_SCAN_BATCH_SIZE` in wp-config.php lets you lower the batch size on a constrained host.
 
-Above roughly a thousand subscriptions the scan can take long enough to hit a PHP time limit, because it currently runs in one pass rather than resuming across requests. If that happens the scan reports a failure and you can re-run it; nothing is left half-fixed, since fixes are separate and explicit. Making large scans resumable is the next thing being worked on.
+As of 2.3.0 a bulk repair no longer runs inside one request. It is split into chunks on Action Scheduler with a saved position, so it shows progress, can be stopped, and picks up where it left off if a chunk times out. Cohort size is not the limit it used to be.
+
+The scan itself still runs in one pass. On a very large store it can take long enough to hit a PHP time limit, in which case it reports a failure and you can re-run it; nothing is left half-fixed, because fixes are separate and explicit. Making the scan resumable the same way is next.
 
 = Can I extend it with my own rules? =
 
@@ -97,7 +99,7 @@ WooCommerce ships a [Subscriptions Health Check tool](https://woocommerce.com/do
 
 Doctor Subs overlaps on those two patterns (Manual-renewal drift, Ghost subscription) and adds four more the built-in tool doesn't cover: mass on-hold cascade after a product edit, stuck on-hold despite a captured Stripe renewal, repeated payment failures within 30 days, and total drift between the stored total and line items.
 
-It also wraps every detection in a preview-before-apply modal, one-click fixes, a per-entry revert journal, bulk-fix across N matches, state-guarded apply (aborts if the sub changed between detection and apply), and an optional email digest when something new breaks between scans.
+It also wraps every detection in a preview-before-apply modal, one-click fixes, and a per-entry undo journal. Bulk repair runs in the background in chunks, so it reports progress and resumes after a timeout rather than dying with the request. Both directions are state-guarded: a fix aborts if the subscription changed since it was detected, and an undo asks first if the subscription changed since the fix. There is also an optional email digest when something new breaks between scans.
 
 Short version: WC's tool is a flagger. Doctor Subs is a flagger plus a reversible repair surface. Running both is fine - they don't conflict.
 
@@ -110,6 +112,20 @@ Short version: WC's tool is a flagger. Doctor Subs is a flagger plus a reversibl
 5. Detection rules: six rule cards with on/off toggles plus Detects + Fix descriptions for every rule
 
 == Changelog ==
+
+= 2.3.0 =
+
+Bulk repair that holds up on a real store, and the first tests.
+
+* Fixed: Manual-renewal drift did not actually fix anything on stores that keep orders in the classic posts table. The rule cleared the flag correctly, then wrote a follow-up value that WooCommerce Subscriptions reads back as "manual renewal is on", undoing the repair it had just made. If you ran this fix in 2.2.0, re-scan and run it again. Stores on High-Performance Order Storage were not affected.
+* Bulk fix now runs in the background in chunks instead of inside one browser request. It shows progress, can be stopped, and resumes where it stopped if a chunk times out, so the size of the cohort is no longer the limit. Everything it fixes is still one batch with one undo.
+* Fixed: the Needs attention table showed at most 50 subscriptions with nothing telling you there were more. It now pages, 25 at a time.
+* Fixed: the rule filter on that table was applied after the database had already cut the list to 50, so filtering could show an empty table while matching subscriptions sat below the cut, and the counts were wrong.
+* Undo now checks whether the subscription changed after the fix was applied. If it did, it says what changed and asks before overwriting your edit, instead of silently rolling it back.
+* Fixed: subscriptions you deleted left a health record behind forever, inflating the counters and pushing real rows off the table.
+* Fixed: alert suppression never survived a scan, because each scan rewrote the health record from scratch.
+* Faster: reading the scheduled-renewal index took one database query per scheduled renewal, so a store with thousands of them paid thousands of queries before any check ran. It is now a fixed handful, whatever the size of the store.
+* Added a test suite: 35 tests covering the undo journal and every rule's fix-and-undo pair, run against real WooCommerce and Subscriptions. The manual-renewal bug above was found by it.
 
 = 2.2.0 =
 
@@ -210,6 +226,10 @@ Major rewrite. Single breaking change moment: every PHP class renamed from WCST_
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.3.0 =
+
+Manual-renewal drift did not actually repair anything on stores using the classic posts table. If you ran that fix in 2.2.0, re-scan and run it again. Bulk fix now runs in the background with progress and resume, the subscription table pages instead of stopping at 50, and undo warns you before overwriting a change you made after the fix.
 
 = 2.2.0 =
 

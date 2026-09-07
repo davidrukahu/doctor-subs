@@ -11,7 +11,7 @@ declare( strict_types=1 );
  * Plugin Name: Doctor Subs
  * Plugin URI: https://github.com/davidrukahu/doctor-subs
  * Description: Finds the subscriptions that quietly stopped renewing, and fixes them in bulk with a preview before and an undo after.
- * Version: 2.2.0
+ * Version: 2.3.0
  * Author: DavidR
  * Author URI: https://github.com/davidrukahu
  * Text Domain: doctor-subs

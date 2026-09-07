@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Doctor Subs 2.2.0\n"
+"Project-Id-Version: Doctor Subs 2.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/doctor-subs\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-05T19:23:54+00:00\n"
+"POT-Creation-Date: 2026-09-07T03:11:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: doctor-subs\n"
@@ -17,9 +17,9 @@ msgstr ""
 #. Plugin Name of the plugin
 #: doctor-subs.php
 #: admin/views/partials/plugin-header.php:51
-#: includes/class-admin.php:59
-#: includes/class-admin.php:60
-#: includes/class-admin.php:189
+#: includes/class-admin.php:68
+#: includes/class-admin.php:69
+#: includes/class-admin.php:201
 msgid "Doctor Subs"
 msgstr ""
 
@@ -43,12 +43,12 @@ msgstr ""
 msgid "https://github.com/davidrukahu"
 msgstr ""
 
-#: admin/views/dashboard.php:33
+#: admin/views/dashboard.php:36
 msgid "2 hours ago"
 msgstr ""
 
-#: admin/views/dashboard.php:51
-#: admin/views/dashboard.php:82
+#: admin/views/dashboard.php:54
+#: admin/views/dashboard.php:85
 #: admin/views/fix-history.php:32
 #: admin/views/fix-history.php:38
 #: admin/views/modal-fix-preview.php:43
@@ -58,8 +58,8 @@ msgstr ""
 msgid "Ghost"
 msgstr ""
 
-#: admin/views/dashboard.php:56
-#: admin/views/dashboard.php:87
+#: admin/views/dashboard.php:59
+#: admin/views/dashboard.php:90
 #: admin/views/fix-history.php:34
 #: admin/views/fix-history.php:39
 #: admin/views/modal-fix-preview.php:47
@@ -69,8 +69,8 @@ msgstr ""
 msgid "Stuck on-hold"
 msgstr ""
 
-#: admin/views/dashboard.php:61
-#: admin/views/dashboard.php:92
+#: admin/views/dashboard.php:64
+#: admin/views/dashboard.php:95
 #: admin/views/fix-history.php:35
 #: admin/views/fix-history.php:40
 #: admin/views/modal-fix-preview.php:51
@@ -80,7 +80,7 @@ msgstr ""
 msgid "Repeated fails"
 msgstr ""
 
-#: admin/views/dashboard.php:66
+#: admin/views/dashboard.php:69
 #: admin/views/fix-history.php:33
 #: admin/views/modal-fix-preview.php:55
 #: includes/rules/class-rule-catalog.php:55
@@ -88,7 +88,7 @@ msgstr ""
 msgid "Mass hold"
 msgstr ""
 
-#: admin/views/dashboard.php:71
+#: admin/views/dashboard.php:74
 #: admin/views/fix-history.php:36
 #: admin/views/modal-fix-preview.php:59
 #: includes/rules/class-rule-catalog.php:76
@@ -96,76 +96,76 @@ msgstr ""
 msgid "Total drift"
 msgstr ""
 
-#: admin/views/dashboard.php:76
+#: admin/views/dashboard.php:79
 #: admin/views/fix-history.php:31
 #: admin/views/modal-fix-preview.php:63
 #: includes/rules/class-rule-catalog.php:41
 msgid "Manual-renewal drift"
 msgstr ""
 
-#: admin/views/dashboard.php:148
+#: admin/views/dashboard.php:166
 msgid "The last scan didn&rsquo;t complete. Nothing was changed."
 msgstr ""
 
-#: admin/views/dashboard.php:150
+#: admin/views/dashboard.php:168
 msgid "Try again"
 msgstr ""
 
-#: admin/views/dashboard.php:153
+#: admin/views/dashboard.php:171
 msgid "View logs"
 msgstr ""
 
 #. translators: 1: healthy sub count, 2: total scanned count
-#: admin/views/dashboard.php:168
+#: admin/views/dashboard.php:186
 #, php-format
 msgid "%1$s of %2$s healthy"
 msgstr ""
 
-#: admin/views/dashboard.php:180
+#: admin/views/dashboard.php:198
 msgid "Subscription health counts"
 msgstr ""
 
-#: admin/views/dashboard.php:185
+#: admin/views/dashboard.php:203
 #: admin/views/settings.php:203
 msgid "At risk"
 msgstr ""
 
-#: admin/views/dashboard.php:186
-#: admin/views/dashboard.php:190
+#: admin/views/dashboard.php:204
+#: admin/views/dashboard.php:208
 msgid "since last scan"
 msgstr ""
 
-#: admin/views/dashboard.php:189
+#: admin/views/dashboard.php:207
 #: admin/views/settings.php:204
 msgid "Broken"
 msgstr ""
 
-#: admin/views/dashboard.php:225
+#: admin/views/dashboard.php:243
 msgid "All clear"
 msgstr ""
 
-#: admin/views/dashboard.php:227
+#: admin/views/dashboard.php:245
 msgid "Everything looks good."
 msgstr ""
 
 #. translators: %s: relative time
-#: admin/views/dashboard.php:231
+#: admin/views/dashboard.php:249
 #, php-format
 msgid "We&rsquo;ll keep watching. Last checked %s."
 msgstr ""
 
-#: admin/views/dashboard.php:242
+#: admin/views/dashboard.php:260
 msgid "Needs attention"
 msgstr ""
 
-#: admin/views/dashboard.php:246
-#: includes/class-admin.php:115
+#: admin/views/dashboard.php:264
+#: includes/class-admin.php:124
 msgid "showing all broken and at-risk"
 msgstr ""
 
 #. translators: %d: number of broken subs filtered
-#: admin/views/dashboard.php:250
-#: includes/class-admin.php:118
+#: admin/views/dashboard.php:268
+#: includes/class-admin.php:127
 #, php-format
 msgid "filtering to %d broken"
 msgid_plural "filtering to %d broken"
@@ -173,82 +173,108 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of at-risk subs filtered
-#: admin/views/dashboard.php:256
-#: includes/class-admin.php:120
+#: admin/views/dashboard.php:274
+#: includes/class-admin.php:129
 #, php-format
 msgid "filtering to %d at-risk"
 msgid_plural "filtering to %d at-risk"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/views/dashboard.php:265
+#: admin/views/dashboard.php:283
 msgid "clear filter"
 msgstr ""
 
-#: admin/views/dashboard.php:281
+#: admin/views/dashboard.php:299
 msgid "Search by sub #, customer, or email"
 msgstr ""
 
-#: admin/views/dashboard.php:282
+#: admin/views/dashboard.php:300
 msgid "Search subscriptions"
 msgstr ""
 
-#: admin/views/dashboard.php:286
+#: admin/views/dashboard.php:304
 msgid "Clear search"
 msgstr ""
 
-#: admin/views/dashboard.php:291
+#: admin/views/dashboard.php:309
 msgid "Filter by rule"
 msgstr ""
 
-#: admin/views/dashboard.php:296
+#: admin/views/dashboard.php:314
 msgid "All rules"
 msgstr ""
 
-#: admin/views/dashboard.php:320
+#: admin/views/dashboard.php:338
 msgid "Fix all"
 msgstr ""
 
-#: admin/views/dashboard.php:329
+#: admin/views/dashboard.php:347
 msgid "Rule indicator"
 msgstr ""
 
-#: admin/views/dashboard.php:330
+#: admin/views/dashboard.php:348
 msgid "Customer"
 msgstr ""
 
-#: admin/views/dashboard.php:331
+#: admin/views/dashboard.php:349
 msgid "Subscription"
 msgstr ""
 
-#: admin/views/dashboard.php:332
+#: admin/views/dashboard.php:350
 msgid "Issue"
 msgstr ""
 
-#: admin/views/dashboard.php:333
+#: admin/views/dashboard.php:351
 msgid "Reason"
 msgstr ""
 
-#: admin/views/dashboard.php:334
+#: admin/views/dashboard.php:352
 msgid "Actions"
 msgstr ""
 
-#: admin/views/dashboard.php:364
+#: admin/views/dashboard.php:382
 #: admin/views/fix-history.php:170
 #: admin/views/modal-fix-preview.php:96
 msgid "Open subscription in WooCommerce (new tab)"
 msgstr ""
 
-#: admin/views/dashboard.php:399
+#: admin/views/dashboard.php:417
 msgid "Fix"
 msgstr ""
 
-#: admin/views/dashboard.php:407
+#: admin/views/dashboard.php:425
 msgid "No subscriptions match this filter."
 msgstr ""
 
-#: admin/views/dashboard.php:413
+#: admin/views/dashboard.php:431
 msgid "No subscriptions match."
+msgstr ""
+
+#: admin/views/dashboard.php:440
+msgid "Needs attention pages"
+msgstr ""
+
+#. translators: 1: first row number on this page, 2: last row number, 3: total rows
+#: admin/views/dashboard.php:446
+#, php-format
+msgid "Showing %1$s to %2$s of %3$s"
+msgstr ""
+
+#: admin/views/dashboard.php:457
+#: admin/views/dashboard.php:460
+msgid "Previous"
+msgstr ""
+
+#. translators: 1: current page number, 2: total number of pages
+#: admin/views/dashboard.php:467
+#, php-format
+msgid "Page %1$s of %2$s"
+msgstr ""
+
+#: admin/views/dashboard.php:476
+#: admin/views/dashboard.php:479
+msgid "Next"
 msgstr ""
 
 #: admin/views/first-run.php:47
@@ -399,7 +425,7 @@ msgid "Revert all %d"
 msgstr ""
 
 #: admin/views/fix-history.php:229
-#: includes/class-admin.php:128
+#: includes/class-admin.php:137
 msgid "Revert"
 msgstr ""
 
@@ -609,7 +635,7 @@ msgid "Discard"
 msgstr ""
 
 #: admin/views/settings.php:248
-#: includes/class-admin.php:137
+#: includes/class-admin.php:149
 msgid "Saved."
 msgstr ""
 
@@ -665,93 +691,113 @@ msgstr ""
 msgid "Issue detected"
 msgstr ""
 
+#. translators: %s: rule id
+#: includes/bulk/class-bulk-runner.php:152
+#, php-format
+msgid "Rule \"%s\" is no longer registered; the run was stopped."
+msgstr ""
+
+#: includes/bulk/class-bulk-runner.php:189
+msgid "No longer matches the rule; skipped."
+msgstr ""
+
 #. translators: %d: number of healthy subs filtered
-#: includes/class-admin.php:122
+#: includes/class-admin.php:131
 #, php-format
 msgid "filtering to %d healthy"
 msgstr ""
 
-#: includes/class-admin.php:124
+#: includes/class-admin.php:133
 msgid "Could not load the fix preview. Try again in a moment."
 msgstr ""
 
-#: includes/class-admin.php:125
+#: includes/class-admin.php:134
 msgid "Applying…"
 msgstr ""
 
-#: includes/class-admin.php:126
+#: includes/class-admin.php:135
 msgid "Something went wrong - nothing was changed."
 msgstr ""
 
-#: includes/class-admin.php:127
+#: includes/class-admin.php:136
 msgid "Reverting…"
 msgstr ""
 
-#: includes/class-admin.php:129
+#: includes/class-admin.php:138
 msgid "Revert this fix?"
 msgstr ""
 
-#: includes/class-admin.php:130
+#: includes/class-admin.php:139
 msgid "The subscription will return to its previous state."
 msgstr ""
 
-#: includes/class-admin.php:131
+#: includes/class-admin.php:140
 msgid "The renewal payment for this fix has already gone through. Reverting will undo the status change."
 msgstr ""
 
-#: includes/class-admin.php:132
+#: includes/class-admin.php:141
 msgid "This will NOT refund the customer. If a refund is needed, handle it in the WooCommerce order directly."
 msgstr ""
 
-#: includes/class-admin.php:133
+#: includes/class-admin.php:142
 msgid "Revert this batch?"
 msgstr ""
 
 #. translators: %d: number of subscriptions in the batch
-#: includes/class-admin.php:135
+#: includes/class-admin.php:144
 #, php-format
 msgid "All %d subscriptions in this batch will return to their previous state. They are reverted newest first."
 msgstr ""
 
-#: includes/class-admin.php:136
+#: includes/class-admin.php:145
+msgid "Starting…"
+msgstr ""
+
+#. translators: 1: number of subscriptions fixed so far, 2: total in the run
+#: includes/class-admin.php:147
+#, php-format
+msgid "Fixed %1$s of %2$s"
+msgstr ""
+
+#: includes/class-admin.php:148
 msgid "Saving…"
 msgstr ""
 
-#: includes/class-admin.php:138
+#: includes/class-admin.php:150
 msgid "Could not save. Check your connection and try again."
 msgstr ""
 
-#: includes/class-admin.php:139
+#: includes/class-admin.php:151
 msgid "Scanning…"
 msgstr ""
 
-#: includes/class-admin.php:140
+#: includes/class-admin.php:152
 msgid "Refreshing…"
 msgstr ""
 
-#: includes/class-admin.php:141
+#: includes/class-admin.php:153
 msgid "Scan failed. Check your connection and try again."
 msgstr ""
 
-#: includes/class-admin.php:158
+#: includes/class-admin.php:170
 msgid "Open"
 msgstr ""
 
-#: includes/class-admin.php:310
-#: includes/class-ajax-handler.php:456
+#: includes/class-admin.php:330
+#: includes/class-ajax-handler.php:445
 msgid "You do not have permission to do this."
 msgstr ""
 
-#: includes/class-admin.php:636
+#: includes/class-admin.php:770
 msgid "never"
 msgstr ""
 
-#: includes/class-admin.php:686
+#: includes/class-admin.php:820
 msgid "just now"
 msgstr ""
 
 #. translators: %d: minutes
-#: includes/class-admin.php:691
+#: includes/class-admin.php:825
 #, php-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
@@ -759,7 +805,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: hours
-#: includes/class-admin.php:696
+#: includes/class-admin.php:830
 #, php-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
@@ -767,73 +813,75 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: days
-#: includes/class-admin.php:701
+#: includes/class-admin.php:835
 #, php-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin.php:703
+#: includes/class-admin.php:837
 msgid "M j"
 msgstr ""
 
 #. translators: %d: subscription ID
-#: includes/class-admin.php:749
+#: includes/class-admin.php:883
 #, php-format
 msgid "Customer #%d"
 msgstr ""
 
-#: includes/class-ajax-handler.php:75
-#: includes/class-ajax-handler.php:125
+#: includes/class-ajax-handler.php:77
+#: includes/class-ajax-handler.php:127
 msgid "Invalid subscription ID."
 msgstr ""
 
-#: includes/class-ajax-handler.php:81
+#: includes/class-ajax-handler.php:83
 msgid "No matching rule found for this subscription."
 msgstr ""
 
-#: includes/class-ajax-handler.php:89
+#: includes/class-ajax-handler.php:91
 msgid "This subscription no longer matches the rule (state changed since scan). Re-scan and try again."
 msgstr ""
 
-#: includes/class-ajax-handler.php:131
+#: includes/class-ajax-handler.php:133
 msgid "No matching rule for this subscription."
 msgstr ""
 
-#: includes/class-ajax-handler.php:139
+#: includes/class-ajax-handler.php:141
 msgid "State changed since scan. Re-scan and try again."
 msgstr ""
 
-#: includes/class-ajax-handler.php:180
+#: includes/class-ajax-handler.php:182
 msgid "Fix applied."
 msgstr ""
 
-#: includes/class-ajax-handler.php:194
+#: includes/class-ajax-handler.php:196
 msgid "Invalid journal entry."
 msgstr ""
 
-#: includes/class-ajax-handler.php:240
+#: includes/class-ajax-handler.php:242
 msgid "Missing rule_id."
 msgstr ""
 
-#: includes/class-ajax-handler.php:246
+#: includes/class-ajax-handler.php:248
 msgid "Unknown rule."
 msgstr ""
 
-#: includes/class-ajax-handler.php:261
+#: includes/class-ajax-handler.php:267
 msgid "No matching subscriptions to fix."
 msgstr ""
 
-#: includes/class-ajax-handler.php:279
-msgid "No longer matches rule; skipped."
-msgstr ""
-
-#: includes/class-ajax-handler.php:341
+#: includes/class-ajax-handler.php:290
+#: includes/class-ajax-handler.php:308
+#: includes/class-ajax-handler.php:330
 msgid "Missing batch_id."
 msgstr ""
 
-#: includes/class-ajax-handler.php:434
+#: includes/class-ajax-handler.php:312
+msgid "That bulk run was not found."
+msgstr ""
+
+#: includes/class-ajax-handler.php:423
 msgid "Enter a valid email address."
 msgstr ""
 
@@ -851,15 +899,23 @@ msgstr ""
 msgid "Rule \"%s\" is not registered; cannot revert."
 msgstr ""
 
-#: includes/journal/class-fix-journal.php:172
+#: includes/journal/class-fix-journal.php:180
+msgid "This subscription has changed since the fix was applied, so undoing it would overwrite that change. Review the differences and confirm to undo anyway."
+msgstr ""
+
+#: includes/journal/class-fix-journal.php:192
 msgid "Revert raised an error; nothing was changed."
+msgstr ""
+
+#: includes/journal/class-fix-journal.php:250
+msgid "deleted"
 msgstr ""
 
 #: includes/narrator/class-narrator.php:88
 #: includes/narrator/class-narrator.php:92
 #: includes/narrator/class-narrator.php:98
 #: includes/rules/class-rule-ghost-sub.php:311
-#: includes/rules/class-rule-manual-renewal-drift.php:335
+#: includes/rules/class-rule-manual-renewal-drift.php:328
 #: includes/rules/class-rule-mass-hold.php:245
 #: includes/rules/class-rule-on-hold-paid.php:276
 #: includes/rules/class-rule-repeated-failures.php:293
@@ -969,12 +1025,12 @@ msgid "Next payment"
 msgstr ""
 
 #: includes/rules/class-rule-ghost-sub.php:146
-#: includes/rules/class-rule-manual-renewal-drift.php:391
+#: includes/rules/class-rule-manual-renewal-drift.php:384
 msgid "- (not scheduled)"
 msgstr ""
 
 #: includes/rules/class-rule-ghost-sub.php:147
-#: includes/rules/class-rule-manual-renewal-drift.php:394
+#: includes/rules/class-rule-manual-renewal-drift.php:387
 msgid "(UTC)"
 msgstr ""
 
@@ -1058,21 +1114,21 @@ msgid "on"
 msgstr ""
 
 #. translators: 1: scheduled time, 2: AS action id
-#: includes/rules/class-rule-manual-renewal-drift.php:205
+#: includes/rules/class-rule-manual-renewal-drift.php:200
 #, php-format
 msgid "Doctor Subs: cleared the manual-renewal flag and scheduled the next renewal for %1$s (AS action #%2$d)."
 msgstr ""
 
-#: includes/rules/class-rule-manual-renewal-drift.php:317
+#: includes/rules/class-rule-manual-renewal-drift.php:310
 msgid "Doctor Subs: revert requested but the renewal payment had already executed; nothing to unschedule."
 msgstr ""
 
-#: includes/rules/class-rule-manual-renewal-drift.php:318
+#: includes/rules/class-rule-manual-renewal-drift.php:311
 msgid "Doctor Subs: reverted manual-renewal-drift fix - restored the flag and unscheduled the renewal."
 msgstr ""
 
 #. translators: %s: first name
-#: includes/rules/class-rule-manual-renewal-drift.php:340
+#: includes/rules/class-rule-manual-renewal-drift.php:333
 #, php-format
 msgid "%1$s's subscription is marked as <em>manual renewal</em>, but their Stripe card is on file and the gateway supports auto-renewals - so this is almost certainly the silent-manual-flag bug, not an intentional setting. WCS's scheduler is skipping them, no renewal will fire, and the customer will churn quietly. Clearing the flag and rescheduling restores auto-billing."
 msgstr ""

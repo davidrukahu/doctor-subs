@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Doctor Subs 2.0.0-alpha.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/doctor-subs\n"
-"POT-Creation-Date: 2026-09-05T19:23:54+00:00\n"
+"POT-Creation-Date: 2026-09-07T03:11:09+00:00\n"
 "PO-Revision-Date: 2026-04-23 07:29+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,8 +18,8 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: doctor-subs.php admin/views/partials/plugin-header.php:51
-#: includes/class-admin.php:59 includes/class-admin.php:60
-#: includes/class-admin.php:189
+#: includes/class-admin.php:68 includes/class-admin.php:69
+#: includes/class-admin.php:201
 msgid "Doctor Subs"
 msgstr "Doctor Subs"
 
@@ -45,11 +45,11 @@ msgstr "DavidR"
 msgid "https://github.com/davidrukahu"
 msgstr "https://github.com/davidrukahu"
 
-#: admin/views/dashboard.php:33
+#: admin/views/dashboard.php:36
 msgid "2 hours ago"
 msgstr "2시간 전"
 
-#: admin/views/dashboard.php:51 admin/views/dashboard.php:82
+#: admin/views/dashboard.php:54 admin/views/dashboard.php:85
 #: admin/views/fix-history.php:32 admin/views/fix-history.php:38
 #: admin/views/modal-fix-preview.php:43 admin/views/modal-fix-preview.php:68
 #: includes/rules/class-rule-catalog.php:48
@@ -57,7 +57,7 @@ msgstr "2시간 전"
 msgid "Ghost"
 msgstr "유령"
 
-#: admin/views/dashboard.php:56 admin/views/dashboard.php:87
+#: admin/views/dashboard.php:59 admin/views/dashboard.php:90
 #: admin/views/fix-history.php:34 admin/views/fix-history.php:39
 #: admin/views/modal-fix-preview.php:47 admin/views/modal-fix-preview.php:72
 #: includes/rules/class-rule-catalog.php:62
@@ -65,7 +65,7 @@ msgstr "유령"
 msgid "Stuck on-hold"
 msgstr "보류 중"
 
-#: admin/views/dashboard.php:61 admin/views/dashboard.php:92
+#: admin/views/dashboard.php:64 admin/views/dashboard.php:95
 #: admin/views/fix-history.php:35 admin/views/fix-history.php:40
 #: admin/views/modal-fix-preview.php:51 admin/views/modal-fix-preview.php:76
 #: includes/rules/class-rule-catalog.php:69
@@ -73,170 +73,195 @@ msgstr "보류 중"
 msgid "Repeated fails"
 msgstr "반복 실패"
 
-#: admin/views/dashboard.php:66 admin/views/fix-history.php:33
+#: admin/views/dashboard.php:69 admin/views/fix-history.php:33
 #: admin/views/modal-fix-preview.php:55
 #: includes/rules/class-rule-catalog.php:55
 #: includes/rules/class-rule-mass-hold.php:73
 msgid "Mass hold"
 msgstr ""
 
-#: admin/views/dashboard.php:71 admin/views/fix-history.php:36
+#: admin/views/dashboard.php:74 admin/views/fix-history.php:36
 #: admin/views/modal-fix-preview.php:59
 #: includes/rules/class-rule-catalog.php:76
 #: includes/rules/class-rule-total-drift.php:56
 msgid "Total drift"
 msgstr ""
 
-#: admin/views/dashboard.php:76 admin/views/fix-history.php:31
+#: admin/views/dashboard.php:79 admin/views/fix-history.php:31
 #: admin/views/modal-fix-preview.php:63
 #: includes/rules/class-rule-catalog.php:41
 msgid "Manual-renewal drift"
 msgstr ""
 
-#: admin/views/dashboard.php:148
+#: admin/views/dashboard.php:166
 msgid "The last scan didn&rsquo;t complete. Nothing was changed."
 msgstr "마지막 스캔이 완료되지 않았습니다. 변경된 사항이 없습니다."
 
-#: admin/views/dashboard.php:150
+#: admin/views/dashboard.php:168
 msgid "Try again"
 msgstr "다시 시도"
 
-#: admin/views/dashboard.php:153
+#: admin/views/dashboard.php:171
 msgid "View logs"
 msgstr "로그 보기"
 
 #. translators: 1: healthy sub count, 2: total scanned count
-#: admin/views/dashboard.php:168
+#: admin/views/dashboard.php:186
 #, fuzzy, php-format
 msgid "%1$s of %2$s healthy"
 msgstr "%1$s 주문 #%2$d 생성됨"
 
-#: admin/views/dashboard.php:180
+#: admin/views/dashboard.php:198
 msgid "Subscription health counts"
 msgstr "구독 상태 수"
 
-#: admin/views/dashboard.php:185 admin/views/settings.php:203
+#: admin/views/dashboard.php:203 admin/views/settings.php:203
 msgid "At risk"
 msgstr "위험"
 
-#: admin/views/dashboard.php:186 admin/views/dashboard.php:190
+#: admin/views/dashboard.php:204 admin/views/dashboard.php:208
 msgid "since last scan"
 msgstr ""
 
-#: admin/views/dashboard.php:189 admin/views/settings.php:204
+#: admin/views/dashboard.php:207 admin/views/settings.php:204
 msgid "Broken"
 msgstr "손상됨"
 
-#: admin/views/dashboard.php:225
+#: admin/views/dashboard.php:243
 msgid "All clear"
 msgstr "모두 정상"
 
-#: admin/views/dashboard.php:227
+#: admin/views/dashboard.php:245
 msgid "Everything looks good."
 msgstr "모든 것이 좋아 보입니다."
 
 #. translators: %s: relative time
-#: admin/views/dashboard.php:231
+#: admin/views/dashboard.php:249
 #, php-format
 msgid "We&rsquo;ll keep watching. Last checked %s."
 msgstr "계속 감시하겠습니다. 마지막 확인 %s."
 
-#: admin/views/dashboard.php:242
+#: admin/views/dashboard.php:260
 msgid "Needs attention"
 msgstr "주의 필요"
 
-#: admin/views/dashboard.php:246 includes/class-admin.php:115
+#: admin/views/dashboard.php:264 includes/class-admin.php:124
 msgid "showing all broken and at-risk"
 msgstr "모든 손상 및 위험 항목 표시"
 
 #. translators: %d: number of broken subs filtered
-#: admin/views/dashboard.php:250 includes/class-admin.php:118
+#: admin/views/dashboard.php:268 includes/class-admin.php:127
 #, php-format
 msgid "filtering to %d broken"
 msgid_plural "filtering to %d broken"
 msgstr[0] "%d개의 손상된 항목으로 필터링 중"
 
 #. translators: %d: number of at-risk subs filtered
-#: admin/views/dashboard.php:256 includes/class-admin.php:120
+#: admin/views/dashboard.php:274 includes/class-admin.php:129
 #, php-format
 msgid "filtering to %d at-risk"
 msgid_plural "filtering to %d at-risk"
 msgstr[0] "%d개의 위험 항목으로 필터링 중"
 
-#: admin/views/dashboard.php:265
+#: admin/views/dashboard.php:283
 msgid "clear filter"
 msgstr "필터 지우기"
 
-#: admin/views/dashboard.php:281
+#: admin/views/dashboard.php:299
 msgid "Search by sub #, customer, or email"
 msgstr ""
 
-#: admin/views/dashboard.php:282
+#: admin/views/dashboard.php:300
 #, fuzzy
 msgid "Search subscriptions"
 msgstr "내 Subscription 검사하기"
 
-#: admin/views/dashboard.php:286
+#: admin/views/dashboard.php:304
 msgid "Clear search"
 msgstr ""
 
-#: admin/views/dashboard.php:291
+#: admin/views/dashboard.php:309
 #, fuzzy
 msgid "Filter by rule"
 msgstr "규칙별 수정사항 필터"
 
-#: admin/views/dashboard.php:296
+#: admin/views/dashboard.php:314
 #, fuzzy
 msgid "All rules"
 msgstr "모두 정상"
 
-#: admin/views/dashboard.php:320
+#: admin/views/dashboard.php:338
 #, fuzzy
 msgid "Fix all"
 msgstr "수정이 적용되었습니다."
 
-#: admin/views/dashboard.php:329
+#: admin/views/dashboard.php:347
 msgid "Rule indicator"
 msgstr "규칙 표시기"
 
-#: admin/views/dashboard.php:330
+#: admin/views/dashboard.php:348
 msgid "Customer"
 msgstr "고객"
 
-#: admin/views/dashboard.php:331
+#: admin/views/dashboard.php:349
 msgid "Subscription"
 msgstr "Subscription"
 
-#: admin/views/dashboard.php:332
+#: admin/views/dashboard.php:350
 msgid "Issue"
 msgstr "문제"
 
-#: admin/views/dashboard.php:333
+#: admin/views/dashboard.php:351
 msgid "Reason"
 msgstr "이유"
 
-#: admin/views/dashboard.php:334
+#: admin/views/dashboard.php:352
 msgid "Actions"
 msgstr "작업"
 
-#: admin/views/dashboard.php:364 admin/views/fix-history.php:170
+#: admin/views/dashboard.php:382 admin/views/fix-history.php:170
 #: admin/views/modal-fix-preview.php:96
 #, fuzzy
 msgid "Open subscription in WooCommerce (new tab)"
 msgstr "한 번에 %d Subscription 수정 완료"
 
-#: admin/views/dashboard.php:399
+#: admin/views/dashboard.php:417
 msgid "Fix"
 msgstr "수정"
 
-#: admin/views/dashboard.php:407
+#: admin/views/dashboard.php:425
 msgid "No subscriptions match this filter."
 msgstr "이 필터와 일치하는 Subscription이 없습니다."
 
-#: admin/views/dashboard.php:413
+#: admin/views/dashboard.php:431
 #, fuzzy
 msgid "No subscriptions match."
 msgstr "이 필터와 일치하는 Subscription이 없습니다."
+
+#: admin/views/dashboard.php:440
+#, fuzzy
+msgid "Needs attention pages"
+msgstr "주의 필요"
+
+#. translators: 1: first row number on this page, 2: last row number, 3: total rows
+#: admin/views/dashboard.php:446
+#, fuzzy, php-format
+msgid "Showing %1$s to %2$s of %3$s"
+msgstr "- %1$s (#%2$d) - %3$s"
+
+#: admin/views/dashboard.php:457 admin/views/dashboard.php:460
+msgid "Previous"
+msgstr ""
+
+#. translators: 1: current page number, 2: total number of pages
+#: admin/views/dashboard.php:467
+#, fuzzy, php-format
+msgid "Page %1$s of %2$s"
+msgstr "%1$s 주문 #%2$d 생성됨"
+
+#: admin/views/dashboard.php:476 admin/views/dashboard.php:479
+msgid "Next"
+msgstr ""
 
 #: admin/views/first-run.php:47
 msgid "First visit"
@@ -399,7 +424,7 @@ msgstr "되돌리기에는 너무 오래됨"
 msgid "Revert all %d"
 msgstr "모두 되돌리기 %d"
 
-#: admin/views/fix-history.php:229 includes/class-admin.php:128
+#: admin/views/fix-history.php:229 includes/class-admin.php:137
 msgid "Revert"
 msgstr "되돌리기"
 
@@ -629,7 +654,7 @@ msgstr "변경 사항 저장"
 msgid "Discard"
 msgstr "취소"
 
-#: admin/views/settings.php:248 includes/class-admin.php:137
+#: admin/views/settings.php:248 includes/class-admin.php:149
 msgid "Saved."
 msgstr "저장되었습니다."
 
@@ -694,44 +719,55 @@ msgstr "(이름 없음)"
 msgid "Issue detected"
 msgstr "문제 감지됨"
 
+#. translators: %s: rule id
+#: includes/bulk/class-bulk-runner.php:152
+#, fuzzy, php-format
+msgid "Rule \"%s\" is no longer registered; the run was stopped."
+msgstr "규칙 \"%s\"는 등록되어 있지 않아 되돌릴 수 없습니다."
+
+#: includes/bulk/class-bulk-runner.php:189
+#, fuzzy
+msgid "No longer matches the rule; skipped."
+msgstr "더 이상 규칙과 일치하지 않으므로 건너뜁니다."
+
 #. translators: %d: number of healthy subs filtered
-#: includes/class-admin.php:122
+#: includes/class-admin.php:131
 #, fuzzy, php-format
 msgid "filtering to %d healthy"
 msgstr "%d개의 위험 항목으로 필터링 중"
 
-#: includes/class-admin.php:124
+#: includes/class-admin.php:133
 msgid "Could not load the fix preview. Try again in a moment."
 msgstr "수정 미리보기를 불러올 수 없습니다. 잠시 후 다시 시도하세요."
 
-#: includes/class-admin.php:125
+#: includes/class-admin.php:134
 msgid "Applying…"
 msgstr "적용 중…"
 
-#: includes/class-admin.php:126
+#: includes/class-admin.php:135
 msgid "Something went wrong - nothing was changed."
 msgstr "문제가 발생했습니다 - 변경된 내용이 없습니다."
 
-#: includes/class-admin.php:127
+#: includes/class-admin.php:136
 msgid "Reverting…"
 msgstr "되돌리는 중…"
 
-#: includes/class-admin.php:129
+#: includes/class-admin.php:138
 msgid "Revert this fix?"
 msgstr ""
 
-#: includes/class-admin.php:130
+#: includes/class-admin.php:139
 #, fuzzy
 msgid "The subscription will return to its previous state."
 msgstr "이 수정을 되돌리시겠습니까? Subscription이 이전 상태로 돌아갑니다."
 
-#: includes/class-admin.php:131
+#: includes/class-admin.php:140
 msgid ""
 "The renewal payment for this fix has already gone through. Reverting will "
 "undo the status change."
 msgstr ""
 
-#: includes/class-admin.php:132
+#: includes/class-admin.php:141
 #, fuzzy
 msgid ""
 "This will NOT refund the customer. If a refund is needed, handle it in the "
@@ -741,97 +777,108 @@ msgstr ""
 "것이 아니며, 단지 수정 기록에서만 제거됩니다. 환불이 필요하면 WooCommerce 주"
 "문에서 직접 처리하세요."
 
-#: includes/class-admin.php:133
+#: includes/class-admin.php:142
 msgid "Revert this batch?"
 msgstr ""
 
 #. translators: %d: number of subscriptions in the batch
-#: includes/class-admin.php:135
+#: includes/class-admin.php:144
 #, php-format
 msgid ""
 "All %d subscriptions in this batch will return to their previous state. They "
 "are reverted newest first."
 msgstr ""
 
-#: includes/class-admin.php:136
+#: includes/class-admin.php:145
+#, fuzzy
+msgid "Starting…"
+msgstr "저장 중…"
+
+#. translators: 1: number of subscriptions fixed so far, 2: total in the run
+#: includes/class-admin.php:147
+#, fuzzy, php-format
+msgid "Fixed %1$s of %2$s"
+msgstr "%1$s 주문 #%2$d 생성됨"
+
+#: includes/class-admin.php:148
 msgid "Saving…"
 msgstr "저장 중…"
 
-#: includes/class-admin.php:138
+#: includes/class-admin.php:150
 msgid "Could not save. Check your connection and try again."
 msgstr "저장할 수 없습니다. 연결 상태를 확인하고 다시 시도하세요."
 
-#: includes/class-admin.php:139
+#: includes/class-admin.php:151
 #, fuzzy
 msgid "Scanning…"
 msgstr "스캔 중"
 
-#: includes/class-admin.php:140
+#: includes/class-admin.php:152
 #, fuzzy
 msgid "Refreshing…"
 msgstr "되돌리는 중…"
 
-#: includes/class-admin.php:141
+#: includes/class-admin.php:153
 #, fuzzy
 msgid "Scan failed. Check your connection and try again."
 msgstr "저장할 수 없습니다. 연결 상태를 확인하고 다시 시도하세요."
 
-#: includes/class-admin.php:158
+#: includes/class-admin.php:170
 msgid "Open"
 msgstr "열기"
 
-#: includes/class-admin.php:310 includes/class-ajax-handler.php:456
+#: includes/class-admin.php:330 includes/class-ajax-handler.php:445
 msgid "You do not have permission to do this."
 msgstr "이 작업을 수행할 권한이 없습니다."
 
-#: includes/class-admin.php:636
+#: includes/class-admin.php:770
 msgid "never"
 msgstr "절대 없음"
 
-#: includes/class-admin.php:686
+#: includes/class-admin.php:820
 msgid "just now"
 msgstr "방금 전"
 
 #. translators: %d: minutes
-#: includes/class-admin.php:691
+#: includes/class-admin.php:825
 #, php-format
 msgid "%d minute ago"
 msgid_plural "%d minutes ago"
 msgstr[0] "%d분 전"
 
 #. translators: %d: hours
-#: includes/class-admin.php:696
+#: includes/class-admin.php:830
 #, php-format
 msgid "%d hour ago"
 msgid_plural "%d hours ago"
 msgstr[0] "%d 시간 전"
 
 #. translators: %d: days
-#: includes/class-admin.php:701
+#: includes/class-admin.php:835
 #, php-format
 msgid "%d day ago"
 msgid_plural "%d days ago"
 msgstr[0] "%d 일 전"
 
-#: includes/class-admin.php:703
+#: includes/class-admin.php:837
 msgid "M j"
 msgstr "M j"
 
 #. translators: %d: subscription ID
-#: includes/class-admin.php:749
+#: includes/class-admin.php:883
 #, fuzzy, php-format
 msgid "Customer #%d"
 msgstr "고객"
 
-#: includes/class-ajax-handler.php:75 includes/class-ajax-handler.php:125
+#: includes/class-ajax-handler.php:77 includes/class-ajax-handler.php:127
 msgid "Invalid subscription ID."
 msgstr "유효하지 않은 Subscription ID입니다."
 
-#: includes/class-ajax-handler.php:81
+#: includes/class-ajax-handler.php:83
 msgid "No matching rule found for this subscription."
 msgstr "이 Subscription에 일치하는 규칙이 없습니다."
 
-#: includes/class-ajax-handler.php:89
+#: includes/class-ajax-handler.php:91
 msgid ""
 "This subscription no longer matches the rule (state changed since scan). Re-"
 "scan and try again."
@@ -839,43 +886,44 @@ msgstr ""
 "이 Subscription은 더 이상 규칙과 일치하지 않습니다(스캔 이후 상태 변경됨). 다"
 "시 스캔하고 다시 시도하세요."
 
-#: includes/class-ajax-handler.php:131
+#: includes/class-ajax-handler.php:133
 msgid "No matching rule for this subscription."
 msgstr "이 Subscription에 일치하는 규칙이 없습니다."
 
-#: includes/class-ajax-handler.php:139
+#: includes/class-ajax-handler.php:141
 msgid "State changed since scan. Re-scan and try again."
 msgstr "스캔 이후 상태가 변경되었습니다. 다시 스캔하고 다시 시도하세요."
 
-#: includes/class-ajax-handler.php:180
+#: includes/class-ajax-handler.php:182
 msgid "Fix applied."
 msgstr "수정이 적용되었습니다."
 
-#: includes/class-ajax-handler.php:194
+#: includes/class-ajax-handler.php:196
 msgid "Invalid journal entry."
 msgstr "유효하지 않은 저널 항목입니다."
 
-#: includes/class-ajax-handler.php:240
+#: includes/class-ajax-handler.php:242
 msgid "Missing rule_id."
 msgstr "rule_id가 누락되었습니다."
 
-#: includes/class-ajax-handler.php:246
+#: includes/class-ajax-handler.php:248
 msgid "Unknown rule."
 msgstr "알 수 없는 규칙입니다."
 
-#: includes/class-ajax-handler.php:261
+#: includes/class-ajax-handler.php:267
 msgid "No matching subscriptions to fix."
 msgstr "수정할 일치하는 Subscriptions가 없습니다."
 
-#: includes/class-ajax-handler.php:279
-msgid "No longer matches rule; skipped."
-msgstr "더 이상 규칙과 일치하지 않으므로 건너뜁니다."
-
-#: includes/class-ajax-handler.php:341
+#: includes/class-ajax-handler.php:290 includes/class-ajax-handler.php:308
+#: includes/class-ajax-handler.php:330
 msgid "Missing batch_id."
 msgstr "batch_id가 누락되었습니다."
 
-#: includes/class-ajax-handler.php:434
+#: includes/class-ajax-handler.php:312
+msgid "That bulk run was not found."
+msgstr ""
+
+#: includes/class-ajax-handler.php:423
 msgid "Enter a valid email address."
 msgstr "유효한 이메일 주소를 입력하세요."
 
@@ -893,15 +941,25 @@ msgstr "이미 되돌려졌습니다."
 msgid "Rule \"%s\" is not registered; cannot revert."
 msgstr "규칙 \"%s\"는 등록되어 있지 않아 되돌릴 수 없습니다."
 
-#: includes/journal/class-fix-journal.php:172
+#: includes/journal/class-fix-journal.php:180
+msgid ""
+"This subscription has changed since the fix was applied, so undoing it would "
+"overwrite that change. Review the differences and confirm to undo anyway."
+msgstr ""
+
+#: includes/journal/class-fix-journal.php:192
 msgid "Revert raised an error; nothing was changed."
 msgstr "되돌리기 중 오류가 발생했습니다; 변경된 사항이 없습니다."
+
+#: includes/journal/class-fix-journal.php:250
+msgid "deleted"
+msgstr ""
 
 #: includes/narrator/class-narrator.php:88
 #: includes/narrator/class-narrator.php:92
 #: includes/narrator/class-narrator.php:98
 #: includes/rules/class-rule-ghost-sub.php:311
-#: includes/rules/class-rule-manual-renewal-drift.php:335
+#: includes/rules/class-rule-manual-renewal-drift.php:328
 #: includes/rules/class-rule-mass-hold.php:245
 #: includes/rules/class-rule-on-hold-paid.php:276
 #: includes/rules/class-rule-repeated-failures.php:293
@@ -1060,13 +1118,13 @@ msgid "Next payment"
 msgstr "다음 결제"
 
 #: includes/rules/class-rule-ghost-sub.php:146
-#: includes/rules/class-rule-manual-renewal-drift.php:391
+#: includes/rules/class-rule-manual-renewal-drift.php:384
 #, fuzzy
 msgid "- (not scheduled)"
 msgstr "— (예정 없음)"
 
 #: includes/rules/class-rule-ghost-sub.php:147
-#: includes/rules/class-rule-manual-renewal-drift.php:394
+#: includes/rules/class-rule-manual-renewal-drift.php:387
 msgid "(UTC)"
 msgstr "(UTC)"
 
@@ -1177,27 +1235,27 @@ msgid "on"
 msgstr ""
 
 #. translators: 1: scheduled time, 2: AS action id
-#: includes/rules/class-rule-manual-renewal-drift.php:205
+#: includes/rules/class-rule-manual-renewal-drift.php:200
 #, php-format
 msgid ""
 "Doctor Subs: cleared the manual-renewal flag and scheduled the next renewal "
 "for %1$s (AS action #%2$d)."
 msgstr ""
 
-#: includes/rules/class-rule-manual-renewal-drift.php:317
+#: includes/rules/class-rule-manual-renewal-drift.php:310
 msgid ""
 "Doctor Subs: revert requested but the renewal payment had already executed; "
 "nothing to unschedule."
 msgstr ""
 
-#: includes/rules/class-rule-manual-renewal-drift.php:318
+#: includes/rules/class-rule-manual-renewal-drift.php:311
 msgid ""
 "Doctor Subs: reverted manual-renewal-drift fix - restored the flag and "
 "unscheduled the renewal."
 msgstr ""
 
 #. translators: %s: first name
-#: includes/rules/class-rule-manual-renewal-drift.php:340
+#: includes/rules/class-rule-manual-renewal-drift.php:333
 #, php-format
 msgid ""
 "%1$s's subscription is marked as <em>manual renewal</em>, but their Stripe "
